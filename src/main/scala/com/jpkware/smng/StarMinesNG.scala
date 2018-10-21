@@ -84,6 +84,8 @@ class StarMinesNG(parent: Element, options: Map[String,String]) {
     cursors = game.input.keyboard.createCursorKeys()
     fireButton = game.input.keyboard.addKey(Keyboard.SPACEBAR)
 
+    Explosion.initGroups(game, Seq(Explosion.LargeExploCount, Explosion.SmallExploCount))
+
     scorebox = game.add.sprite(game.width/2,game.height/2, "scorebox")
     scorebox.anchor.set(0.5,0.5)
     game.physics.enable(scorebox)
@@ -94,14 +96,11 @@ class StarMinesNG(parent: Element, options: Map[String,String]) {
     }, null, 1)
 
     game.add.bitmapText(game.width/2,game.height/2-40, "font", "StarMines", 48).anchor.set(0.5,0.5)
-    game.add.bitmapText(game.width/2,game.height/2-20, "font", "The Next Generation", 18).anchor.set(0.5,0.5)
+    game.add.bitmapText(game.width/2,game.height/2-20, "font", "THE NEXT GENERATION", 16).anchor.set(0.5,0.5)
     game.add.bitmapText(game.width/2-140,game.height/2+10, "font", "Score:", 24)
     scoreText = game.add.bitmapText(game.width/2-48,game.height/2+10, "font", "", 24)
     score = 0
     updateScore(0)
-
-    Explosion.initGroups(game, Seq(Explosion.LargeExploCount, Explosion.SmallExploCount))
-
     fpsText = game.add.bitmapText(5,5, "font", "", 18)
 
     spawnMines()
