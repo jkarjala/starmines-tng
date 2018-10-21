@@ -1,0 +1,31 @@
+body {
+    background-color: "#000020";
+}
+p {
+    padding: "10px";
+    color: white;
+    font-family: "Arial"
+}
+
+game {
+    padding: "10px"
+}
+ /* unvisited link */
+a:link {
+    color: aqua;
+}
+
+/* visited link */
+a:visited {
+    color: aqua;
+}
+
+/* mouse over link */
+a:hover {
+    color: white;
+}
+
+/* selected link */
+a:active {
+    color: blue;
+}
