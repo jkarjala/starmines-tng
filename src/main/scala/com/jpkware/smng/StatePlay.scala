@@ -227,7 +227,7 @@ class StatePlay(game: Game, options: Map[String,String], status: Element) {
 
     if (thrust) player.thrust() else player.brake()
 
-    if (fireButton.isDown || k.isDown('M') || fire) {
+    if (fireButton.isDown || k.isDown('M') || k.isDown(0x0D) || fire) {
       if (player.fire()!=null) sfxZap.play()
     }
   }

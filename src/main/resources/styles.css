@@ -2,14 +2,20 @@ body {
     background-color: "#000020";
 }
 p {
-    padding: "10px";
+    text-align: center;
     color: white;
     font-family: "Arial"
 }
 
-game {
-    padding: "10px"
+#container {
+    text-align: center;
 }
+
+#game {
+    display: inline-block;
+    padding: 4px;
+}
+
  /* unvisited link */
 a:link {
     color: aqua;
