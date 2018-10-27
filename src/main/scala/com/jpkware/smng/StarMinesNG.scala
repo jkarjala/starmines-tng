@@ -24,7 +24,7 @@ object StarMinesNG {
       }).toMap
     }
     val mode = if (options.contains("webgl")) Phaser.WEBGL else Phaser.CANVAS
-    val game = new Game(960, 540, mode, parent)
+    val game = new Game(1920, 1080, mode, parent)
     game.state.add("boot", new StateBoot(game, options).state)
     game.state.add("preloader", new StatePreload(game, options).state)
     game.state.add("play", new StatePlay(game, options, status).state)

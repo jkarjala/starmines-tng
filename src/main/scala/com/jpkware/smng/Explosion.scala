@@ -13,11 +13,11 @@ class ExplosionItem(game: Game, x: Double, y: Double) extends Image(game, x,y, "
 
   override def reset(x: Double, y: Double, health: Double = 1): Image = {
     super.reset(x, y, health)
-    val spd : Double = Random.nextDouble() * 5
+    val spd : Double = Random.nextDouble() * 8
     val theta: Double = Random.nextDouble() * 2 * scala.math.Pi
     vx = spd * scala.math.cos(theta)
     vy = spd * scala.math.sin(theta)
-    scale.set(0.25,0.25)
+    scale.set(0.5,0.5)
     this
   }
 }
@@ -57,7 +57,7 @@ class Explosion(game: Game, count:Int) extends SpriteBatch(game, null,null, fals
       child.vy *= 0.97
       val ratio = child.lifespan/lifespan
       child.alpha = ratio
-      child.scale.set(0.25*ratio, 0.25*ratio)
+      child.scale.set(0.4*ratio, 0.4*ratio)
     }, null)
     if (countLiving()==0) {
       alive = false

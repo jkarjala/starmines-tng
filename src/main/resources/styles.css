@@ -9,11 +9,12 @@ p {
 
 #container {
     text-align: center;
-}
+    width: 98vw;
+    margin: 0 auto;
+}}
 
 #game {
     display: inline-block;
-    padding: 4px;
 }
 
  /* unvisited link */

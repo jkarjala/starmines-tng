@@ -10,12 +10,12 @@ class StateBoot(game: Game, options: Map[String,String]) {
   def init(): Unit = {
     game.time.advancedTiming = true
     game.scale.fullScreenScaleMode = ScaleManager.SHOW_ALL
+    game.scale.scaleMode = ScaleManager.SHOW_ALL
   }
 
   def preload(): Unit = {
-    game.load.image("preloaderBackground", "res/space1.jpg")
     game.load.image("preloaderBar", "res/flame.png")
-    game.load.image("ship128", "res/ship128.png")
+    game.load.image("ship-preload", "res/ship-preload.png")
   }
 
   def create(): Unit = {

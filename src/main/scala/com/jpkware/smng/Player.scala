@@ -16,7 +16,7 @@ class Player(game: Game, x: Double, y: Double)
   weapon.bulletLifespan = 1000
   weapon.bulletCollideWorldBounds = true
   weapon.bulletRotateToVelocity = true
-  weapon.bulletSpeed = 600
+  weapon.bulletSpeed = 900
   weapon.bulletInheritSpriteSpeed = true
   weapon.fireRate = 300
   weapon.autofire = false

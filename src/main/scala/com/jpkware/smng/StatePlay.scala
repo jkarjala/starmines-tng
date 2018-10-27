@@ -41,7 +41,8 @@ class StatePlay(game: Game, options: Map[String,String], status: Element) {
       if (!game.device.iOS) status.innerHTML += " - tap scorebox to toggle full-screen"
     }
 
-    game.add.sprite(0,0,"space")
+    val space = game.add.sprite(0,0,"space")
+    space.scale.set(2,2)
 
     if (options.contains("touch") || !game.device.desktop) addTouchButtons()
 
@@ -63,10 +64,10 @@ class StatePlay(game: Game, options: Map[String,String], status: Element) {
       if (game.scale.isFullScreen) game.scale.stopFullScreen() else game.scale.startFullScreen()
     }, null, 1)
 
-    game.add.bitmapText(game.width/2,game.height/2-40, "font", "StarMines", 48).anchor.set(0.5,0.5)
-    game.add.bitmapText(game.width/2,game.height/2-20, "font", "THE NEXT GENERATION", 16).anchor.set(0.5,0.5)
-    game.add.bitmapText(game.width/2-140,game.height/2+10, "font", "Score:", 24)
-    scoreText = game.add.bitmapText(game.width/2-48,game.height/2+10, "font", "", 24)
+    game.add.bitmapText(game.width/2,game.height/2-80, "font", "StarMines", 96).anchor.set(0.5,0.5)
+    game.add.bitmapText(game.width/2,game.height/2-48, "font", "THE NEXT GENERATION", 32).anchor.set(0.5,0.5)
+    game.add.bitmapText(game.width/2-280,game.height/2+20, "font", "Score:", 48)
+    scoreText = game.add.bitmapText(game.width/2-96,game.height/2+20, "font", "", 48)
     score = 0
     updateScore(0)
     fpsText = game.add.bitmapText(5,5, "font", "", 18)
@@ -96,24 +97,24 @@ class StatePlay(game: Game, options: Map[String,String], status: Element) {
   def addTouchButtons(): Unit = {
     game.input.addPointer() // 3rd
     game.input.addPointer() // 4th
-
-    val buttonY = game.height - 128
-    addTouchButton(10, buttonY, () => {
+    val dpr = 2
+    val buttonY = game.height - 128*dpr
+    addTouchButton(10*dpr, buttonY, () => {
       rotateLeft = true
     }, () => {
       rotateStop = true
     })
-    addTouchButton(150, buttonY, () => {
+    addTouchButton(150*dpr, buttonY, () => {
       rotateRight = true
     }, () => {
       rotateStop = true
     })
-    addTouchButton(game.width - 138, buttonY, () => {
+    addTouchButton(game.width - 138*dpr, buttonY, () => {
       fire = true
     }, () => {
       fire = false
     })
-    addTouchButton(game.width - 278, buttonY, () => {
+    addTouchButton(game.width - 278*dpr, buttonY, () => {
       thrust = true
     }, () => {
       thrust = false
@@ -123,6 +124,7 @@ class StatePlay(game: Game, options: Map[String,String], status: Element) {
   def addTouchButton(x: Double, y: Double, down: () => Unit, up: () => Unit): Button = {
     val button = game.add.button(x, y, "button", null, null, 0, 1, 0, 1)
     button.fixedToCamera = true
+    button.scale.set(2,2)
     button.events.onInputOver.add(down, null, 1)
     button.events.onInputOut.add(up, null, 1)
     button.events.onInputDown.add(down, null, 1)
@@ -154,6 +156,7 @@ class StatePlay(game: Game, options: Map[String,String], status: Element) {
     val x = StarMinesNG.rnd.nextFloat()*game.world.width
     val y = StarMinesNG.rnd.nextFloat()*game.world.height
     val sbb: Rectangle = scorebox.getBounds().asInstanceOf[Rectangle]
+
     // XXX the bounds are in local space if the sprite is not yet in world, transform manually
     if (sbb.x<0) {
       sbb.x += scorebox.position.x
