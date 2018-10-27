@@ -5,6 +5,7 @@ import com.definitelyscala.phaser._
 import org.scalajs.dom
 import org.scalajs.dom.raw.Element
 
+import scala.scalajs.js
 import scala.util.Random
 
 
@@ -27,7 +28,9 @@ object StarMinesNG {
     val game = new Game(1920, 1080, mode, parent)
     game.state.add("boot", new StateBoot(game, options).state)
     game.state.add("preloader", new StatePreload(game, options).state)
+    game.state.add("menu", new StateMenu(game, options, status).state)
     game.state.add("play", new StatePlay(game, options, status).state)
-    game.state.start("boot", clearWorld = true, clearCache = false)
+    game.state.add("gameover", new StateGameOver(game, options, status).state)
+    game.state.start("boot", args = js.Array[String](), clearWorld = true, clearCache = false)
   }
 }

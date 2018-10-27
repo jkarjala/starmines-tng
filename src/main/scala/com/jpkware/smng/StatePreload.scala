@@ -1,16 +1,18 @@
 package com.jpkware.smng
 
-import com.definitelyscala.phaser.{Game, Sprite}
+import com.definitelyscala.phaser.{Game, Sprite, State}
+
+import scala.scalajs.js
 
 class StatePreload(game: Game, options: Map[String,String]) {
 
-  val state: State = State(preload, create, update)
+  val state: State = PhaserState(preload, create, update)
 
   var preloadBar: Sprite = _
-
+  var ship: Sprite = _
   def preload(): Unit = {
 
-    val ship = game.add.sprite(game.width / 2, game.height / 2, "ship-preload")
+    ship = game.add.sprite(game.width / 2, game.height / 2, "ship-preload")
     ship.anchor.set(1, 0.5)
     preloadBar = game.add.sprite(game.width / 2 - 16, game.height / 2, "preloaderBar")
     preloadBar.angle = 180
@@ -31,7 +33,9 @@ class StatePreload(game: Game, options: Map[String,String]) {
   }
 
   def create(): Unit = {
-    game.state.start("play", args = null, clearCache = false, clearWorld = false)
+    game.state.start("menu", args = js.Array[String](), clearCache = false, clearWorld = false)
+    ship.destroy(true)
+    preloadBar.destroy(true)
   }
 
   def update(): Unit = {

@@ -2,12 +2,14 @@ package com.jpkware.smng
 
 import com.definitelyscala.phaser.{Game, _}
 
+import scala.scalajs.js
+
 
 class StateBoot(game: Game, options: Map[String,String]) {
 
-  val state: State = State(init, preload, create, () => {}, () => {})
+  val state: State = PhaserState(init, preload, create, () => {}, () => {})
 
-  def init(): Unit = {
+  def init(args: js.Array[String]): Unit = {
     game.time.advancedTiming = true
     game.scale.fullScreenScaleMode = ScaleManager.SHOW_ALL
     game.scale.scaleMode = ScaleManager.SHOW_ALL
@@ -19,6 +21,6 @@ class StateBoot(game: Game, options: Map[String,String]) {
   }
 
   def create(): Unit = {
-    game.state.start("preloader", args = null, clearCache = false, clearWorld = false)
+    game.state.start("preloader", args = js.Array[String](), clearCache = false, clearWorld = false)
   }
 }

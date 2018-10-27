@@ -37,7 +37,9 @@ class Player(game: Game, x: Double, y: Double)
   def rotateStop(): Unit = setRotationSpeed(0)
 
   def thrust(): Unit = {
-    game.physics.arcade.accelerationFromRotation(indexRotation, 250, physBody.acceleration)
+    if (!this.visible) return
+
+    game.physics.arcade.accelerationFromRotation(indexRotation, 500, physBody.acceleration)
     flame.rotation = indexRotation
     flame.position = headPoint(-fullWidth/6)
     flame.scale.set(flameScale, flameScale)
@@ -60,11 +62,18 @@ class Player(game: Game, x: Double, y: Double)
   }
 
   def fire(): Bullet = {
+    if (!this.visible) return null
     weapon.fireAngle = indexAngle
     weapon.fire(headPoint(fullWidth/2))
   }
 
   def setBounce(bullet: Bullet): Unit = {
     bullet.body match { case body: Body => body.bounce.set(1,1) }
+  }
+
+  def death(): Unit = {
+    stop()
+    flame.kill()
+    kill()
   }
 }
