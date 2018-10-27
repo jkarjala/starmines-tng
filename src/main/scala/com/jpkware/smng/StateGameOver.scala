@@ -17,7 +17,7 @@ class StateGameOver(game: Game, options: Map[String,String], status: Element) {
 
   def create(): Unit = {
 
-    game.add.bitmapText(game.width/2,game.height/2-200, "font", "Game Over", 128).anchor.set(0.5,0.5)
+    game.add.bitmapText(game.width/2,300, "font", "Game Over", 128).anchor.set(0.5,0.5)
 
     val button = PhaserButton.add(game, game.width/2,game.height-200, "Menu")
     button.events.onInputUp.add(toMenu _, null, 1)

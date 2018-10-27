@@ -14,7 +14,7 @@ class StatePreload(game: Game, options: Map[String,String]) {
 
     ship = game.add.sprite(game.width / 2, game.height / 2, "ship-preload")
     ship.anchor.set(1, 0.5)
-    preloadBar = game.add.sprite(game.width / 2 - 16, game.height / 2, "preloaderBar")
+    preloadBar = game.add.sprite(game.width / 2 - 12, game.height / 2, "preloaderBar")
     preloadBar.angle = 180
     preloadBar.anchor.set(1, 0.5)
     game.load.setPreloadSprite(preloadBar)

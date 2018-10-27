@@ -55,6 +55,7 @@ class StatePlay(game: Game, options: Map[String,String], status: Element) {
     val space = game.add.sprite(0,0,"space")
     space.scale.set(2,2)
 
+    touchButtons = game.add.group()
     if (options.contains("touch") || !game.device.desktop) addTouchButtons()
 
     game.physics.startSystem(PhysicsObj.ARCADE)
@@ -110,7 +111,6 @@ class StatePlay(game: Game, options: Map[String,String], status: Element) {
   }
 
   def addTouchButtons(): Unit = {
-    touchButtons = game.add.group()
     game.input.addPointer() // 3rd
     game.input.addPointer() // 4th
     val radius = 128
@@ -138,12 +138,11 @@ class StatePlay(game: Game, options: Map[String,String], status: Element) {
   }
 
   def addTouchButton(x: Double, y: Double, text: String, down: () => Unit, up: () => Unit): Button = {
-    val button = PhaserButton.add(game, x, y, text, 0.2)
+    val button = PhaserButton.add(game, x, y, text, 0.2, touchButtons)
     button.events.onInputOver.add(down, null, 1)
     button.events.onInputOut.add(up, null, 1)
     button.events.onInputDown.add(down, null, 1)
     button.events.onInputUp.add(up, null, 1)
-    touchButtons.add(button)
     button
   }
 
@@ -216,35 +215,35 @@ class StatePlay(game: Game, options: Map[String,String], status: Element) {
     else {
       Explosion(game, Explosion.LargeExploCount).explode(player, 2000)
       sfxExplo.play()
-      addToScore(-1000)
       enemy.kill()
-      reviveMine()
-      reviveMine()
       player.death()
       val timer = game.time.create(true)
       timer.add(2000, () => {
         shield = true
-        player.revive(1)
-        player.alpha = 0.5
+        updateLives(lives - 1)
+        if (lives==0) handleGameOver()
+        else {
+          player.revive(1)
+          player.alpha = 0.5
+        }
       }, null)
       timer.add(3000, () => {
         shield = false
         player.alpha = 1.0
       }, null)
       timer.start(0)
-      updateLives(lives - 1)
     }
   }
 
   def updateLives(lives: Int): Unit = {
     this.lives = lives
     livesText.setText(f"$lives%d")
-    if (lives==0) handleGameOver()
   }
 
   def handleGameOver(): Unit = {
     gameOver = true
     touchButtons.destroy()
+    mines.destroy()
     game.state.start("gameover", args = js.Array[String]("gameover"), clearCache = false, clearWorld = false)
   }
 
