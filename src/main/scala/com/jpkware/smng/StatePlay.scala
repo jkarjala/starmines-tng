@@ -12,23 +12,13 @@ class StatePlay(game: Game, options: Map[String,String], status: Element) extend
   var player: Player = _
   var scorebox: Sprite = _
   var mines: Group = _
-  var touchButtons: Group = _
-  var sfxZap: Sound = _
-  var sfxExplo: Sound = _
-  var sfxTinyexp: Sound = _
   var cursors: CursorKeys = _
   var scoreText: BitmapText = _
   var score: Int = _
   var livesText: BitmapText = _
   var lives: Int = _
   var fpsText: BitmapText = _
-  var shield: Boolean = _
-
-  var rotateRight = false
-  var rotateLeft = false
-  var rotateStop = false
-  var thrust = false
-  var fire = false
+  var touch: TouchControls = _
   var gameOver = false
 
   private val mineCount = options.getOrElse("mines", "10").toInt
@@ -40,12 +30,6 @@ class StatePlay(game: Game, options: Map[String,String], status: Element) extend
     }
     score = 0
     lives = 5
-    shield = false
-    rotateRight = false
-    rotateLeft = false
-    rotateStop = false
-    thrust = false
-    fire = false
     gameOver = false
   }
 
@@ -56,8 +40,8 @@ class StatePlay(game: Game, options: Map[String,String], status: Element) extend
     val space = game.add.sprite(0,0,"space")
     space.scale.set(2,2)
 
-    touchButtons = game.add.group()
-    if (options.contains("touch") || !game.device.desktop) addTouchButtons()
+    touch = new TouchControls(game)
+    if (options.contains("touch") || !game.device.desktop) touch.enable()
 
     game.physics.startSystem(PhysicsObj.ARCADE)
 
@@ -89,13 +73,6 @@ class StatePlay(game: Game, options: Map[String,String], status: Element) extend
     fpsText = game.add.bitmapText(5,5, "font", "", 18)
 
     spawnMines()
-
-    sfxZap = game.add.audio("sfx:zap")
-    sfxZap.allowMultiple = true
-    sfxExplo = game.add.audio("sfx:explo")
-    sfxZap.allowMultiple = true
-    sfxTinyexp = game.add.audio("sfx:tinyexp")
-    sfxTinyexp.allowMultiple = true
   }
 
   override def update(): Unit = {
@@ -109,42 +86,6 @@ class StatePlay(game: Game, options: Map[String,String], status: Element) extend
     // game.debug.bodyInfo(player, 32, 32)
     // game.debug.body(player)
     // game.debug.pointer(game.input.mousePointer)
-  }
-
-  def addTouchButtons(): Unit = {
-    game.input.addPointer() // 3rd
-    game.input.addPointer() // 4th
-    val radius = 128
-    val buttonY = game.height - radius
-    addTouchButton(radius, buttonY, "CCW", () => {
-      rotateLeft = true
-    }, () => {
-      rotateStop = true
-    })
-    addTouchButton(radius*3, buttonY, "CW", () => {
-      rotateRight = true
-    }, () => {
-      rotateStop = true
-    })
-    addTouchButton(game.width - radius, buttonY, "Fire", () => {
-      fire = true
-    }, () => {
-      fire = false
-    })
-    addTouchButton(game.width - radius*4 + radius, buttonY, "Thrust", () => {
-      thrust = true
-    }, () => {
-      thrust = false
-    })
-  }
-
-  def addTouchButton(x: Double, y: Double, text: String, down: () => Unit, up: () => Unit): Button = {
-    val button = PhaserButton.add(game, x, y, text, 0.2, touchButtons)
-    button.events.onInputOver.add(down, null, 1)
-    button.events.onInputOut.add(up, null, 1)
-    button.events.onInputDown.add(down, null, 1)
-    button.events.onInputUp.add(up, null, 1)
-    button
   }
 
   def spawnMines(): Unit = {
@@ -199,38 +140,26 @@ class StatePlay(game: Game, options: Map[String,String], status: Element) extend
   }
 
   def bulletVsEnemy(bullet: Bullet, enemy: Sprite): Unit = {
-    Explosion(game, Explosion.SmallExploCount).explode(enemy, 500)
+    Explosion(game, Explosion.SmallExploCount).explode(enemy)
     enemy.kill()
     bullet.kill()
     addToScore(123)
-    sfxTinyexp.play()
     reviveMine()
   }
   def playerVsEnemy(player: Player, enemy: Sprite): Unit = {
-    if (shield) {
-      Explosion(game, Explosion.SmallExploCount).explode(enemy, 500)
-      sfxTinyexp.play()
+    if (player.immortal) {
+      Explosion(game, Explosion.SmallExploCount).explode(enemy)
       enemy.kill()
       reviveMine()
     }
     else {
-      Explosion(game, Explosion.LargeExploCount).explode(player, 2000)
-      sfxExplo.play()
+      Explosion(game, Explosion.LargeExploCount).explode(player)
       enemy.kill()
-      player.death()
+      player.kill()
       val timer = game.time.create(true)
       timer.add(2000, () => {
-        shield = true
         updateLives(lives - 1)
-        if (lives==0) handleGameOver()
-        else {
-          player.revive(1)
-          player.alpha = 0.5
-        }
-      }, null)
-      timer.add(3000, () => {
-        shield = false
-        player.alpha = 1.0
+        if (lives==0) handleGameOver() else player.revive()
       }, null)
       timer.start(0)
     }
@@ -243,7 +172,7 @@ class StatePlay(game: Game, options: Map[String,String], status: Element) extend
 
   def handleGameOver(): Unit = {
     gameOver = true
-    touchButtons.destroy()
+    touch.disable()
     mines.destroy()
     game.state.start("gameover", args = js.Array[String]("gameover"), clearCache = false, clearWorld = false)
   }
@@ -253,33 +182,17 @@ class StatePlay(game: Game, options: Map[String,String], status: Element) extend
     if (score<0) score = 0
     scoreText.setText(f"$score%08d")
   }
+
   def handleInput(): Unit = {
     val k = game.input.keyboard
-    if (game.device.desktop) {
-      if (cursors.left.isDown || k.isDown('Z')) rotateLeft = true
-      else if (cursors.right.isDown || k.isDown('X')) rotateRight = true
-      else if (!options.contains("touch"))
-        rotateStop = true
-    }
 
-    if (rotateRight) player.rotateRight()
-    if (rotateLeft) player.rotateLeft()
-    if (rotateStop) {
-      rotateRight = false
-      rotateLeft = false
-      rotateStop = false
-      player.rotateStop()
-    }
+    if (cursors.left.isDown || k.isDown('Z') || touch.rotateLeft) player.rotateLeft()
+    else if (cursors.right.isDown || k.isDown('X') || touch.rotateRight) player.rotateRight()
+    else player.rotateStop()
 
-    if (game.device.desktop) {
-      if (cursors.up.isDown || k.isDown('N')) thrust = true else if (!options.contains("touch")) thrust = false
-    }
+    if (cursors.up.isDown || k.isDown('N') || touch.thrust) player.thrust() else player.brake()
 
-    if (thrust) player.thrust() else player.brake()
-
-    if (PhaserKeys.isFireDown(game) || fire) {
-      if (player.fire()!=null) sfxZap.play()
-    }
+    if (PhaserKeys.isFireDown(game) || touch.fire) player.fire()
 
     if (k.isDown(27)) game.state.start("menu", args = js.Array[String]("quit"), clearCache = false, clearWorld = true)
   }

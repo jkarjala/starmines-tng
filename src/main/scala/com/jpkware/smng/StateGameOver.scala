@@ -17,17 +17,26 @@ class StateGameOver(game: Game, options: Map[String,String], status: Element) ex
 
     game.add.bitmapText(game.width/2,300, "font", "Game Over", 128).anchor.set(0.5,0.5)
 
-    val button = PhaserButton.add(game, game.width/2,game.height-200, "Menu")
-    button.events.onInputUp.add(toMenu _, null, 1)
+    val button = PhaserButton.add(game, game.width/2-150,game.height-200, "Play")
+    button.events.onInputUp.add(gotoPlay _, null, 1)
     keyDown = PhaserKeys.isFireDown(game)
+
+    val buttonMenu = PhaserButton.add(game, game.width/2+150,game.height-200, "Menu")
+    buttonMenu.events.onInputUp.add(gotoMenu _, null, 1)
+
   }
 
   override def update(): Unit = {
     if (keyDown) keyDown = !PhaserKeys.isFireDown(game)
-    if (!keyDown && PhaserKeys.isFireDown(game)) toMenu()
+    if (!keyDown && PhaserKeys.isFireDown(game)) gotoPlay()
+    if (game.input.keyboard.isDown(27)) gotoMenu()
   }
 
-  def toMenu(): Unit = {
-    game.state.start("menu", args = js.Array[String]("gameover"), clearCache = false, clearWorld = true)
+  def gotoMenu(): Unit = {
+    game.state.start("menu", args = "gameover", clearCache = false, clearWorld = true)
   }
+  def gotoPlay(): Unit = {
+    game.state.start("play", args = "restart", clearCache = false, clearWorld = true)
+  }
+
 }

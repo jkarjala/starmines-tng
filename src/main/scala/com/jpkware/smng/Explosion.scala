@@ -34,7 +34,12 @@ class Explosion(game: Game, count:Int) extends SpriteBatch(game, null,null, fals
   alive = false
   exists = false
 
-  def explode(sprite: Sprite, lifespan: Double): Unit = {
+  val sfxExplo: Sound = game.add.audio("sfx:explo")
+  sfxExplo.allowMultiple = true
+  val sfxTinyexp: Sound = game.add.audio("sfx:tinyexp")
+  sfxTinyexp.allowMultiple = true
+
+  def explode(sprite: Sprite, lifespan: Double = 10*count): Unit = {
     alive = true
     exists = true
     this.lifespan = lifespan
@@ -45,6 +50,7 @@ class Explosion(game: Game, count:Int) extends SpriteBatch(game, null,null, fals
         i.reset(sx,sy)
         i.lifespan = lifespan
     }
+    if (lifespan<1000) sfxTinyexp.play() else  sfxExplo.play()
   }
 
   override def update(): Unit = {

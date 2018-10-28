@@ -1,7 +1,7 @@
 package com.jpkware.smng
 
 import com.definitelyscala.phaser.Physics.Arcade.Body
-import com.definitelyscala.phaser.{Bullet, Game, Point, Weapon}
+import com.definitelyscala.phaser._
 
 class Player(game: Game, x: Double, y: Double)
   extends PreRotatedSprite(game, x,y, "sprites", "ship", 64) {
@@ -23,14 +23,18 @@ class Player(game: Game, x: Double, y: Double)
   weapon.bullets.forEach(setBounce _, null, false)
   weapon.trackSprite(this, 0,0, false)
 
-  val FlameScalaMax = fullWidth/80
-  val flame = game.add.sprite(x,y,"flame")
+  val FlameScalaMax: Double = fullWidth/80
+  val flame: Sprite = game.add.sprite(x,y,"flame")
   flame.anchor = new Point(1.0, 0.5)
   flame.visible = false
   var flameScale = 0.25
   game.physics.arcade.enable(flame)
 
-  Logger.info("Player constructed")
+  val sfxZap: Sound = game.add.audio("sfx:zap")
+  sfxZap.allowMultiple = true
+
+  var immortal: Boolean = true
+  revive()
 
   def rotateLeft(): Unit = setRotationSpeed(scala.math.Pi*2)
   def rotateRight(): Unit = setRotationSpeed(-scala.math.Pi*2)
@@ -64,16 +68,31 @@ class Player(game: Game, x: Double, y: Double)
   def fire(): Bullet = {
     if (!this.visible) return null
     weapon.fireAngle = indexAngle
-    weapon.fire(headPoint(fullWidth/2))
+    val bullet = weapon.fire(headPoint(fullWidth/2))
+    if (bullet!=null) sfxZap.play()
+    bullet
   }
 
   def setBounce(bullet: Bullet): Unit = {
     bullet.body match { case body: Body => body.bounce.set(1,1) }
   }
 
-  def death(): Unit = {
+  override def kill(): Sprite = {
     stop()
     flame.kill()
-    kill()
+    super.kill()
+  }
+
+  override def revive(health: Double = 1): Sprite = {
+    alpha = 0.5
+    immortal = true
+    val timer = game.time.create(true)
+    timer.add(1000, () => {
+      immortal = false
+      alpha = 1.0
+    }, null)
+    timer.start(0)
+
+    super.revive(health)
   }
 }
