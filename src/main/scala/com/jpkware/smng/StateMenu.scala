@@ -18,12 +18,21 @@ class StateMenu(game: Game, options: Map[String,String], status: Element) extend
     game.add.bitmapText(game.width/2,game.height/2-180, "font", "StarMines", 128).anchor.set(0.5,0.5)
     game.add.bitmapText(game.width/2,game.height/2-140, "font", "THE NEXT GENERATION", 32).anchor.set(0.5,0.5)
 
-    game.add.bitmapText(game.width/2,game.height-100, "font", help, 32).anchor.set(0.5,0.5)
+    game.add.bitmapText(game.width/2,game.height-200, "font", "Collect all Bonusoids for maximum score", 32).anchor.set(0.5,0.5)
+    game.add.bitmapText(game.width/2,game.height-150, "font", help, 32).anchor.set(0.5,0.5)
 
     game.add.bitmapText(game.width/2,game.height-50, "font", "Copyright 2018 Jari.Karjala@iki.fi", 32).anchor.set(0.5,0.5)
 
     val button = PhaserButton.add(game, game.width/2,game.height/2+40, "Play")
     button.events.onInputUp.add(startGame _, null, 1)
+
+    val button2 = PhaserButton.add(game, 80,80, "Full\nScreen\nToggle", scale=1)
+    button2.events.onInputUp.add(() => if (game.scale.isFullScreen) {
+      game.scale.stopFullScreen()
+    } else {
+      game.scale.startFullScreen()
+    }, null, 1)
+
   }
 
   override def update(): Unit = {

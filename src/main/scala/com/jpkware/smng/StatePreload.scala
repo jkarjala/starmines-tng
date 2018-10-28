@@ -2,8 +2,6 @@ package com.jpkware.smng
 
 import com.definitelyscala.phaser.{Game, Sprite, State}
 
-import scala.scalajs.js
-
 class StatePreload(game: Game, options: Map[String,String]) extends State {
 
   var preloadBar: Sprite = _
@@ -25,7 +23,10 @@ class StatePreload(game: Game, options: Map[String,String]) extends State {
     game.load.bitmapFont("font", "res/font.png", "res/font.fnt")
     game.load.spritesheet("button", "res/button.png", 128, 128)
     game.load.atlasJSONHash("sprites", s"res/mainv2.png", s"res/mainv2.json")
+    game.load.audio("sfx:levelclr", "res/levelclr.wav")
+    game.load.audio("sfx:levelend", "res/levelend.wav")
     game.load.audio("sfx:zap", "res/zap.wav")
+    game.load.audio("sfx:swip", "res/swip.wav")
     game.load.audio("sfx:explo", "res/explo.wav")
     game.load.audio("sfx:tinyexp", "res/tinyexp.wav")
   }

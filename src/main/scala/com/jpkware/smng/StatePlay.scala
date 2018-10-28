@@ -12,24 +12,42 @@ class StatePlay(game: Game, options: Map[String,String], status: Element) extend
   var player: Player = _
   var scorebox: Sprite = _
   var mines: Group = _
+  var bonusManager: BonusManager = _
   var cursors: CursorKeys = _
   var scoreText: BitmapText = _
   var score: Int = _
   var livesText: BitmapText = _
   var lives: Int = _
+  var levelText: BitmapText = _
+  var level: Int = _
   var fpsText: BitmapText = _
   var touch: TouchControls = _
   var gameOver = false
+  var sfxLevelEnd: Sound = _
+  var sfxLevelClr: Sound = _
+  var sfxCollect: Sound = _
+  var bonusesCollected: Int = _
+  var messages: Messages = _
 
-  private val mineCount = options.getOrElse("mines", "10").toInt
+  def mineCount: Int = if (options.contains("mines")) options("mines").toInt else 9 + level
 
   override def init(args: js.Any*): Unit = {
     args.headOption match {
-      case Some(str) => Logger.info(s"init $str")
+      case str: Some[js.Any] =>
+        Logger.info(s"init ${str.get}")
+        if (str.get.asInstanceOf[String]!="nextlevel") {
+          score = 0
+          lives = 5
+          level = 1
+          bonusesCollected = 0
+        }
+        else {
+          level += 1
+          updateLevel(level)
+        }
       case _ =>
     }
-    score = 0
-    lives = 5
+    StarMinesNG.rnd.setSeed(42+level)
     gameOver = false
   }
 
@@ -66,12 +84,23 @@ class StatePlay(game: Game, options: Map[String,String], status: Element) extend
     scoreText = game.add.bitmapText(game.width/2-96,game.height/2+20, "font", "", 48)
     addToScore(0)
 
-    game.add.bitmapText(game.width/2-280,game.height/2+60, "font", "Lives:", 48)
+    game.add.bitmapText(game.width/2-280,game.height/2+60, "font", "Ships:", 48)
     livesText = game.add.bitmapText(game.width/2-96,game.height/2+60, "font", "", 48)
     updateLives(lives)
 
+    game.add.bitmapText(game.width/2+40,game.height/2+60, "font", "Level:", 48)
+    levelText = game.add.bitmapText(game.width/2+220,game.height/2+60, "font", "", 48)
+    updateLevel(level)
+
     fpsText = game.add.bitmapText(5,5, "font", "", 18)
 
+    sfxLevelEnd = game.add.audio("sfx:levelend")
+    sfxLevelClr = game.add.audio("sfx:levelclr")
+    sfxCollect = game.add.audio("sfx:swip")
+
+    messages = new Messages(game)
+
+    bonusManager = new BonusManager(game, 2 + scala.math.min(level/2, 8), findSafePosition)
     spawnMines()
   }
 
@@ -93,22 +122,13 @@ class StatePlay(game: Game, options: Map[String,String], status: Element) extend
 
     (1 to mineCount).foreach(i => {
       val mine = new Mine(game, 0,0)
-      ensureSafePosition(mine)
+      findSafePosition(mine)
       mines.add(mine)
     })
   }
 
-  def reviveMine(): Mine = {
-    mines.getFirstDead() match {
-      case mine: Mine =>
-        ensureSafePosition(mine)
-        mine
-      case _ => null
-    }
-  }
-
   @tailrec
-  private def ensureSafePosition(sprite: Sprite): Unit = {
+  private def findSafePosition(sprite: Sprite): Unit = {
     val x = StarMinesNG.rnd.nextFloat()*game.world.width
     val y = StarMinesNG.rnd.nextFloat()*game.world.height
     val sbb: Rectangle = scorebox.getBounds().asInstanceOf[Rectangle]
@@ -127,16 +147,38 @@ class StatePlay(game: Game, options: Map[String,String], status: Element) extend
     }
     else {
       Logger.info(s"$x, $y was unsafe, retrying")
-      ensureSafePosition(sprite)
+      findSafePosition(sprite)
     }
   }
 
   def handleCollisions(): Unit = {
     game.physics.arcade.collide(player, scorebox)
     game.physics.arcade.overlap(player, mines, playerVsEnemy _, null, null)
+    game.physics.arcade.overlap(player, bonusManager.bonuses, playerVsBonus _, null, null)
     game.physics.arcade.collide(player.weapon.bullets, scorebox)
     game.physics.arcade.overlap(player.weapon.bullets, mines, bulletVsEnemy _, null, null)
+    game.physics.arcade.overlap(player.weapon.bullets, bonusManager.bonusoids, bulletVsBonusoid _, null, null)
+    game.physics.arcade.overlap(player.weapon.bullets, bonusManager.bonuses, bulletVsBonus _, null, null)
     game.physics.arcade.collide(mines, scorebox)
+    game.physics.arcade.collide(bonusManager.bonuses, scorebox)
+    if (bonusManager.bonusoids.countLiving()==0 && bonusManager.bonuses.countLiving()==0) nextLevel()
+  }
+
+  def nextLevel(): Unit = {
+    val result = if (bonusManager.bonusCount == bonusesCollected) {
+      sfxLevelEnd.play()
+      "All Bonusoids collected!"
+    }
+    else {
+      sfxLevelClr.play()
+      "Level cleared"
+    }
+    messages.show(result)
+    touch.disable()
+    mines.destroy()
+    messages.clear()
+    player.hide()
+    game.state.start("nextlevel", args = result, clearCache = false, clearWorld = false)
   }
 
   def bulletVsEnemy(bullet: Bullet, enemy: Sprite): Unit = {
@@ -144,15 +186,39 @@ class StatePlay(game: Game, options: Map[String,String], status: Element) extend
     enemy.kill()
     bullet.kill()
     addToScore(123)
-    reviveMine()
   }
+
+  def bulletVsBonusoid(bullet: Bullet, bonusoid: Sprite): Unit = {
+    messages.show("Bonusoids released, go catch them!")
+    Explosion(game, Explosion.SmallExploCount).explode(bonusoid)
+    bonusoid.kill()
+    bullet.kill()
+    addToScore(1000)
+  }
+
+  def bulletVsBonus(bullet: Bullet, bonus: Sprite): Unit = {
+    messages.show("Bonusoid lost!")
+    Explosion(game, Explosion.SmallExploCount).explode(bonus)
+    bonus.kill()
+    bullet.kill()
+    addToScore(100)
+  }
+
+  def playerVsBonus(player: Player, bonus: Sprite): Unit = {
+    messages.show("Bonusoid collected!")
+    sfxCollect.play()
+    bonus.kill()
+    bonusesCollected += 1
+    addToScore(10000)
+  }
+
   def playerVsEnemy(player: Player, enemy: Sprite): Unit = {
     if (player.immortal) {
       Explosion(game, Explosion.SmallExploCount).explode(enemy)
       enemy.kill()
-      reviveMine()
     }
     else {
+      messages.show("SHIP LOST!")
       Explosion(game, Explosion.LargeExploCount).explode(player)
       enemy.kill()
       player.kill()
@@ -170,11 +236,17 @@ class StatePlay(game: Game, options: Map[String,String], status: Element) extend
     livesText.setText(f"$lives%d")
   }
 
+  def updateLevel(level: Int): Unit = {
+    this.level= level
+    levelText.setText(f"$level%d")
+  }
+
   def handleGameOver(): Unit = {
     gameOver = true
     touch.disable()
     mines.destroy()
-    game.state.start("gameover", args = js.Array[String]("gameover"), clearCache = false, clearWorld = false)
+    player.hide()
+    game.state.start("gameover", args = "gameover", clearCache = false, clearWorld = false)
   }
 
   def addToScore(delta: Int): Unit = {
@@ -194,6 +266,6 @@ class StatePlay(game: Game, options: Map[String,String], status: Element) extend
 
     if (PhaserKeys.isFireDown(game) || touch.fire) player.fire()
 
-    if (k.isDown(27)) game.state.start("menu", args = js.Array[String]("quit"), clearCache = false, clearWorld = true)
+    if (k.isDown(27)) game.state.start("menu", args = "quit", clearCache = false, clearWorld = true)
   }
 }

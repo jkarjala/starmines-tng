@@ -1,13 +1,10 @@
 package com.jpkware.smng
 
-import com.definitelyscala.phaser.{Game, Sprite, State}
-import org.scalajs.dom.raw.{Element, KeyboardEvent}
-
-import scala.scalajs.js
+import com.definitelyscala.phaser.{Game, State}
+import org.scalajs.dom.raw.Element
 
 class StateGameOver(game: Game, options: Map[String,String], status: Element) extends State {
 
-  var preloadBar: Sprite = _
   var keyDown: Boolean = _
 
   override def preload(): Unit = {

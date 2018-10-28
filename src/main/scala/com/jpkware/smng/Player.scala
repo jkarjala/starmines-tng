@@ -20,8 +20,8 @@ class Player(game: Game, x: Double, y: Double)
   weapon.bulletInheritSpriteSpeed = true
   weapon.fireRate = 300
   weapon.autofire = false
-  weapon.bullets.forEach(setBounce _, null, false)
-  weapon.trackSprite(this, 0,0, false)
+  weapon.bullets.forEach(setBounce _, null, checkExists = false)
+  weapon.trackSprite(this, 0,0, trackRotation = false)
 
   val FlameScalaMax: Double = fullWidth/80
   val flame: Sprite = game.add.sprite(x,y,"flame")
@@ -44,6 +44,7 @@ class Player(game: Game, x: Double, y: Double)
     if (!this.visible) return
 
     game.physics.arcade.accelerationFromRotation(indexRotation, 500, physBody.acceleration)
+    this.updateTransform()
     flame.rotation = indexRotation
     flame.position = headPoint(-fullWidth/6)
     flame.scale.set(flameScale, flameScale)
@@ -65,6 +66,10 @@ class Player(game: Game, x: Double, y: Double)
     physBody.velocity.set(0,0)
   }
 
+  def hide(): Unit = {
+    stop()
+    visible = false
+  }
   def fire(): Bullet = {
     if (!this.visible) return null
     weapon.fireAngle = indexAngle

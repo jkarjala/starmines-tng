@@ -3,9 +3,12 @@ package com.jpkware.smng
 import com.definitelyscala.phaser._
 
 import scala.collection.mutable
+import scala.scalajs.js
+import scala.scalajs.js.annotation.JSExportTopLevel
 import scala.util.Random
 
-class ExplosionItem(game: Game, x: Double, y: Double) extends Image(game, x,y, "explo") {
+@JSExportTopLevel("ExplosionItem")
+class ExplosionItem(game: Game, x: Double, y: Double, frame: String) extends Image(game, x,y, frame) {
   var vx: Double = _
   var vy: Double = _
   alive = false
@@ -26,10 +29,9 @@ class Explosion(game: Game, count:Int) extends SpriteBatch(game, null,null, fals
 
   var lifespan: Double = _
 
-  (1 to count).foreach( i => {
-    val item = new ExplosionItem(game, 0,0)
-    this.add(item)
-  })
+  classType = js.Dynamic.global.ExplosionItem
+  createMultiple(count, "explo")
+
   game.add.existing(this)
   alive = false
   exists = false

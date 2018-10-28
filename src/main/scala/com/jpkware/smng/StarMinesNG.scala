@@ -10,7 +10,7 @@ import scala.util.Random
 
 
 object StarMinesNG {
-  val rnd = new Random(42)
+  val rnd = new Random(42) // This random should be used only for level generation, reset at level change
 
   def main(args: Array[String]): Unit = {
 
@@ -30,6 +30,7 @@ object StarMinesNG {
     game.state.add("preloader", new StatePreload(game, options))
     game.state.add("menu", new StateMenu(game, options, status))
     game.state.add("play", new StatePlay(game, options, status))
+    game.state.add("nextlevel", new StateNextLevel(game, options, status))
     game.state.add("gameover", new StateGameOver(game, options, status))
     game.state.start("boot", args = null, clearWorld = true, clearCache = false)
   }
