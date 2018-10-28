@@ -26,13 +26,14 @@ class StateMenu(game: Game, options: Map[String,String], status: Element) extend
     val button = PhaserButton.add(game, game.width/2,game.height/2+40, "Play")
     button.events.onInputUp.add(startGame _, null, 1)
 
-    val button2 = PhaserButton.add(game, 80,80, "Full\nScreen\nToggle", scale=1)
-    button2.events.onInputUp.add(() => if (game.scale.isFullScreen) {
-      game.scale.stopFullScreen()
-    } else {
-      game.scale.startFullScreen()
-    }, null, 1)
-
+    if (!game.device.iOS) {
+      val button2 = PhaserButton.add(game, 80, 80, "Full\nScreen\nToggle", scale = 1)
+      button2.events.onInputUp.add(() => if (game.scale.isFullScreen) {
+        game.scale.stopFullScreen()
+      } else {
+        game.scale.startFullScreen()
+      }, null, 1)
+    }
   }
 
   override def update(): Unit = {
