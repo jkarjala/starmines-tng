@@ -26,11 +26,11 @@ object StarMinesNG {
     }
     val mode = if (options.contains("webgl")) Phaser.WEBGL else Phaser.CANVAS
     val game = new Game(1920, 1080, mode, parent)
-    game.state.add("boot", new StateBoot(game, options).state)
-    game.state.add("preloader", new StatePreload(game, options).state)
-    game.state.add("menu", new StateMenu(game, options, status).state)
-    game.state.add("play", new StatePlay(game, options, status).state)
-    game.state.add("gameover", new StateGameOver(game, options, status).state)
-    game.state.start("boot", args = js.Array[String](), clearWorld = true, clearCache = false)
+    game.state.add("boot", new StateBoot(game, options))
+    game.state.add("preloader", new StatePreload(game, options))
+    game.state.add("menu", new StateMenu(game, options, status))
+    game.state.add("play", new StatePlay(game, options, status))
+    game.state.add("gameover", new StateGameOver(game, options, status))
+    game.state.start("boot", args = null, clearWorld = true, clearCache = false)
   }
 }

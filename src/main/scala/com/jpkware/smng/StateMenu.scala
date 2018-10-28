@@ -3,18 +3,14 @@ package com.jpkware.smng
 import com.definitelyscala.phaser.{Game, Sprite, State}
 import org.scalajs.dom.raw.Element
 
-import scala.scalajs.js
-
-class StateMenu(game: Game, options: Map[String,String], status: Element) {
-
-  val state: State = PhaserState(preload, create, update)
+class StateMenu(game: Game, options: Map[String,String], status: Element) extends State {
 
   var preloadBar: Sprite = _
 
-  def preload(): Unit = {
+  override def preload(): Unit = {
   }
 
-  def create(): Unit = {
+  override def create(): Unit = {
     status.innerHTML = ""
     val help = if (game.device.desktop || options.contains("touch")) "Control your ship with arrow keys and space, or z,x,n,m"
     else "Use the touch buttons to control your ship"
@@ -30,11 +26,11 @@ class StateMenu(game: Game, options: Map[String,String], status: Element) {
     button.events.onInputUp.add(startGame _, null, 1)
   }
 
-  def update(): Unit = {
+  override def update(): Unit = {
     if (PhaserKeys.isFireDown(game)) startGame()
   }
 
   def startGame(): Unit = {
-    game.state.start("play", args = js.Array[String]("start"), clearCache = false, clearWorld = true)
+    game.state.start("play", args = "start", clearCache = false, clearWorld = true)
   }
 }

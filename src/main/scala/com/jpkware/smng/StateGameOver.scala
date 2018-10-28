@@ -5,17 +5,15 @@ import org.scalajs.dom.raw.{Element, KeyboardEvent}
 
 import scala.scalajs.js
 
-class StateGameOver(game: Game, options: Map[String,String], status: Element) {
-
-  val state: State = PhaserState(preload, create, update)
+class StateGameOver(game: Game, options: Map[String,String], status: Element) extends State {
 
   var preloadBar: Sprite = _
   var keyDown: Boolean = _
 
-  def preload(): Unit = {
+  override def preload(): Unit = {
   }
 
-  def create(): Unit = {
+  override def create(): Unit = {
 
     game.add.bitmapText(game.width/2,300, "font", "Game Over", 128).anchor.set(0.5,0.5)
 
@@ -24,7 +22,7 @@ class StateGameOver(game: Game, options: Map[String,String], status: Element) {
     keyDown = PhaserKeys.isFireDown(game)
   }
 
-  def update(): Unit = {
+  override def update(): Unit = {
     if (keyDown) keyDown = !PhaserKeys.isFireDown(game)
     if (!keyDown && PhaserKeys.isFireDown(game)) toMenu()
   }

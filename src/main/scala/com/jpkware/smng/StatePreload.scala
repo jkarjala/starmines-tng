@@ -4,13 +4,11 @@ import com.definitelyscala.phaser.{Game, Sprite, State}
 
 import scala.scalajs.js
 
-class StatePreload(game: Game, options: Map[String,String]) {
-
-  val state: State = PhaserState(preload, create, update)
+class StatePreload(game: Game, options: Map[String,String]) extends State {
 
   var preloadBar: Sprite = _
   var ship: Sprite = _
-  def preload(): Unit = {
+  override def preload(): Unit = {
 
     ship = game.add.sprite(game.width / 2, game.height / 2, "ship-preload")
     ship.anchor.set(1, 0.5)
@@ -32,13 +30,13 @@ class StatePreload(game: Game, options: Map[String,String]) {
     game.load.audio("sfx:tinyexp", "res/tinyexp.wav")
   }
 
-  def create(): Unit = {
-    game.state.start("menu", args = js.Array[String](), clearCache = false, clearWorld = false)
+  override def create(): Unit = {
+    game.state.start("menu", args = null, clearCache = false, clearWorld = false)
     ship.destroy(true)
     preloadBar.destroy(true)
   }
 
-  def update(): Unit = {
+  override def update(): Unit = {
   }
 
 }

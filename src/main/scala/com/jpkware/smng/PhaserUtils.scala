@@ -2,27 +2,6 @@ package com.jpkware.smng
 
 import com.definitelyscala.phaser._
 
-import scala.scalajs.js
-
-// Javascript literal object generator for Phaser State
-object PhaserState {
-  def apply(init: (js.Array[String]) => Unit, preload: () => Unit,  create: () => Unit, update: () => Unit, render: () => Unit, destroy: () => Unit): State = {
-    js.Dynamic.literal(init = init, preload = preload, create = create, update = update, render = render, destroy = destroy).asInstanceOf[State]
-  }
-
-  def apply(init: (js.Array[String]) => Unit, preload: () => Unit,  create: () => Unit, update: () => Unit, render: () => Unit): State = {
-    js.Dynamic.literal(init = init, preload = preload, create = create, update = update, render = render).asInstanceOf[State]
-  }
-
-  def apply(preload: () => Unit,  create: () => Unit, update: () => Unit, render: () => Unit): State = {
-    js.Dynamic.literal(init = () => {}, preload = preload, create = create, update = update, render = render).asInstanceOf[State]
-  }
-
-  def apply(preload: () => Unit,  create: () => Unit, update: () => Unit): State = {
-    js.Dynamic.literal(init = () => {}, preload = preload, create = create, update = update, render = () => {}).asInstanceOf[State]
-  }
-}
-
 object PhaserKeys {
   def isFireDown(game: Game) = {
     val k = game.input.keyboard

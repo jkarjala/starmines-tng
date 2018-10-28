@@ -8,7 +8,7 @@ import scala.annotation.tailrec
 import scala.scalajs.js
 
 
-class StatePlay(game: Game, options: Map[String,String], status: Element) {
+class StatePlay(game: Game, options: Map[String,String], status: Element) extends State {
   var player: Player = _
   var scorebox: Sprite = _
   var mines: Group = _
@@ -31,12 +31,13 @@ class StatePlay(game: Game, options: Map[String,String], status: Element) {
   var fire = false
   var gameOver = false
 
-  val state: State = PhaserState(init _, preload, create, update, render)
-
   private val mineCount = options.getOrElse("mines", "10").toInt
 
-  def init(args: js.Array[String]): Unit = {
-    Logger.info(s"init: $args")
+  override def init(args: js.Any*): Unit = {
+    args.headOption match {
+      case Some(str) => Logger.info(s"init $str")
+      case _ =>
+    }
     score = 0
     lives = 5
     shield = false
@@ -48,10 +49,10 @@ class StatePlay(game: Game, options: Map[String,String], status: Element) {
     gameOver = false
   }
 
-  def preload(): Unit = {
+  override def preload(): Unit = {
   }
 
-  def create(): Unit = {
+  override def create(): Unit = {
     val space = game.add.sprite(0,0,"space")
     space.scale.set(2,2)
 
@@ -97,14 +98,14 @@ class StatePlay(game: Game, options: Map[String,String], status: Element) {
     sfxTinyexp.allowMultiple = true
   }
 
-  def update(): Unit = {
+  override def update(): Unit = {
     if (gameOver) return
     handleCollisions()
     handleInput()
     if (options.contains("fps")) fpsText.setText(game.time.fps.toString)
   }
 
-  def render(): Unit = {
+  override def render(): Unit = {
     // game.debug.bodyInfo(player, 32, 32)
     // game.debug.body(player)
     // game.debug.pointer(game.input.mousePointer)
