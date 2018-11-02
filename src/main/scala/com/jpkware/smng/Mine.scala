@@ -17,3 +17,7 @@ class Mine(game: Game, x: Double, y: Double)
     this
   }
 }
+
+object Mine {
+  def spawn(game: Game, level: Rule) = new Mine(game, 0,0)
+}
