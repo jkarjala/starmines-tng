@@ -5,7 +5,8 @@ import com.definitelyscala.phaser.{BitmapText, Game, Timer}
 import scala.collection.mutable
 
 class Messages(game: Game) {
-  val Limit: Int = 5
+  var limit: Int = 5
+  var fontSize = 48
   private val texts = mutable.ArrayBuffer[BitmapText]()
   private val timer: Timer = game.time.create(false)
 
@@ -13,12 +14,12 @@ class Messages(game: Game) {
   timer.start()
 
   def show(msg: String): Unit = {
-    if (texts.length==Limit) {
+    if (texts.length==limit) {
       texts(0).destroy()
       texts.remove(0)
     }
-    texts.foreach(_.position.y -= 50)
-    val text: BitmapText = game.add.bitmapText(game.width / 2, 300, "font", msg, 48)
+    texts.foreach(_.position.y -= fontSize+2)
+    val text: BitmapText = game.add.bitmapText(game.width / 2, 300, GlobalRes.FontId, msg, fontSize)
     text.anchor.set(0.5, 0.5)
     texts += text
   }

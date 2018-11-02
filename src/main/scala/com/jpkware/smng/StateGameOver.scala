@@ -12,7 +12,7 @@ class StateGameOver(game: Game, options: Map[String,String], status: Element) ex
 
   override def create(): Unit = {
 
-    game.add.bitmapText(game.width/2,300, "font", "Game Over", 128).anchor.set(0.5,0.5)
+    game.add.bitmapText(game.width/2,300, GlobalRes.FontId, "Game Over", 128).anchor.set(0.5,0.5)
 
     val button = PhaserButton.add(game, game.width/2-150,game.height-200, "Play")
     button.events.onInputUp.add(gotoPlay _, null, 1)

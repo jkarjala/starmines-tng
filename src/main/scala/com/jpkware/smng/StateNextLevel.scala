@@ -20,7 +20,7 @@ class StateNextLevel(game: Game, options: Map[String,String], status: Element) e
 
   override def create(): Unit = {
 
-    game.add.bitmapText(game.width/2,300, "font", result, 64).anchor.set(0.5,0.5)
+    game.add.bitmapText(game.width/2,300, GlobalRes.FontId, result, 64).anchor.set(0.5,0.5)
 
     val button = PhaserButton.add(game, game.width/2,game.height-200, "Next")
     button.events.onInputUp.add(gotoPlay _, null, 1)

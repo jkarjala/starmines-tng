@@ -30,15 +30,15 @@ class Explosion(game: Game, count:Int) extends SpriteBatch(game, null,null, fals
   var lifespan: Double = _
 
   classType = js.Dynamic.global.ExplosionItem
-  createMultiple(count, "explo")
+  createMultiple(count, Explosion.ExploId)
 
   game.add.existing(this)
   alive = false
   exists = false
 
-  val sfxExplo: Sound = game.add.audio("sfx:explo")
+  val sfxExplo: Sound = game.add.audio(Explosion.SfzExploId)
   sfxExplo.allowMultiple = true
-  val sfxTinyexp: Sound = game.add.audio("sfx:tinyexp")
+  val sfxTinyexp: Sound = game.add.audio(Explosion.SfzTinyExploId)
   sfxTinyexp.allowMultiple = true
 
   def explode(sprite: Sprite, lifespan: Double = 10*count): Unit = {
@@ -80,6 +80,10 @@ object Explosion {
   val SmallExploCount: Int = 50
   val LargeExploCount: Int = 200
 
+  val ExploId = "explo"
+  val SfzExploId = "sfx:explo"
+  val SfzTinyExploId = "sfx:tinyexp"
+
   def apply(game: Game, count:Int): Explosion = {
     val group = groupMap.getOrElse(count, sys.error(s"Explosion size $count was not initialized"))
     group.getFirstDead() match {
@@ -94,5 +98,11 @@ object Explosion {
       (1 to maxExplosions).foreach(i => group.add(new Explosion(game, count)))
       groupMap(count) = group
     })
+  }
+
+  def preloadResources(game: Game): Unit = {
+    game.load.audio(SfzExploId, "res/explo.wav")
+    game.load.audio(SfzTinyExploId, "res/tinyexp.wav")
+    game.load.image(ExploId, "res/explo.png")
   }
 }

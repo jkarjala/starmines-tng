@@ -4,14 +4,14 @@ import com.definitelyscala.phaser.Physics.Arcade.Body
 import com.definitelyscala.phaser._
 
 class Player(game: Game, x: Double, y: Double)
-  extends PreRotatedSprite(game, x,y, "sprites", "ship", 64) {
+  extends PreRotatedSprite(game, x,y, GlobalRes.MainAtlasId, Player.ShipPrefix, 64) {
   game.physics.arcade.enable(this)
   physBody.drag.set(10,10)
   physBody.maxVelocity.set(500,500)
   physBody.collideWorldBounds = true
   physBody.bounce.set(1,1)
 
-  val weapon: Weapon = game.add.weapon(10, "missile")
+  val weapon: Weapon = game.add.weapon(10, Player.MissileId)
   weapon.bulletKillType = Weapon.KILL_LIFESPAN
   weapon.bulletLifespan = 1000
   weapon.bulletCollideWorldBounds = true
@@ -24,13 +24,13 @@ class Player(game: Game, x: Double, y: Double)
   weapon.trackSprite(this, 0,0, trackRotation = false)
 
   val FlameScalaMax: Double = fullWidth/80
-  val flame: Sprite = game.add.sprite(x,y,"flame")
+  val flame: Sprite = game.add.sprite(x,y,Player.FlameId)
   flame.anchor = new Point(1.0, 0.5)
   flame.visible = false
   var flameScale = 0.25
   game.physics.arcade.enable(flame)
 
-  val sfxZap: Sound = game.add.audio("sfx:zap")
+  val sfxZap: Sound = game.add.audio(Player.SfxZapId)
   sfxZap.allowMultiple = true
 
   var immortal: Boolean = true
@@ -99,5 +99,18 @@ class Player(game: Game, x: Double, y: Double)
     timer.start(0)
 
     super.revive(health)
+  }
+}
+
+object Player {
+  def MissileId = "missile"
+  def FlameId = "flame"
+  def SfxZapId = "sfx:zap"
+  def ShipPrefix = "ship"
+
+  def preloadResources(game: Game): Unit = {
+    game.load.image(MissileId, "res/missile.png")
+    game.load.image(FlameId, "res/flame.png")
+    game.load.audio(SfxZapId, "res/zap.wav")
   }
 }

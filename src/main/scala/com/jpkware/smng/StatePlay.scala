@@ -1,6 +1,5 @@
 package com.jpkware.smng
 
-import com.definitelyscala.phaser.Physics.Arcade.Body
 import com.definitelyscala.phaser.{Game, _}
 import org.scalajs.dom.raw.Element
 
@@ -11,9 +10,10 @@ import scala.scalajs.js
 class StatePlay(game: Game, options: Map[String,String], status: Element) extends State {
   var player: Player = _
   var scorebox: Scorebox = _
-  var scores: Scores = _
-  var mines: Group = _
+  var scores: ScoreState = _
+  var enemies: Group = _
   var bonusManager: BonusManager = _
+  var enemyManager: EnemyManager = _
   var cursors: CursorKeys = _
   var fpsText: BitmapText = _
   var touch: TouchControls = _
@@ -23,14 +23,15 @@ class StatePlay(game: Game, options: Map[String,String], status: Element) extend
   var sfxCollect: Sound = _
   var messages: Messages = _
 
-  def mineCount: Int = if (options.contains("mines")) options("mines").toInt else 9 + scores.level
+  def optionsCount: Int = if (options.contains("mines")) options("mines").toInt else -1
 
   override def init(args: js.Any*): Unit = {
     args.headOption match {
       case str: Some[js.Any] =>
         Logger.info(s"init ${str.get}")
         if (str.get.asInstanceOf[String]=="nextlevel") {
-          scorebox.updateLevel(1)
+          scorebox.addToLevel(1)
+          scores.bonusesCollected = 0
           StarMinesNG.rnd.setSeed(42+scores.level)
         }
         else {
@@ -69,16 +70,17 @@ class StatePlay(game: Game, options: Map[String,String], status: Element) extend
 
     scorebox = new Scorebox(game, scores)
 
-    fpsText = game.add.bitmapText(5,5, "font", "", 18)
+    fpsText = game.add.bitmapText(5,5, GlobalRes.FontId, "", 18)
 
-    sfxLevelEnd = game.add.audio("sfx:levelend")
-    sfxLevelClr = game.add.audio("sfx:levelclr")
-    sfxCollect = game.add.audio("sfx:swip")
+    sfxLevelEnd = game.add.audio(StatePlay.SfxLevelEndId)
+    sfxLevelClr = game.add.audio(StatePlay.SfxLevelClrId)
+    sfxCollect = game.add.audio(StatePlay.SfxSwip)
 
     bonusManager = new BonusManager(game, 2 + scala.math.min(scores.level/2, 8), findSafePosition)
-    spawnMines()
-
     messages = new Messages(game)
+
+    enemyManager = new EnemyManager(game, findSafePosition)
+    enemies = enemyManager.spawnEnemies(scores.level, optionsCount)
   }
 
   override def update(): Unit = {
@@ -92,16 +94,6 @@ class StatePlay(game: Game, options: Map[String,String], status: Element) extend
     // game.debug.bodyInfo(player, 32, 32)
     // game.debug.body(player)
     // game.debug.pointer(game.input.mousePointer)
-  }
-
-  def spawnMines(): Unit = {
-    mines = game.add.group()
-
-    (1 to mineCount).foreach(i => {
-      val mine = new Mine(game, 0,0)
-      findSafePosition(mine)
-      mines.add(mine)
-    })
   }
 
   @tailrec
@@ -132,13 +124,13 @@ class StatePlay(game: Game, options: Map[String,String], status: Element) extend
 
   def handleCollisions(): Unit = {
     game.physics.arcade.collide(player, scorebox)
-    game.physics.arcade.overlap(player, mines, playerVsEnemy _, null, null)
+    game.physics.arcade.overlap(player, enemies, playerVsEnemy _, null, null)
     game.physics.arcade.overlap(player, bonusManager.bonuses, playerVsBonus _, null, null)
     game.physics.arcade.collide(player.weapon.bullets, scorebox)
-    game.physics.arcade.overlap(player.weapon.bullets, mines, bulletVsEnemy _, null, null)
+    game.physics.arcade.overlap(player.weapon.bullets, enemies, bulletVsEnemy _, null, null)
     game.physics.arcade.overlap(player.weapon.bullets, bonusManager.bonusoids, bulletVsBonusoid _, null, null)
     game.physics.arcade.overlap(player.weapon.bullets, bonusManager.bonuses, bulletVsBonus _, null, null)
-    game.physics.arcade.collide(mines, scorebox)
+    game.physics.arcade.collide(enemies, scorebox)
     game.physics.arcade.collide(bonusManager.bonuses, scorebox)
     if (bonusManager.bonusoids.countLiving()==0 && bonusManager.bonuses.countLiving()==0) nextLevel()
   }
@@ -152,9 +144,8 @@ class StatePlay(game: Game, options: Map[String,String], status: Element) extend
       sfxLevelClr.play()
       "Mine field complete\nLost some Bonusoids..."
     }
-    messages.show(result)
     touch.disable()
-    mines.destroy()
+    enemies.destroy()
     messages.clear()
     player.hide()
     game.state.start("nextlevel", args = result, clearCache = false, clearWorld = false)
@@ -187,7 +178,7 @@ class StatePlay(game: Game, options: Map[String,String], status: Element) extend
     messages.show("Bonusoid collected!")
     sfxCollect.play()
     bonus.kill()
-    scorebox.updateBonusesCollected(1)
+    scorebox.addToBonusesCollected(1)
     scorebox.addToScore(10000)
   }
 
@@ -203,7 +194,7 @@ class StatePlay(game: Game, options: Map[String,String], status: Element) extend
       player.kill()
       val timer = game.time.create(true)
       timer.add(3000, () => {
-        scorebox.updateLives(-1)
+        scorebox.addToLives(-1)
         if (scores.lives==0) handleGameOver() else player.revive()
       }, null)
       timer.start(0)
@@ -213,7 +204,7 @@ class StatePlay(game: Game, options: Map[String,String], status: Element) extend
   def handleGameOver(): Unit = {
     gameOver = true
     touch.disable()
-    mines.destroy()
+    enemies.destroy()
     player.hide()
     messages.clear()
     game.state.start("gameover", args = "gameover", clearCache = false, clearWorld = false)
@@ -231,5 +222,17 @@ class StatePlay(game: Game, options: Map[String,String], status: Element) extend
     if (PhaserKeys.isFireDown(game) || touch.fire) player.fire()
 
     if (k.isDown(27)) game.state.start("menu", args = "quit", clearCache = false, clearWorld = true)
+  }
+}
+
+object StatePlay {
+  def SfxLevelClrId = "sfx:levelclr"
+  def SfxLevelEndId = "sfx:levelend"
+  def SfxSwip = "sfx:swip"
+
+  def preloadResources(game: Game): Unit = {
+    game.load.audio(SfxLevelClrId, "res/levelclr.wav")
+    game.load.audio(SfxLevelEndId, "res/levelend.wav")
+    game.load.audio(SfxSwip, "res/swip.wav")
   }
 }
