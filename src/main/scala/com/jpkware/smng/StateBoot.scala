@@ -19,6 +19,9 @@ class StateBoot(game: Game, options: Map[String,String]) extends State {
   }
 
   override def create(): Unit = {
+    game.input.addPointer() // 3rd touch
+    game.input.addPointer() // 4th touch
+
     game.state.start("preloader", args = js.Array[String](), clearCache = false, clearWorld = false)
   }
 }

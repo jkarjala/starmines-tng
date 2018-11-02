@@ -29,8 +29,6 @@ class TouchControls(game: Game) {
   }
 
   def addTouchButtons(): Unit = {
-    game.input.addPointer() // 3rd
-    game.input.addPointer() // 4th
     val radius = 128
     val buttonY = game.height - radius
     addTouchButton(radius, buttonY, "CCW", () => {

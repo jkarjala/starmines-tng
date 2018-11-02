@@ -11,6 +11,7 @@ import scala.util.Random
 
 object StarMinesNG {
   val rnd = new Random(42) // This random should be used only for level generation, reset at level change
+  val maxBackground = 18
 
   def main(args: Array[String]): Unit = {
 

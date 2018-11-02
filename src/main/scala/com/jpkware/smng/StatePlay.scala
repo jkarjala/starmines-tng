@@ -10,44 +10,34 @@ import scala.scalajs.js
 
 class StatePlay(game: Game, options: Map[String,String], status: Element) extends State {
   var player: Player = _
-  var scorebox: Sprite = _
+  var scorebox: Scorebox = _
+  var scores: Scores = _
   var mines: Group = _
   var bonusManager: BonusManager = _
   var cursors: CursorKeys = _
-  var scoreText: BitmapText = _
-  var score: Int = _
-  var livesText: BitmapText = _
-  var lives: Int = _
-  var levelText: BitmapText = _
-  var level: Int = _
   var fpsText: BitmapText = _
   var touch: TouchControls = _
   var gameOver = false
   var sfxLevelEnd: Sound = _
   var sfxLevelClr: Sound = _
   var sfxCollect: Sound = _
-  var bonusesCollected: Int = _
   var messages: Messages = _
 
-  def mineCount: Int = if (options.contains("mines")) options("mines").toInt else 9 + level
+  def mineCount: Int = if (options.contains("mines")) options("mines").toInt else 9 + scores.level
 
   override def init(args: js.Any*): Unit = {
     args.headOption match {
       case str: Some[js.Any] =>
         Logger.info(s"init ${str.get}")
-        if (str.get.asInstanceOf[String]!="nextlevel") {
-          score = 0
-          lives = 5
-          level = 1
-          bonusesCollected = 0
+        if (str.get.asInstanceOf[String]=="nextlevel") {
+          scorebox.updateLevel(1)
+          StarMinesNG.rnd.setSeed(42+scores.level)
         }
         else {
-          level += 1
-          updateLevel(level)
+          scores = Scorebox.InitialScore
         }
       case _ =>
     }
-    StarMinesNG.rnd.setSeed(42+level)
     gameOver = false
   }
 
@@ -55,7 +45,14 @@ class StatePlay(game: Game, options: Map[String,String], status: Element) extend
   }
 
   override def create(): Unit = {
-    val space = game.add.sprite(0,0,"space")
+
+    if (options.contains("debug")) {
+      val button = PhaserButton.add(game, 128, 128, "")
+      button.events.onInputUp.add(nextLevel _, null, 1)
+    }
+
+    val bg = if (scores.level-1 <= StarMinesNG.maxBackground) scores.level-1 else 6 + scores.level % (StarMinesNG.maxBackground-5)
+    val space = game.add.sprite(0,0,s"space$bg")
     space.scale.set(2,2)
 
     touch = new TouchControls(game)
@@ -65,32 +62,12 @@ class StatePlay(game: Game, options: Map[String,String], status: Element) extend
 
     player = new Player(game, 100,100)
     game.add.existing(player)
+
     cursors = game.input.keyboard.createCursorKeys()
 
     Explosion.initGroups(game, Seq(Explosion.LargeExploCount, Explosion.SmallExploCount))
 
-    scorebox = game.add.sprite(game.width/2,game.height/2, "scorebox")
-    scorebox.anchor.set(0.5,0.5)
-    game.physics.enable(scorebox)
-    scorebox.body match { case b: Body => b.immovable = true}
-    scorebox.inputEnabled = true
-    scorebox.events.onInputUp.add(() => {
-      if (game.scale.isFullScreen) game.scale.stopFullScreen() else game.scale.startFullScreen()
-    }, null, 1)
-
-    game.add.bitmapText(game.width/2,game.height/2-80, "font", "StarMines", 96).anchor.set(0.5,0.5)
-    game.add.bitmapText(game.width/2,game.height/2-48, "font", "THE NEXT GENERATION", 32).anchor.set(0.5,0.5)
-    game.add.bitmapText(game.width/2-280,game.height/2+20, "font", "Score:", 48)
-    scoreText = game.add.bitmapText(game.width/2-96,game.height/2+20, "font", "", 48)
-    addToScore(0)
-
-    game.add.bitmapText(game.width/2-280,game.height/2+60, "font", "Ships:", 48)
-    livesText = game.add.bitmapText(game.width/2-96,game.height/2+60, "font", "", 48)
-    updateLives(lives)
-
-    game.add.bitmapText(game.width/2+40,game.height/2+60, "font", "Level:", 48)
-    levelText = game.add.bitmapText(game.width/2+220,game.height/2+60, "font", "", 48)
-    updateLevel(level)
+    scorebox = new Scorebox(game, scores)
 
     fpsText = game.add.bitmapText(5,5, "font", "", 18)
 
@@ -98,10 +75,10 @@ class StatePlay(game: Game, options: Map[String,String], status: Element) extend
     sfxLevelClr = game.add.audio("sfx:levelclr")
     sfxCollect = game.add.audio("sfx:swip")
 
-    messages = new Messages(game)
-
-    bonusManager = new BonusManager(game, 2 + scala.math.min(level/2, 8), findSafePosition)
+    bonusManager = new BonusManager(game, 2 + scala.math.min(scores.level/2, 8), findSafePosition)
     spawnMines()
+
+    messages = new Messages(game)
   }
 
   override def update(): Unit = {
@@ -131,18 +108,20 @@ class StatePlay(game: Game, options: Map[String,String], status: Element) extend
   private def findSafePosition(sprite: Sprite): Unit = {
     val x = StarMinesNG.rnd.nextFloat()*game.world.width
     val y = StarMinesNG.rnd.nextFloat()*game.world.height
-    val sbb: Rectangle = scorebox.getBounds().asInstanceOf[Rectangle]
 
+    val sbb: Rectangle = scorebox.getBounds().asInstanceOf[Rectangle]
     // XXX the bounds are in local space if the sprite is not yet in world, transform manually
     if (sbb.x<0) {
       sbb.x += scorebox.position.x
       sbb.y += scorebox.position.y
     }
+    val pbb: Rectangle = new Rectangle(0,0,200,200) // safe zone around player
+
     val mbb: Rectangle = sprite.getBounds().asInstanceOf[Rectangle]
     // The new position is not yet in effect; assume x,y is center
     mbb.x = x - mbb.width/2
     mbb.y = y - mbb.height/2
-    if (!Rectangle.intersects(sbb,mbb)) {
+    if (!Rectangle.intersects(sbb,mbb) && !Rectangle.intersects(pbb,mbb)) {
       sprite.reset(x, y)
     }
     else {
@@ -165,13 +144,13 @@ class StatePlay(game: Game, options: Map[String,String], status: Element) extend
   }
 
   def nextLevel(): Unit = {
-    val result = if (bonusManager.bonusCount == bonusesCollected) {
+    val result = if (bonusManager.bonusCount == scores.bonusesCollected) {
       sfxLevelEnd.play()
-      "All Bonusoids collected!"
+      "Mine field complete\nAll Bonusoids collected!"
     }
     else {
       sfxLevelClr.play()
-      "Level cleared"
+      "Mine field complete\nLost some Bonusoids..."
     }
     messages.show(result)
     touch.disable()
@@ -185,7 +164,7 @@ class StatePlay(game: Game, options: Map[String,String], status: Element) extend
     Explosion(game, Explosion.SmallExploCount).explode(enemy)
     enemy.kill()
     bullet.kill()
-    addToScore(123)
+    scorebox.addToScore(123)
   }
 
   def bulletVsBonusoid(bullet: Bullet, bonusoid: Sprite): Unit = {
@@ -193,7 +172,7 @@ class StatePlay(game: Game, options: Map[String,String], status: Element) extend
     Explosion(game, Explosion.SmallExploCount).explode(bonusoid)
     bonusoid.kill()
     bullet.kill()
-    addToScore(1000)
+    scorebox.addToScore(1000)
   }
 
   def bulletVsBonus(bullet: Bullet, bonus: Sprite): Unit = {
@@ -201,15 +180,15 @@ class StatePlay(game: Game, options: Map[String,String], status: Element) extend
     Explosion(game, Explosion.SmallExploCount).explode(bonus)
     bonus.kill()
     bullet.kill()
-    addToScore(100)
+    scorebox.addToScore(100)
   }
 
   def playerVsBonus(player: Player, bonus: Sprite): Unit = {
     messages.show("Bonusoid collected!")
     sfxCollect.play()
     bonus.kill()
-    bonusesCollected += 1
-    addToScore(10000)
+    scorebox.updateBonusesCollected(1)
+    scorebox.addToScore(10000)
   }
 
   def playerVsEnemy(player: Player, enemy: Sprite): Unit = {
@@ -223,22 +202,12 @@ class StatePlay(game: Game, options: Map[String,String], status: Element) extend
       enemy.kill()
       player.kill()
       val timer = game.time.create(true)
-      timer.add(2000, () => {
-        updateLives(lives - 1)
-        if (lives==0) handleGameOver() else player.revive()
+      timer.add(3000, () => {
+        scorebox.updateLives(-1)
+        if (scores.lives==0) handleGameOver() else player.revive()
       }, null)
       timer.start(0)
     }
-  }
-
-  def updateLives(lives: Int): Unit = {
-    this.lives = lives
-    livesText.setText(f"$lives%d")
-  }
-
-  def updateLevel(level: Int): Unit = {
-    this.level= level
-    levelText.setText(f"$level%d")
   }
 
   def handleGameOver(): Unit = {
@@ -246,13 +215,8 @@ class StatePlay(game: Game, options: Map[String,String], status: Element) extend
     touch.disable()
     mines.destroy()
     player.hide()
+    messages.clear()
     game.state.start("gameover", args = "gameover", clearCache = false, clearWorld = false)
-  }
-
-  def addToScore(delta: Int): Unit = {
-    score += delta
-    if (score<0) score = 0
-    scoreText.setText(f"$score%08d")
   }
 
   def handleInput(): Unit = {
