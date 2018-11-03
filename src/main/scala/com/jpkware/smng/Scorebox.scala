@@ -3,13 +3,14 @@ package com.jpkware.smng
 import com.definitelyscala.phaser.{BitmapText, Game, Sprite}
 import com.definitelyscala.phaser.Physics.Arcade.Body
 
-case class ScoreState(var score: Int, var lives: Int, var level: Int, var bonusesCollected: Int)
+case class ScoreState(var score: Int, var lives: Int, var level: Int, var bonusesCollected: Int, var timeBonus: Int)
 
 class Scorebox(game: Game, scores: ScoreState) extends Sprite(game, 0,0, Scorebox.ScoreboxId) {
 
   var scoreText: BitmapText = _
   var livesText: BitmapText = _
   var levelText: BitmapText = _
+  var bonusText: BitmapText = _
 
   game.add.existing(this)
   position.set(game.width/2,game.height/2)
@@ -23,17 +24,35 @@ class Scorebox(game: Game, scores: ScoreState) extends Sprite(game, 0,0, Scorebo
 
   game.add.bitmapText(game.width/2,game.height/2-80, GlobalRes.FontId, "StarMines", 96).anchor.set(0.5,0.5)
   game.add.bitmapText(game.width/2,game.height/2-48, GlobalRes.FontId, "THE NEXT GENERATION", 32).anchor.set(0.5,0.5)
-  game.add.bitmapText(game.width/2-280,game.height/2+20, GlobalRes.FontId, "Score:", 48)
-  scoreText = game.add.bitmapText(game.width/2-96,game.height/2+20, GlobalRes.FontId, "", 48)
 
-  game.add.bitmapText(game.width/2-280,game.height/2+60, GlobalRes.FontId, "Ships:", 48)
-  livesText = game.add.bitmapText(game.width/2-96,game.height/2+60, GlobalRes.FontId, "", 48)
+  game.add.bitmapText(game.width/2-280,game.height/2, GlobalRes.FontId, "Score:", 48)
+  scoreText = game.add.bitmapText(game.width/2+280,game.height/2, GlobalRes.FontId, "", 48)
+  scoreText.anchor.set(1,0)
 
-  game.add.bitmapText(game.width/2+60,game.height/2+60, GlobalRes.FontId, "Field:", 48)
-  levelText = game.add.bitmapText(game.width/2+200,game.height/2+60, GlobalRes.FontId, "", 48)
+  game.add.bitmapText(game.width/2-280,game.height/2+50, GlobalRes.FontId, "Bonus:", 48)
+  bonusText = game.add.bitmapText(game.width/2+280,game.height/2+50, GlobalRes.FontId, "", 48)
+  bonusText.anchor.set(1,0)
+
+  game.add.bitmapText(game.width/2-280,game.height/2+100, GlobalRes.FontId, "Ships:", 48)
+  livesText = game.add.bitmapText(game.width/2-96,game.height/2+100, GlobalRes.FontId, "", 48)
+
+  game.add.bitmapText(game.width/2+60,game.height/2+100, GlobalRes.FontId, "Field:", 48)
+  levelText = game.add.bitmapText(game.width/2+280,game.height/2+100, GlobalRes.FontId, "", 48)
+  levelText.anchor.set(1,0)
+
   addToScore(0)
   addToLives(0)
   addToLevel(0)
+  addToTimeBonus(0)
+
+  private val timer = game.time.create(true)
+  private var ts = game.time.time
+  timer.loop(100, () => {
+    val ts2 = game.time.time
+    addToTimeBonus((ts-ts2).toInt)
+    ts = ts2
+  }, null)
+  timer.start(0)
 
   def addToBonusesCollected(delta: Int): Unit = {
     this.scores.bonusesCollected += delta
@@ -52,13 +71,24 @@ class Scorebox(game: Game, scores: ScoreState) extends Sprite(game, 0,0, Scorebo
   def addToScore(delta: Int): Unit = {
     scores.score += delta
     if (scores.score<0) scores.score = 0
-    scoreText.setText(f"${scores.score}%08d")
+    scoreText.setText(f"${scores.score}%d")
+  }
+
+  def addToTimeBonus(delta: Int): Unit = {
+    if (scores.timeBonus + delta < 0) {
+      scores.timeBonus = 0
+      bonusText.setText(f"${scores.timeBonus}%d")
+    }
+    else {
+      scores.timeBonus += delta
+      bonusText.setText(f"${scores.timeBonus}%d")
+    }
   }
 }
 
 object Scorebox {
   def ScoreboxId = "scorebox"
-  def InitialScore = ScoreState(score = 0, lives = 5, level = 1, bonusesCollected = 0)
+  def InitialScore = ScoreState(score = 0, lives = 5, level = 1, bonusesCollected = 0, timeBonus = 0)
   def preloadResources(game: Game): Unit = {
     game.load.image(ScoreboxId, "res/scorebox.png")
   }

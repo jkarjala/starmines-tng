@@ -32,13 +32,13 @@ class StatePlay(game: Game, options: Map[String,String], status: Element) extend
         if (str.get.asInstanceOf[String]=="nextlevel") {
           scorebox.addToLevel(1)
           scores.bonusesCollected = 0
-          StarMinesNG.rnd.setSeed(42+scores.level)
         }
         else {
           scores = Scorebox.InitialScore
         }
       case _ =>
     }
+    StarMinesNG.rnd.setSeed(42+scores.level)
     gameOver = false
   }
 
@@ -76,11 +76,13 @@ class StatePlay(game: Game, options: Map[String,String], status: Element) extend
     sfxLevelClr = game.add.audio(StatePlay.SfxLevelClrId)
     sfxCollect = game.add.audio(StatePlay.SfxSwip)
 
-    bonusManager = new BonusManager(game, 2 + scala.math.min(scores.level/2, 8), findSafePosition)
+    bonusManager = new BonusManager(game, 1 + scala.math.min(((scores.level-1)/2).toInt, 8), findSafePosition)
     messages = new Messages(game)
 
     enemyManager = new EnemyManager(game, findSafePosition)
     enemies = enemyManager.spawnEnemies(scores.level, optionsCount)
+
+    scores.timeBonus = bonusManager.bonusCount * 10000
   }
 
   override def update(): Unit = {
@@ -144,6 +146,7 @@ class StatePlay(game: Game, options: Map[String,String], status: Element) extend
       sfxLevelClr.play()
       "Mine field complete\nLost some Bonusoids..."
     }
+    scorebox.addToScore(scores.timeBonus) // should do a count down somewhere...
     touch.disable()
     enemies.destroy()
     messages.clear()
@@ -180,6 +183,7 @@ class StatePlay(game: Game, options: Map[String,String], status: Element) extend
     bonus.kill()
     scorebox.addToBonusesCollected(1)
     scorebox.addToScore(10000)
+    scorebox.addToTimeBonus(5000)
   }
 
   def playerVsEnemy(player: Player, enemy: Sprite): Unit = {

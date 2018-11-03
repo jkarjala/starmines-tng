@@ -3,7 +3,7 @@
   "short_name": "StarMines",
   "start_url": ".",
   "display": "fullscreen",
-  "background_color": "#fff",
+  "background_color": "#000",
   "description": "Space shooter inspired by old classics like Asteroids and Omega Race",
   "icons": [{
     "src": "res/ship128.png"

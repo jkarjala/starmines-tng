@@ -44,9 +44,8 @@ class Player(game: Game, x: Double, y: Double)
     if (!this.visible) return
 
     game.physics.arcade.accelerationFromRotation(indexRotation, 500, physBody.acceleration)
-    this.updateTransform()
     flame.rotation = indexRotation
-    flame.position = headPoint(-fullWidth/6)
+    flame.position = position
     flame.scale.set(flameScale, flameScale)
     if (flameScale<FlameScalaMax) flameScale += 0.1
     flame.body match {
@@ -90,11 +89,13 @@ class Player(game: Game, x: Double, y: Double)
 
   override def revive(health: Double = 1): Sprite = {
     alpha = 0.5
+    flame.alpha = 0.5
     immortal = true
     val timer = game.time.create(true)
     timer.add(1000, () => {
       immortal = false
       alpha = 1.0
+      flame.alpha = 1.0
     }, null)
     timer.start(0)
 
