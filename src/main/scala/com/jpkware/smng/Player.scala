@@ -11,7 +11,7 @@ class Player(game: Game, x: Double, y: Double)
   physBody.collideWorldBounds = true
   physBody.bounce.set(1,1)
 
-  val weapon: Weapon = game.add.weapon(10, Player.MissileId)
+  val weapon: Weapon = game.add.weapon(10, GlobalRes.MainAtlasId, Player.MissileId)
   weapon.bulletKillType = Weapon.KILL_LIFESPAN
   weapon.bulletLifespan = 1000
   weapon.bulletCollideWorldBounds = true
@@ -110,7 +110,6 @@ object Player {
   def ShipPrefix = "ship"
 
   def preloadResources(game: Game): Unit = {
-    game.load.image(MissileId, "res/missile.png")
     game.load.image(FlameId, "res/flame.png")
     game.load.audio(SfxZapId, "res/zap.wav")
   }
