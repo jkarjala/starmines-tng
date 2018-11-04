@@ -106,9 +106,9 @@
             <key>freeSizeMode</key>
             <enum type="AlgorithmSettings::AlgorithmFreeSizeMode">Best</enum>
             <key>sizeConstraints</key>
-            <enum type="AlgorithmSettings::SizeConstraints">AnySize</enum>
+            <enum type="AlgorithmSettings::SizeConstraints">WordAligned</enum>
             <key>forceSquared</key>
-            <false/>
+            <true/>
             <key>maxRects</key>
             <struct type="AlgorithmMaxRectsSettings">
                 <key>heuristic</key>
@@ -151,7 +151,7 @@
         <key>autoAliasEnabled</key>
         <true/>
         <key>trimSpriteNames</key>
-        <false/>
+        <true/>
         <key>prependSmartFolderName</key>
         <false/>
         <key>autodetectAnimations</key>
@@ -277,33 +277,16 @@
                 <key>scale9FromFile</key>
                 <false/>
             </struct>
-            <key type="filename">tmp/main/mine01.png</key>
-            <key type="filename">tmp/main/mine02.png</key>
-            <key type="filename">tmp/main/mine03.png</key>
-            <key type="filename">tmp/main/mine04.png</key>
-            <key type="filename">tmp/main/mine05.png</key>
-            <key type="filename">tmp/main/mine06.png</key>
-            <key type="filename">tmp/main/mine07.png</key>
-            <key type="filename">tmp/main/mine08.png</key>
-            <key type="filename">tmp/main/mine09.png</key>
-            <key type="filename">tmp/main/mine10.png</key>
-            <key type="filename">tmp/main/mine11.png</key>
-            <key type="filename">tmp/main/mine12.png</key>
-            <key type="filename">tmp/main/mine13.png</key>
-            <key type="filename">tmp/main/mine14.png</key>
-            <key type="filename">tmp/main/mine15.png</key>
-            <key type="filename">tmp/main/mine16.png</key>
-            <key type="filename">tmp/main/mine17.png</key>
-            <key type="filename">tmp/main/mine18.png</key>
+            <key type="filename">tmp/main/missile.png</key>
             <struct type="IndividualSpriteSettings">
                 <key>pivotPoint</key>
                 <point_f>0.5,0.5</point_f>
                 <key>scale9Enabled</key>
                 <false/>
                 <key>scale9Borders</key>
-                <rect>10,10,20,20</rect>
+                <rect>8,3,15,6</rect>
                 <key>scale9Paddings</key>
-                <rect>10,10,20,20</rect>
+                <rect>8,3,15,6</rect>
                 <key>scale9FromFile</key>
                 <false/>
             </struct>
