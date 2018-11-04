@@ -76,10 +76,10 @@ class StatePlay(game: Game, options: Map[String,String], status: Element) extend
     sfxLevelClr = game.add.audio(StatePlay.SfxLevelClrId)
     sfxCollect = game.add.audio(StatePlay.SfxSwip)
 
-    bonusManager = new BonusManager(game, 1 + scala.math.min(((scores.level-1)/2).toInt, 8), findSafePosition)
+    bonusManager = new BonusManager(game, 1 + scala.math.min(((scores.level-1)/2).toInt, 8), setStartPosition)
     messages = new Messages(game)
 
-    enemyManager = new EnemyManager(game, findSafePosition)
+    enemyManager = new EnemyManager(game, setStartPosition)
     enemies = enemyManager.spawnEnemies(scores.level, optionsCount)
 
     scores.timeBonus = bonusManager.bonusCount * 10000
@@ -98,30 +98,23 @@ class StatePlay(game: Game, options: Map[String,String], status: Element) extend
     // game.debug.pointer(game.input.mousePointer)
   }
 
-  @tailrec
-  private def findSafePosition(sprite: Sprite): Unit = {
-    val x = StarMinesNG.rnd.nextFloat()*game.world.width
-    val y = StarMinesNG.rnd.nextFloat()*game.world.height
+  private def setStartPosition(sprite: Sprite): Unit = {
+    val minX = scorebox.position.x - scorebox.width/2
+    val maxX = scorebox.position.x + scorebox.width/2
+    val minY = scorebox.position.y - scorebox.height/2
+    val maxY = scorebox.position.y + scorebox.height/2
 
-    val sbb: Rectangle = scorebox.getBounds().asInstanceOf[Rectangle]
-    // XXX the bounds are in local space if the sprite is not yet in world, transform manually
-    if (sbb.x<0) {
-      sbb.x += scorebox.position.x
-      sbb.y += scorebox.position.y
-    }
-    val pbb: Rectangle = new Rectangle(0,0,200,200) // safe zone around player
-
-    val mbb: Rectangle = sprite.getBounds().asInstanceOf[Rectangle]
-    // The new position is not yet in effect; assume x,y is center
-    mbb.x = x - mbb.width/2
-    mbb.y = y - mbb.height/2
-    if (!Rectangle.intersects(sbb,mbb) && !Rectangle.intersects(pbb,mbb)) {
-      sprite.reset(x, y)
-    }
-    else {
-      Logger.info(s"$x, $y was unsafe, retrying")
-      findSafePosition(sprite)
-    }
+    val areas = Seq(
+      new Rectangle(200, 0, game.width-200-minX, minY), // from player to right
+      new Rectangle(0, 200, minX, game.height-200), // from player to down end of screen
+      new Rectangle(minX, maxY, game.width-minX, game.height-maxY), // below scorebox right end of screen
+      new Rectangle(maxX, 0, game.width-maxX, game.height-minY) // top-right of scorebox to down
+    )
+    val margin = 20
+    val area = areas(StarMinesNG.rnd.nextInt(4))
+    val x = area.x+margin + StarMinesNG.rnd.nextInt(area.width.toInt-2*margin)
+    val y = area.y+margin + StarMinesNG.rnd.nextInt(area.height.toInt-2*margin)
+    sprite.reset(x,y)
   }
 
   def handleCollisions(): Unit = {
@@ -155,10 +148,10 @@ class StatePlay(game: Game, options: Map[String,String], status: Element) extend
   }
 
   def bulletVsEnemy(bullet: Bullet, enemy: Sprite): Unit = {
-    Explosion(game, Explosion.SmallExploCount).explode(enemy)
-    enemy.kill()
-    bullet.kill()
-    scorebox.addToScore(123)
+    enemy match {
+      case e: Enemy => scorebox.addToScore(e.bulletHit(bullet))
+      case _ => Logger.warn(s"Unknown enemy $enemy")
+    }
   }
 
   def bulletVsBonusoid(bullet: Bullet, bonusoid: Sprite): Unit = {
