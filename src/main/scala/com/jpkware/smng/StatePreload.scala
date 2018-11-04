@@ -25,6 +25,7 @@ class StatePreload(game: Game, options: Map[String,String]) extends State {
     Player.preloadResources(game)
     Explosion.preloadResources(game)
     StatePlay.preloadResources(game)
+    StateNextLevel.preloadResources(game)
     (0 to StarMinesNG.maxBackground).foreach(i => game.load.image(s"space$i", s"res/space$i.jpg"))
   }
 
