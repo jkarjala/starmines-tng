@@ -33,6 +33,8 @@ class StatePlay(game: Game, options: Map[String,String], status: Element) extend
         }
         else {
           StatePlay.scores = Scorebox.InitialScore
+          if (options.contains("level"))
+            StatePlay.scores.level = options("level").toInt
         }
       case _ =>
     }
@@ -50,7 +52,8 @@ class StatePlay(game: Game, options: Map[String,String], status: Element) extend
       button.events.onInputUp.add(nextLevel _, null, 1)
     }
 
-    val bg = if (StatePlay.scores.level-1 <= StarMinesNG.maxBackground) StatePlay.scores.level-1 else 6 + StatePlay.scores.level % (StarMinesNG.maxBackground-5)
+    val bgLevel = (StatePlay.scores.level-1)/4
+    val bg = if (bgLevel <= StarMinesNG.maxBackground) bgLevel else bgLevel % (StarMinesNG.maxBackground) + 1
     val space = game.add.sprite(0,0,s"space$bg")
     space.scale.set(2,2)
 
@@ -173,7 +176,7 @@ class StatePlay(game: Game, options: Map[String,String], status: Element) extend
     bonus.kill()
     StatePlay.scorebox.addToBonusesCollected(1)
     StatePlay.scorebox.addToScore(2000)
-    StatePlay.scorebox.addToTimeBonus(5000)
+    StatePlay.scorebox.addToTimeBonus(2000)
   }
 
   def playerVsEnemy(player: Player, enemy: Sprite): Unit = {

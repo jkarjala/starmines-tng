@@ -7,7 +7,7 @@ class Player(game: Game, x: Double, y: Double)
   extends PreRotatedSprite(game, x,y, GlobalRes.MainAtlasId, Player.ShipPrefix, 64) {
   game.physics.arcade.enable(this)
   physBody.drag.set(10,10)
-  physBody.maxVelocity.set(500,500)
+  physBody.maxVelocity.set(750,750)
   physBody.collideWorldBounds = true
   physBody.bounce.set(1,1)
 
@@ -16,7 +16,7 @@ class Player(game: Game, x: Double, y: Double)
   weapon.bulletLifespan = 1000
   weapon.bulletCollideWorldBounds = true
   weapon.bulletRotateToVelocity = true
-  weapon.bulletSpeed = 900
+  weapon.bulletSpeed = 1000
   weapon.bulletInheritSpriteSpeed = true
   weapon.fireRate = 300
   weapon.autofire = false

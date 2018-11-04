@@ -46,11 +46,8 @@ class Scorebox(game: Game, scores: ScoreState) extends Sprite(game, 0,0, Scorebo
   addToTimeBonus(0)
 
   private val timer = game.time.create(true)
-  private var ts = game.time.time
-  timer.loop(100, () => {
-    val ts2 = game.time.time
-    addToTimeBonus((ts-ts2).toInt)
-    ts = ts2
+  timer.loop(500, () => {
+    addToTimeBonus(-500)
   }, null)
   timer.start(0)
 

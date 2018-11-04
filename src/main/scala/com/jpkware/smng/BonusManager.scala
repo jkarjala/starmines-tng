@@ -6,12 +6,12 @@ import com.definitelyscala.phaser._
 class BonusoidContainer(manager: BonusManager, game: Game, x: Double, y: Double)
   extends Sprite(game, x,y, "sprites", "bonusoid01") {
   game.physics.arcade.enable(this)
-
+  anchor.set(0.5,0.5)
   animations.add("bonusoidrotate", Animation.generateFrameNames("bonusoid", 1, 36, "", 2))
   animations.play("bonusoidrotate", 9, true)
 
   override def kill(): Sprite = {
-    val v = 200
+    val v = 150
     val directions: Array[Point] = Array(new Point(v,v),new Point(-v,v),new Point(v,-v),new Point(-v,-v))
     (0 to 3).foreach(i => {
       val b = manager.bonuses.getFirstDead()

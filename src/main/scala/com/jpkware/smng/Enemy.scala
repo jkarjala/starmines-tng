@@ -3,6 +3,8 @@ package com.jpkware.smng
 import com.definitelyscala.phaser.Physics.Arcade.Body
 import com.definitelyscala.phaser._
 
+import scala.scalajs.js
+
 class Enemy(game: Game, rule: Rule, group: Group) extends Sprite(game, 0,0, GlobalRes.EnemiesAtlasId, rule.shape+"01") {
 
   animations.add("rotate", Animation.generateFrameNames(rule.shape, 1, rule.frames, "", 2))
@@ -32,6 +34,15 @@ class Enemy(game: Game, rule: Rule, group: Group) extends Sprite(game, 0,0, Glob
     super.reset(x, y, health)
     physBody.velocity.set(rule.spd-StarMinesNG.rnd.nextDouble()*(2*rule.spd), rule.spd-StarMinesNG.rnd.nextDouble()*(2*rule.spd))
     this
+  }
+
+  override def update(): Unit = {
+    val b = physBody
+    val f = game.cache.getFrameData(GlobalRes.EnemiesAtlasId).getFrameByName(frameName)
+    b.offset = new Point(f.spriteSourceSizeX, f.spriteSourceSizeY)
+    b.width = f.width
+    b.height = f.height
+    super.update()
   }
 }
 

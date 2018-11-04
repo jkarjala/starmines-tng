@@ -10,13 +10,13 @@ case class Rule
   frames: Int,   // sprite animation frame count
   fps: Int,      // animation fpx
   score: Int,    // score increment when killed
-  minL: Int, // first level
-  maxL: Int, // last level
-  modL: Int, // (level-minL) % mod must be 0
-  minC: Int, // min count
-  maxC: Int, // max count
-  div: Int,  // count is (level-minL)/div + minC
-  spd: Int,  // speedlimit
+  minL: Int = 1, // first level
+  maxL: Int = 1, // last level
+  modL: Int = 1, // (level-minL) % mod must be 0
+  minC: Int = 1, // min count
+  maxC: Int = 1, // max count
+  div: Int = 1,  // count is (level-minL)/div + minC
+  spd: Int = 50, // speedlimit
   args: Seq[String] = Seq() // Additional arguments
 )
 
@@ -24,12 +24,20 @@ class EnemyManager(game: Game, randomSafePosition: (Sprite) => Unit) {
   val MAX = 100000
   val rules = Seq(
     Rule(Enemy.spawn, "mine",  18, 9,  125, minL=1, maxL=MAX, modL=1, minC=4, maxC=10, div=1, spd=40),
-    Rule(Enemy.spawn, "balla", 32, 12, 150, minL=3, maxL=10, modL=3, minC=4, maxC=10, div=2, spd=60),
-    Rule(Enemy.spawn, "ballb", 32, 12, 150, minL=4, maxL=11, modL=3, minC=4, maxC=10, div=2, spd=60),
-    Rule(Enemy.spawn, "ballc", 32, 12, 150, minL=5, maxL=12, modL=3, minC=4, maxC=10, div=2, spd=60),
-    Rule(Enemy.spawn, "torusa", 32, 12, 250, minL=13, maxL=MAX, modL=3, minC=4, maxC=10, div=2, spd=80),
-    Rule(Enemy.spawn, "torusb", 32, 12, 250, minL=14, maxL=MAX, modL=3, minC=4, maxC=10, div=2, spd=80),
-    Rule(Enemy.spawn, "torusc", 32, 12, 250, minL=15, maxL=MAX, modL=3, minC=4, maxC=10, div=2, spd=80),
+    Rule(Enemy.spawn, "balla", 32, 12, 150, minL=2, maxL=20, modL=3, minC=2, maxC=10, div=2, spd=60),
+    Rule(Enemy.spawn, "ballb", 32, 12, 150, minL=3, maxL=21, modL=3, minC=2, maxC=10, div=2, spd=60),
+    Rule(Enemy.spawn, "ballc", 32, 12, 150, minL=4, maxL=22, modL=3, minC=2, maxC=10, div=2, spd=60),
+    Rule(Enemy.spawn, "torusa", 32, 12, 250, minL=10, maxL=40, modL=3, minC=2, maxC=10, div=2, spd=80),
+    Rule(Enemy.spawn, "torusb", 32, 12, 250, minL=11, maxL=41, modL=3, minC=2, maxC=10, div=2, spd=80),
+    Rule(Enemy.spawn, "torusc", 32, 12, 250, minL=12, maxL=42, modL=3, minC=2, maxC=10, div=2, spd=80),
+    Rule(Splitter.spawn, "2atom", 16, 12, 400, minL=20, maxL=50, modL=3, minC=1, maxC=10, div=2, spd=60, Seq("1atom","16","12","2")),
+    Rule(Splitter.spawn, "2atomb", 16, 12, 400, minL=21, maxL=51, modL=3, minC=1, maxC=10, div=2, spd=60, Seq("1atom","16","12","2")),
+    Rule(Splitter.spawn, "2atomc", 24, 12, 400, minL=22, maxL=52, modL=3, minC=1, maxC=10, div=2, spd=60, Seq("1atom","16","12","2")),
+    Rule(Splitter.spawn, "4atom", 16, 12, 400, minL=30, maxL=60, modL=3, minC=1, maxC=10, div=2, spd=90, Seq("1atom","16","12","4")),
+    Rule(Splitter.spawn, "4atomb", 16, 12, 400, minL=31, maxL=61, modL=3, minC=1, maxC=10, div=2, spd=90, Seq("1atom","16","12","4")),
+    Rule(Splitter.spawn, "4atomc", 16, 12, 400, minL=32, maxL=62, modL=3, minC=1, maxC=10, div=2, spd=90, Seq("1atom","16","12","4")),
+    Rule(Splitter.spawn, "4boxa", 16, 12, 400, minL=50, maxL=MAX, modL=2, minC=1, maxC=10, div=2, spd=120, Seq("1atom","16","12","4")),
+    Rule(Splitter.spawn, "4boxb", 16, 12, 400, minL=51, maxL=MAX, modL=2, minC=1, maxC=10, div=2, spd=120, Seq("1atom","16","12","4")),
     Rule(null,"",0,0,0,0,0,0,0,0,0,0)
   )
 
