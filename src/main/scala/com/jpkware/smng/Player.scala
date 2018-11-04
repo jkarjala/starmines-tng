@@ -44,8 +44,9 @@ class Player(game: Game, x: Double, y: Double)
     if (!this.visible) return
 
     game.physics.arcade.accelerationFromRotation(indexRotation, 500, physBody.acceleration)
+    flame.revive(1)
     flame.rotation = indexRotation
-    flame.position = position
+    flame.position = headPoint(-fullWidth/6)
     flame.scale.set(flameScale, flameScale)
     if (flameScale<FlameScalaMax) flameScale += 0.1
     flame.body match {
@@ -53,11 +54,10 @@ class Player(game: Game, x: Double, y: Double)
         body.acceleration = physBody.acceleration
         body.velocity = physBody.velocity
     }
-    flame.visible = true
   }
   def brake(): Unit = {
     physBody.acceleration.set(0,0)
-    flame.visible = false
+    flame.kill()
     flameScale = 0.25
   }
   def stop(): Unit = {
