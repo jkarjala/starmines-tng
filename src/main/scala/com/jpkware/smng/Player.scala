@@ -7,16 +7,16 @@ class Player(game: Game, x: Double, y: Double)
   extends PreRotatedSprite(game, x,y, GlobalRes.MainAtlasId, Player.ShipPrefix, 64) {
   game.physics.arcade.enable(this)
   physBody.drag.set(10,10)
-  physBody.maxVelocity.set(500,500)
+  physBody.maxVelocity.set(750,750)
   physBody.collideWorldBounds = true
   physBody.bounce.set(1,1)
 
-  val weapon: Weapon = game.add.weapon(10, Player.MissileId)
+  val weapon: Weapon = game.add.weapon(10, GlobalRes.MainAtlasId, Player.MissileId)
   weapon.bulletKillType = Weapon.KILL_LIFESPAN
   weapon.bulletLifespan = 1000
   weapon.bulletCollideWorldBounds = true
   weapon.bulletRotateToVelocity = true
-  weapon.bulletSpeed = 900
+  weapon.bulletSpeed = 1000
   weapon.bulletInheritSpriteSpeed = true
   weapon.fireRate = 300
   weapon.autofire = false
@@ -44,8 +44,9 @@ class Player(game: Game, x: Double, y: Double)
     if (!this.visible) return
 
     game.physics.arcade.accelerationFromRotation(indexRotation, 500, physBody.acceleration)
+    flame.revive(1)
     flame.rotation = indexRotation
-    flame.position = position
+    flame.position = headPoint(-fullWidth/6)
     flame.scale.set(flameScale, flameScale)
     if (flameScale<FlameScalaMax) flameScale += 0.1
     flame.body match {
@@ -53,11 +54,10 @@ class Player(game: Game, x: Double, y: Double)
         body.acceleration = physBody.acceleration
         body.velocity = physBody.velocity
     }
-    flame.visible = true
   }
   def brake(): Unit = {
     physBody.acceleration.set(0,0)
-    flame.visible = false
+    flame.kill()
     flameScale = 0.25
   }
   def stop(): Unit = {
@@ -110,7 +110,6 @@ object Player {
   def ShipPrefix = "ship"
 
   def preloadResources(game: Game): Unit = {
-    game.load.image(MissileId, "res/missile.png")
     game.load.image(FlameId, "res/flame.png")
     game.load.audio(SfxZapId, "res/zap.wav")
   }

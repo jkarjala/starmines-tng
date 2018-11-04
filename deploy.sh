@@ -5,6 +5,7 @@ fi
 DEPLOY_HOST=$1
 TARGET=$DEPLOY_HOST:public_html/smtng
 ZIP=$(PWD)/target/smtng.zip
+DT=`date "+%y%m%d-%H%M"`
 rm $ZIP
 sbt fastOptJS fullOptJS
 pushd target/scala-2.12
@@ -13,5 +14,5 @@ pushd classes
 zip -rp $ZIP index* styles* manifest* lib/* res/*
 popd
 popd
-scp $ZIP ${DEPLOY_HOST}:public_html/smtng
-ssh $DEPLOY_HOST "cd public_html/smtng; unzip -o smtng.zip"
+scp $ZIP ${DEPLOY_HOST}:public_html
+ssh $DEPLOY_HOST "cd public_html && mkdir smtng-dev/$DT && cd smtng-dev/$DT && unzip -o ../../smtng.zip && cd ../.. && rm smtng && ln -s smtng-dev/$DT smtng"

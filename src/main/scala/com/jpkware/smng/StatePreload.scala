@@ -19,11 +19,13 @@ class StatePreload(game: Game, options: Map[String,String]) extends State {
 
     game.load.bitmapFont(GlobalRes.FontId, "res/font.png", "res/font.fnt")
     game.load.spritesheet(GlobalRes.ButtonId, "res/button.png", 128, 128)
-    game.load.atlasJSONHash(GlobalRes.MainAtlasId, s"res/mainv2.png", s"res/mainv2.json")
+    game.load.atlasJSONHash(GlobalRes.MainAtlasId, s"res/main.png", s"res/main.json")
+    game.load.atlasJSONHash(GlobalRes.EnemiesAtlasId, s"res/enemies.png", s"res/enemies.json")
     Scorebox.preloadResources(game)
     Player.preloadResources(game)
     Explosion.preloadResources(game)
     StatePlay.preloadResources(game)
+    StateNextLevel.preloadResources(game)
     (0 to StarMinesNG.maxBackground).foreach(i => game.load.image(s"space$i", s"res/space$i.jpg"))
   }
 
@@ -45,6 +47,7 @@ class StatePreload(game: Game, options: Map[String,String]) extends State {
 
 object GlobalRes {
   val MainAtlasId = "sprites"
+  val EnemiesAtlasId = "enemies"
   val FontId = "font"
   val ButtonId = "button"
 }
