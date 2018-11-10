@@ -11,6 +11,7 @@ class Enemy(game: Game, rule: Rule, group: Group) extends Sprite(game, 0,0, Glob
   animations.play("rotate", rule.fps, loop = true)
   anchor.set(0.5,0.5)
   group.add(this)
+  // Logger.info(s"Added $frameName to ${group.name}")
 
   game.physics.arcade.enable(this)
   physBody.collideWorldBounds = true
