@@ -77,6 +77,7 @@ class Explosion(game: Game, count:Int) extends SpriteBatch(game, null,null, fals
 object Explosion {
   private val groupMap = mutable.Map[Int, Group]()
   private val maxExplosions = 10
+  val TinyExploCount: Int = 20
   val SmallExploCount: Int = 50
   val LargeExploCount: Int = 200
 

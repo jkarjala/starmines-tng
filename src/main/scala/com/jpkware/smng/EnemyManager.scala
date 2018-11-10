@@ -28,24 +28,28 @@ class EnemyManager(game: Game, randomSafePosition: (Sprite) => Unit) {
     Rule(PathMine.spawn, "torusb", 32, 18, 150, minL=3, maxL=20, modL=3, minC=2, maxC=10, div=2, spd=40, Seq("8ALx9ix9iax9ix9id")),
     Rule(PathMine.spawn, "torusc", 32, 18, 150, minL=4, maxL=20, modL=3, minC=2, maxC=10, div=2, spd=40, Seq("8ALz9iz9iz9iz9iz9iz9iaz9iz9iz9iz9iz9iz9id")),
 
-    Rule(PathWorm.spawn, "balla", 32, 12, 250, minL=5, maxL=30, modL=3, minC=1, maxC=5, div=2, spd=50, Seq("6ALx9ix9iz9i", "3")),
-    Rule(PathWorm.spawn, "ballb", 32, 12, 250, minL=6, maxL=31, modL=3, minC=1, maxC=5, div=2, spd=50, Seq("6ALz9i2z9i9ix", "3")),
-    Rule(PathWorm.spawn, "ballc", 32, 12, 250, minL=7, maxL=32, modL=3, minC=1, maxC=5, div=2, spd=50, Seq("6AL9ix9ix9iz", "3")),
+    Rule(PathWorm.spawn, "balla", 32, 12, 250, minL=5, maxL=30, modL=3, minC=1, maxC=5, div=2, spd=50, Seq("6ALx9ix9iz9i", "2")),
+    Rule(PathWorm.spawn, "ballb", 32, 12, 250, minL=6, maxL=31, modL=3, minC=1, maxC=5, div=2, spd=50, Seq("6ALz9i2z9i9ix", "2")),
+    Rule(PathWorm.spawn, "ballc", 32, 12, 250, minL=7, maxL=32, modL=3, minC=1, maxC=5, div=2, spd=50, Seq("6AL9ix9ix9iz", "2")),
 
     Rule(Splitter.spawn, "2atom", 16, 12, 400, minL=10, maxL=40, modL=3, minC=3, maxC=10, div=1, spd=60, Seq("1atom","16","12","2")),
     Rule(Splitter.spawn, "2atomb", 16, 12, 400, minL=11, maxL=41, modL=3, minC=3, maxC=10, div=1, spd=60, Seq("1atom","16","12","2")),
     Rule(Splitter.spawn, "2atomc", 24, 12, 400, minL=12, maxL=42, modL=3, minC=3, maxC=10, div=1, spd=60, Seq("1atom","16","12","2")),
 
-    Rule(Splitter.spawn, "4atom", 16, 12, 400, minL=15, maxL=60, modL=3, minC=1, maxC=5, div=2, spd=90, Seq("1atom","16","12","4")),
-    Rule(Splitter.spawn, "4atomb", 16, 12, 400, minL=16, maxL=61, modL=3, minC=1, maxC=5, div=2, spd=90, Seq("1atom","16","12","4")),
-    Rule(Splitter.spawn, "4atomc", 16, 12, 400, minL=17, maxL=62, modL=3, minC=1, maxC=5, div=2, spd=90, Seq("1atom","16","12","4")),
+    Rule(Splitter.spawn, "4atom", 16, 12, 400, minL=15, maxL=MAX, modL=3, minC=1, maxC=5, div=3, spd=90, Seq("1atom","16","12","4")),
+    Rule(Splitter.spawn, "4atomb", 16, 12, 400, minL=16, maxL=MAX, modL=3, minC=1, maxC=5, div=3, spd=90, Seq("1atom","16","12","4")),
+    Rule(Splitter.spawn, "4atomc", 16, 12, 400, minL=17, maxL=MAX, modL=3, minC=1, maxC=5, div=3, spd=90, Seq("1atom","16","12","4")),
 
-    Rule(PathWorm.spawn, "balla", 32, 12, 250, minL=20, maxL=40, modL=3, minC=1, maxC=5, div=2, spd=50, Seq("6ALx9ix9iz9i", "6")),
-    Rule(PathWorm.spawn, "ballb", 32, 12, 250, minL=21, maxL=41, modL=3, minC=1, maxC=5, div=2, spd=50, Seq("6ALz9i2z9i9ix", "6")),
-    Rule(PathWorm.spawn, "ballc", 32, 12, 250, minL=22, maxL=42, modL=3, minC=1, maxC=5, div=2, spd=50, Seq("6AL9ix9ix9iz", "6")),
+    Rule(PathWorm.spawn, "balla", 32, 12, 250, minL=30, maxL=47, modL=3, minC=1, maxC=5, div=3, spd=60, Seq("6ALx9ix9iz9i", "4")),
+    Rule(PathWorm.spawn, "ballb", 32, 12, 250, minL=31, maxL=48, modL=3, minC=1, maxC=5, div=3, spd=60, Seq("6ALz9i2z9i9ix", "4")),
+    Rule(PathWorm.spawn, "ballc", 32, 12, 250, minL=32, maxL=49, modL=3, minC=1, maxC=5, div=3, spd=60, Seq("6AL9ix9ix9iz", "4")),
 
-    Rule(Splitter.spawn, "4boxa", 16, 12, 400, minL=50, maxL=MAX, modL=2, minC=1, maxC=5, div=2, spd=120, Seq("1atom","16","12","4")),
-    Rule(Splitter.spawn, "4boxb", 16, 12, 400, minL=51, maxL=MAX, modL=2, minC=1, maxC=5, div=2, spd=120, Seq("1atom","16","12","4")),
+    Rule(PathWorm.spawn, "balla", 32, 12, 250, minL=50, maxL=MAX, modL=3, minC=1, maxC=5, div=5, spd=80, Seq("6ALx9ix9iz9i", "6")),
+    Rule(PathWorm.spawn, "ballb", 32, 12, 250, minL=51, maxL=MAX, modL=3, minC=1, maxC=5, div=5, spd=80, Seq("6ALz9i2z9i9ix", "6")),
+    Rule(PathWorm.spawn, "ballc", 32, 12, 250, minL=52, maxL=MAX, modL=3, minC=1, maxC=5, div=5, spd=80, Seq("6AL9ix9ix9iz", "6")),
+
+    Rule(Producer.spawn, "4boxa", 16, 20, 1000, minL=20, maxL=MAX, modL=2, minC=1, maxC=5, div=10, spd=10, Seq("1boxa","16","12","4","5000")),
+    Rule(Producer.spawn, "4boxb", 16, 20, 1000, minL=21, maxL=MAX, modL=2, minC=1, maxC=5, div=10, spd=10, Seq("1boxb","16","12","4", "5000")),
     Rule(null,"",0,0,0,0,0,0,0,0,0,0)
   )
 

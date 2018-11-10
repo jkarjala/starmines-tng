@@ -67,7 +67,7 @@ class StatePlay(game: Game, options: Map[String,String], status: Element) extend
 
     cursors = game.input.keyboard.createCursorKeys()
 
-    Explosion.initGroups(game, Seq(Explosion.LargeExploCount, Explosion.SmallExploCount))
+    Explosion.initGroups(game, Seq(Explosion.LargeExploCount, Explosion.SmallExploCount, Explosion.TinyExploCount))
 
     StatePlay.scorebox = new Scorebox(game, StatePlay.scores)
 

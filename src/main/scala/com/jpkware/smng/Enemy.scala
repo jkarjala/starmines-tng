@@ -8,7 +8,7 @@ import scala.scalajs.js
 class Enemy(game: Game, rule: Rule, group: Group) extends Sprite(game, 0,0, GlobalRes.EnemiesAtlasId, rule.shape+"01") {
 
   animations.add("rotate", Animation.generateFrameNames(rule.shape, 1, rule.frames, "", 2))
-  animations.play("rotate", rule.fps, loop = true)
+  val animation = animations.play("rotate", rule.fps, loop = true)
   anchor.set(0.5,0.5)
   group.add(this)
   // Logger.info(s"Added $frameName to ${group.name}")
