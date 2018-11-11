@@ -42,13 +42,10 @@ class StatePlay(game: Game, options: Map[String,String], status: Element) extend
     gameOver = false
   }
 
-  override def preload(): Unit = {
-  }
-
   override def create(): Unit = {
 
     if (options.contains("debug")) {
-      val button = PhaserButton.add(game, 128, 128, "")
+      val button = PhaserButton.add(game, game.width/2, game.height-128, "")
       button.events.onInputUp.add(nextLevel _, null, 1)
     }
 
@@ -90,7 +87,7 @@ class StatePlay(game: Game, options: Map[String,String], status: Element) extend
     if (gameOver) return
     handleCollisions()
     handleInput()
-    if (options.contains("fps")) fpsText.setText(game.time.fps.toString)
+    if (options.contains("fps")) fpsText.setText(s"${game.time.fps.toString} ${enemies.countLiving()}")
   }
 
   override def render(): Unit = {
@@ -124,26 +121,30 @@ class StatePlay(game: Game, options: Map[String,String], status: Element) extend
     game.physics.arcade.overlap(player, bonusManager.bonuses, playerVsBonus _, null, null)
     game.physics.arcade.collide(player.weapon.bullets, StatePlay.scorebox)
     game.physics.arcade.overlap(player.weapon.bullets, enemies, bulletVsEnemy _, null, null)
-    game.physics.arcade.overlap(player.weapon.bullets, bonusManager.bonusoids, bulletVsBonusoid _, null, null)
+    game.physics.arcade.overlap(player.weapon.bullets, bonusManager.containers, bulletVsBonusoid _, null, null)
     game.physics.arcade.overlap(player.weapon.bullets, bonusManager.bonuses, bulletVsBonus _, null, null)
     game.physics.arcade.collide(enemies, StatePlay.scorebox)
     game.physics.arcade.collide(bonusManager.bonuses, StatePlay.scorebox)
-    if (bonusManager.bonusoids.countLiving()==0 && bonusManager.bonuses.countLiving()==0) nextLevel()
+    if (bonusManager.allDead || enemies.countLiving()==0) nextLevel()
   }
 
   def nextLevel(): Unit = {
     val result = if (bonusManager.bonusCount == StatePlay.scores.bonusesCollected) {
       sfxLevelEnd.play()
-      "Field fully completed,\nAll Bonusoids collected!"
+      "Field completed perfectly!\nAll Bonusoids collected!"
     }
     else {
       sfxLevelClr.play()
-      "Field complete, but\nlost some Bonusoids..."
+      if (enemies.countLiving()==0)
+        "Mines destroyed, field completed!\nSome Bonusoids not collected..."
+      else
+        "Field completed, but\nlost some Bonusoids..."
     }
     touch.disable()
     enemies.destroy()
     messages.clear()
     player.hide()
+    bonusManager.bonuses.destroy()
     game.state.start("nextlevel", args = result, clearCache = false, clearWorld = false)
   }
 

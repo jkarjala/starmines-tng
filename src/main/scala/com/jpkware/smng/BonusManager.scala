@@ -42,15 +42,15 @@ class Bonusoid(game: Game, x: Double, y: Double)
   animations.play("bonusrotate", 9, true)
 }
 
-class BonusManager(game: Game, bonusoidCount: Int, randomSafePosition: (Sprite) => Unit) {
-  val bonusoids: Group = game.add.group()
+class BonusManager(game: Game, containerCount: Int, randomSafePosition: (Sprite) => Unit) {
+  val containers: Group = game.add.group()
   val bonuses: Group = game.add.group()
-  val bonusCount = bonusoidCount*4
+  val bonusCount = containerCount*4
 
-  (1 to bonusoidCount).foreach(i => {
+  (1 to containerCount).foreach(i => {
     val b = new BonusoidContainer(this, game, 0, 0)
     randomSafePosition(b)
-    bonusoids.add(b)
+    containers.add(b)
   })
 
   (1 to bonusCount).foreach(i => {
@@ -58,4 +58,6 @@ class BonusManager(game: Game, bonusoidCount: Int, randomSafePosition: (Sprite) 
     b.kill()
     bonuses.add(b)
   })
+
+  def allDead: Boolean = containers.countLiving()==0 && bonuses.countLiving()==0
 }
