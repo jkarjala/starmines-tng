@@ -1,6 +1,6 @@
 package com.jpkware.smng
 
-import com.definitelyscala.phaser.{Button, Game, Group}
+import com.definitelyscala.phaser._
 
 class TouchControls(game: Game) {
   val touchButtons: Group = game.add.group()
@@ -22,6 +22,7 @@ class TouchControls(game: Game) {
     rotateStop = false
     thrust = false
     fire = false
+    addDragControl()
   }
 
   def disable(): Unit = {
@@ -37,7 +38,7 @@ class TouchControls(game: Game) {
       rotateLeft = false
       rotateStop = true
     })
-    addTouchButton(radius*3, buttonY, "CW", () => {
+    addTouchButton(radius*3+32, buttonY, "CW", () => {
       rotateRight = true
     }, () => {
       rotateRight = false
@@ -48,7 +49,7 @@ class TouchControls(game: Game) {
     }, () => {
       fire = false
     })
-    addTouchButton(game.width - radius*4 + radius, buttonY, "Thrust", () => {
+    addTouchButton(game.width - radius*3 - 32, buttonY, "Thrust", () => {
       thrust = true
     }, () => {
       thrust = false
@@ -64,4 +65,31 @@ class TouchControls(game: Game) {
     button
   }
 
+  def addDragControl(): Unit = {
+    val pos = new Point(256, game.height/2)
+    val cc = game.add.sprite(pos.x, pos.y, GlobalRes.ButtonId, 1)
+    cc.anchor.set(0.5, 0.5)
+    cc.alpha = 0.25
+    cc.scale.set(2,2)
+    val c = game.add.sprite(pos.x, pos.y, GlobalRes.ButtonId)
+    c.anchor.set(0.5, 0.5)
+    c.alpha = 0.25
+    c.scale.set(1.5, 1.5)
+    c.inputEnabled = true
+    c.input.enableDrag(false, false, false)
+    c.events.onDragUpdate.add((c: Sprite, pointer: Pointer, x: Double, y: Double, snap: Point, fromStart: Boolean) => {
+      val deltaX = ((pos.x - x) / 5).toInt
+      val deltaY = ((pos.y - y) / 5).toInt
+      val delta =  if (math.abs(deltaX) > math.abs(deltaY)) deltaX else deltaY
+      rotateLeft = false
+      rotateRight = false
+      if (delta > 0) rotateLeft = true else if (delta < 0) rotateRight = true
+    }, null, 1)
+    c.events.onDragStop.add((c: Sprite, pointer: Pointer) => {
+      c.x = pos.x
+      c.y = pos.y
+      rotateLeft = false
+      rotateRight = false
+    }, null, 1)
+  }
 }
