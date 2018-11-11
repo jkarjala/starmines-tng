@@ -34,7 +34,8 @@ class PreRotatedSprite(game: Game, x: Double, y: Double, sheet: String, prefix: 
 
   protected def setRotationSpeed(s: Double): Unit = rotationSpeed = s
 
-  def indexRotation: Double = -(index-1) * (Pi2/count)
+  val rotationStep: Double = Pi2/count
+  def indexRotation: Double = -(index-1) * rotationStep
 
   def indexAngle: Double = scala.math.toDegrees(indexRotation)
 

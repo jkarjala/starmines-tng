@@ -54,8 +54,8 @@ class StatePlay(game: Game, options: Map[String,String], status: Element) extend
     val space = game.add.sprite(0,0,s"space$bg")
     space.scale.set(2,2)
 
-    touch = new TouchControls(game)
-    if (options.contains("touch") || !game.device.desktop) touch.enable()
+    touch = new TouchControls(game, options.contains("stick"))
+    if (options.contains("touch") || options.contains("stick") || !game.device.desktop) touch.enable()
 
     game.physics.startSystem(PhysicsObj.ARCADE)
 
@@ -215,7 +215,9 @@ class StatePlay(game: Game, options: Map[String,String], status: Element) extend
     else if (cursors.right.isDown || k.isDown('X') || touch.rotateRight) player.rotateRight()
     else player.rotateStop()
 
-    if (cursors.up.isDown || k.isDown('N') || touch.thrust) player.thrust() else player.brake()
+    if (cursors.up.isDown || k.isDown('N') || touch.thrust) player.thrust()
+    else if (touch.joystickRotation!=touch.JoystickUp) player.rotateOrThrust(touch.joystickRotation)
+    else player.thrustStop()
 
     if (PhaserKeys.isFireDown(game) || touch.fire) player.fire()
 
