@@ -23,21 +23,21 @@ class Scorebox(game: Game, scores: ScoreState) extends Sprite(game, 0,0, Scorebo
   }, null, 1)
 
   game.add.bitmapText(game.width/2,game.height/2-80, GlobalRes.FontId, "StarMines", 96).anchor.set(0.5,0.5)
-  game.add.bitmapText(game.width/2,game.height/2-48, GlobalRes.FontId, "THE NEXT GENERATION", 32).anchor.set(0.5,0.5)
+  game.add.bitmapText(game.width/2,game.height/2-48, GlobalRes.FontId, "THE NEXT GENERATION", 28).anchor.set(0.5,0.5)
 
   game.add.bitmapText(game.width/2-280,game.height/2, GlobalRes.FontId, "Score:", 48)
   scoreText = game.add.bitmapText(game.width/2+280,game.height/2, GlobalRes.FontId, "", 48)
   scoreText.anchor.set(1,0)
 
-  game.add.bitmapText(game.width/2-280,game.height/2+50, GlobalRes.FontId, "Bonus:", 48)
-  bonusText = game.add.bitmapText(game.width/2+280,game.height/2+50, GlobalRes.FontId, "", 48)
+  game.add.bitmapText(game.width/2-280,game.height/2+45, GlobalRes.FontId, "Bonus:", 48)
+  bonusText = game.add.bitmapText(game.width/2+280,game.height/2+45, GlobalRes.FontId, "", 48)
   bonusText.anchor.set(1,0)
 
-  game.add.bitmapText(game.width/2-280,game.height/2+100, GlobalRes.FontId, "Ships:", 48)
-  livesText = game.add.bitmapText(game.width/2-96,game.height/2+100, GlobalRes.FontId, "", 48)
+  game.add.bitmapText(game.width/2-280,game.height/2+90, GlobalRes.FontId, "Ships:", 48)
+  livesText = game.add.bitmapText(game.width/2-96,game.height/2+90, GlobalRes.FontId, "", 48)
 
-  game.add.bitmapText(game.width/2+60,game.height/2+100, GlobalRes.FontId, "Field:", 48)
-  levelText = game.add.bitmapText(game.width/2+280,game.height/2+100, GlobalRes.FontId, "", 48)
+  game.add.bitmapText(game.width/2+60,game.height/2+90, GlobalRes.FontId, "Field:", 48)
+  levelText = game.add.bitmapText(game.width/2+280,game.height/2+90, GlobalRes.FontId, "", 48)
   levelText.anchor.set(1,0)
 
   addToScore(0)
