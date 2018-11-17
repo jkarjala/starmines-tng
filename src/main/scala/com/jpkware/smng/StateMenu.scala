@@ -12,7 +12,7 @@ class StateMenu(game: Game, options: Map[String,String], status: Element) extend
 
   override def create(): Unit = {
     status.innerHTML = ""
-    val help = if (game.device.desktop || options.contains("touch")) "Control your ship with arrow keys and space, or z,x,n,m"
+    val help = if (game.device.desktop || options.contains("touch")) "Control your ship with arrow keys and space, or z,x,n,m, or mouse"
     else "Use the touch buttons to control your ship"
 
     game.add.bitmapText(game.width/2,game.height/2-180, GlobalRes.FontId, "StarMines", 128).anchor.set(0.5,0.5)

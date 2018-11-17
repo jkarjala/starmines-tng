@@ -43,7 +43,7 @@ class Player(game: Game, x: Double, y: Double)
   def rotateOrThrust(atan2Angle: Double): Unit = {
     val joystickRotation = atan2Angle - math.Pi
     val playerRotation = indexRotation
-    Logger.info(s"$joystickRotation $indexRotation ${playerRotation-joystickRotation}}")
+    // Logger.info(s"$joystickRotation $indexRotation ${playerRotation-joystickRotation}")
     if (math.abs(joystickRotation-playerRotation) < rotationStep + 0.001 ) {
       rotateStop()
       thrust()

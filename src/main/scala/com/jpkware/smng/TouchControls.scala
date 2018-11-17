@@ -12,9 +12,9 @@ class TouchControls(game: Game, stick: Boolean) {
   var thrust = false
   var fire = false
 
-  val JoystickUp = 100.0
-  var joystickRotation = JoystickUp
-
+  val JoystickReleased = 100.0  // Indicating "no action"
+  var joystickRotation: Double = JoystickReleased
+  var mouseRotation: Double = JoystickReleased
   def isEnabled: Boolean = touchButtons.visible
 
   def enable(): Unit = {
@@ -35,26 +35,26 @@ class TouchControls(game: Game, stick: Boolean) {
 
   def addTouchButtons(): Unit = {
     val radius = 128
-    val buttonY = game.height - radius
+    val buttonY = game.height - radius - 32
     if (!stick) {
-      addTouchButton(radius, buttonY, "CCW", () => {
+      addTouchButton(radius +32 , buttonY, "CCW", () => {
         rotateLeft = true
       }, () => {
         rotateLeft = false
         rotateStop = true
       })
-      addTouchButton(radius * 3 + 32, buttonY, "CW", () => {
+      addTouchButton(radius * 3 + 64, buttonY, "CW", () => {
         rotateRight = true
       }, () => {
         rotateRight = false
         rotateStop = true
       })
-      addTouchButton(game.width - radius, buttonY, "Fire", () => {
+      addTouchButton(game.width - radius - 32, buttonY, "Fire", () => {
         fire = true
       }, () => {
         fire = false
       })
-      addTouchButton(game.width - radius * 3 - 32, buttonY, "Thrust", () => {
+      addTouchButton(game.width - radius * 3 - 64, buttonY, "Thrust", () => {
         thrust = true
       }, () => {
         thrust = false
@@ -77,23 +77,42 @@ class TouchControls(game: Game, stick: Boolean) {
     button
   }
 
+  def addMouseControls(bg: Sprite, player: Sprite): Unit = {
+    bg.inputEnabled = true
+    bg.events.onInputDown.add((spr: Sprite, ptr: Pointer) => {
+      if (ptr.leftButton.isDown) fire = true
+      if (ptr.rightButton.isDown) {
+        val deltaX = player.x - ptr.x
+        val deltaY = player.y - ptr.y
+        val delta =  if (math.abs(deltaX) > math.abs(deltaY)) deltaX else deltaY
+        if (math.abs(delta) > 10) joystickRotation = math.atan2(deltaY,deltaX)
+      }
+    }, null, 0)
+    bg.events.onInputUp.add((spr: Sprite, ptr: Pointer) => {
+      if (!ptr.leftButton.isDown) fire = false
+      if (!ptr.rightButton.isDown) joystickRotation = JoystickReleased
+    }, null, 0)
+  }
+
+
   def addJoystick(): Unit = {
     val pos = new Point(256, game.height - 256)
     val cc = game.add.sprite(pos.x, pos.y, GlobalRes.ButtonId, 1)
     touchButtons.add(cc)
     cc.anchor.set(0.5, 0.5)
     cc.alpha = 0.25
-    cc.scale.set(2,2)
+    cc.scale.set(2.5,2.5)
     val c = game.add.sprite(pos.x, pos.y, GlobalRes.ButtonId)
     touchButtons.add(c)
     c.anchor.set(0.5, 0.5)
     c.alpha = 0.25
-    c.scale.set(1.5, 1.5)
+    c.scale.set(2.0, 2.0)
     c.inputEnabled = true
-    c.input.enableDrag(false, false, false)
+    c.input.enableDrag(lockCenter = false, bringToTop = false, pixelPerfect = false,
+      boundsRect = new Rectangle(pos.x-256, pos.y-256, 512,512))
     c.events.onDragUpdate.add((c: Sprite, pointer: Pointer, x: Double, y: Double, snap: Point, fromStart: Boolean) => {
-      val deltaX = (pos.x - x)
-      val deltaY = (pos.y - y)
+      val deltaX = pos.x - x
+      val deltaY = pos.y - y
       val delta =  if (math.abs(deltaX) > math.abs(deltaY)) deltaX else deltaY
       if (math.abs(delta) > 10) joystickRotation = math.atan2(deltaY,deltaX)
       rotateLeft = false
@@ -103,7 +122,7 @@ class TouchControls(game: Game, stick: Boolean) {
     c.events.onDragStop.add((c: Sprite, pointer: Pointer) => {
       c.x = pos.x
       c.y = pos.y
-      joystickRotation = JoystickUp
+      joystickRotation = JoystickReleased
       rotateLeft = false
       rotateRight = false
     }, null, 1)

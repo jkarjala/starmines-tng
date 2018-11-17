@@ -54,13 +54,17 @@ class StatePlay(game: Game, options: Map[String,String], status: Element) extend
     val space = game.add.sprite(0,0,s"space$bg")
     space.scale.set(2,2)
 
-    touch = new TouchControls(game, options.contains("stick"))
-    if (options.contains("touch") || options.contains("stick") || !game.device.desktop) touch.enable()
+    val gr = game.add.graphics(0,0)
+    gr.lineStyle(2, 0xFFFFFF, 1)
+    gr.drawRect(0,0,game.width,game.height)
 
     game.physics.startSystem(PhysicsObj.ARCADE)
 
     player = new Player(game, 100,100)
     game.add.existing(player)
+
+    touch = new TouchControls(game, options.contains("stick"))
+    if (options.contains("touch") || options.contains("stick") || !game.device.desktop) touch.enable() else touch.addMouseControls(space, player)
 
     cursors = game.input.keyboard.createCursorKeys()
 
@@ -216,7 +220,7 @@ class StatePlay(game: Game, options: Map[String,String], status: Element) extend
     else player.rotateStop()
 
     if (cursors.up.isDown || k.isDown('N') || touch.thrust) player.thrust()
-    else if (touch.joystickRotation!=touch.JoystickUp) player.rotateOrThrust(touch.joystickRotation)
+    else if (touch.joystickRotation!=touch.JoystickReleased) player.rotateOrThrust(touch.joystickRotation)
     else player.thrustStop()
 
     if (PhaserKeys.isFireDown(game) || touch.fire) player.fire()
