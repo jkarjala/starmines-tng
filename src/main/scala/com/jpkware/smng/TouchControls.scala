@@ -12,9 +12,9 @@ class TouchControls(game: Game, stick: Boolean) {
   var thrust = false
   var fire = false
 
-  val JoystickReleased = 100.0  // Indicating "no action"
-  var joystickRotation: Double = JoystickReleased
-  var mouseRotation: Double = JoystickReleased
+  val NoRotation = 100.0  // Indicating "no action"
+  var thrustRotation: Double = NoRotation
+  var fireRotation: Double = NoRotation
   def isEnabled: Boolean = touchButtons.visible
 
   def enable(): Unit = {
@@ -37,39 +37,39 @@ class TouchControls(game: Game, stick: Boolean) {
     val radius = 128
     val buttonY = game.height - radius - 32
     if (!stick) {
-      addTouchButton(radius +32 , buttonY, "CCW", () => {
+      addTouchButton(radius +32 , buttonY, "", () => {
         rotateLeft = true
       }, () => {
         rotateLeft = false
         rotateStop = true
-      })
-      addTouchButton(radius * 3 + 64, buttonY, "CW", () => {
+      }, textFrame=PhaserButton.FrameRotLeft)
+      addTouchButton(radius * 3 + 64, buttonY, "", () => {
         rotateRight = true
       }, () => {
         rotateRight = false
         rotateStop = true
-      })
-      addTouchButton(game.width - radius - 32, buttonY, "Fire", () => {
+      }, textFrame=PhaserButton.FrameRotRight)
+      addTouchButton(game.width - radius - 32, buttonY, "", () => {
         fire = true
       }, () => {
         fire = false
-      })
-      addTouchButton(game.width - radius * 3 - 64, buttonY, "Thrust", () => {
+      }, textFrame=PhaserButton.FrameFire)
+      addTouchButton(game.width - radius * 3 - 64, buttonY, "", () => {
         thrust = true
       }, () => {
         thrust = false
-      })
+      }, textFrame=PhaserButton.FrameThrust)
     }
     else
-      addTouchButton(game.width - 256, game.height-256, "Fire", () => {
+      addTouchButton(game.width - 256, game.height-256, "", () => {
         fire = true
       }, () => {
         fire = false
-      })
+      }, textFrame=PhaserButton.FrameFire)
   }
 
-  def addTouchButton(x: Double, y: Double, text: String, down: () => Unit, up: () => Unit): Button = {
-    val button = PhaserButton.add(game, x, y, text, 0.2, touchButtons)
+  def addTouchButton(x: Double, y: Double, text: String, down: () => Unit, up: () => Unit, textFrame: Int = 0): Button = {
+    val button = PhaserButton.add(game, x, y, text, 0.25, touchButtons, textFrame=textFrame)
     button.events.onInputOver.add(down, null, 1)
     button.events.onInputOut.add(up, null, 1)
     button.events.onInputDown.add(down, null, 1)
@@ -80,17 +80,26 @@ class TouchControls(game: Game, stick: Boolean) {
   def addMouseControls(bg: Sprite, player: Sprite): Unit = {
     bg.inputEnabled = true
     bg.events.onInputDown.add((spr: Sprite, ptr: Pointer) => {
-      if (ptr.leftButton.isDown) fire = true
+      val deltaX = player.x - ptr.x
+      val deltaY = player.y - ptr.y
+      val delta =  if (math.abs(deltaX) > math.abs(deltaY)) deltaX else deltaY
+      if (ptr.leftButton.isDown) {
+        fire = true
+        if (math.abs(delta) > 10) fireRotation = math.atan2(deltaY,deltaX)
+      }
       if (ptr.rightButton.isDown) {
-        val deltaX = player.x - ptr.x
-        val deltaY = player.y - ptr.y
-        val delta =  if (math.abs(deltaX) > math.abs(deltaY)) deltaX else deltaY
-        if (math.abs(delta) > 10) joystickRotation = math.atan2(deltaY,deltaX)
+        if (math.abs(delta) > 10) thrustRotation = math.atan2(deltaY,deltaX)
       }
     }, null, 0)
     bg.events.onInputUp.add((spr: Sprite, ptr: Pointer) => {
-      if (!ptr.leftButton.isDown) fire = false
-      if (!ptr.rightButton.isDown) joystickRotation = JoystickReleased
+      if (ptr.leftButton.isUp) {
+        fireRotation = NoRotation
+        fire = false
+      }
+      if (ptr.rightButton.isUp) {
+        thrustRotation = NoRotation
+        thrust = false
+      }
     }, null, 0)
   }
 
@@ -111,18 +120,20 @@ class TouchControls(game: Game, stick: Boolean) {
     c.input.enableDrag(lockCenter = false, bringToTop = false, pixelPerfect = false,
       boundsRect = new Rectangle(pos.x-256, pos.y-256, 512,512))
     c.events.onDragUpdate.add((c: Sprite, pointer: Pointer, x: Double, y: Double, snap: Point, fromStart: Boolean) => {
+      c.alpha = 1.0
       val deltaX = pos.x - x
       val deltaY = pos.y - y
       val delta =  if (math.abs(deltaX) > math.abs(deltaY)) deltaX else deltaY
-      if (math.abs(delta) > 10) joystickRotation = math.atan2(deltaY,deltaX)
+      if (math.abs(delta) > 10) thrustRotation = math.atan2(deltaY,deltaX)
       rotateLeft = false
       rotateRight = false
       // if (delta > 0) rotateLeft = true else if (delta < 0) rotateRight = true
     }, null, 1)
     c.events.onDragStop.add((c: Sprite, pointer: Pointer) => {
+      c.alpha = 0.25
       c.x = pos.x
       c.y = pos.y
-      joystickRotation = JoystickReleased
+      thrustRotation = NoRotation
       rotateLeft = false
       rotateRight = false
     }, null, 1)

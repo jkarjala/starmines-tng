@@ -7,18 +7,15 @@ class StateGameOver(game: Game, options: Map[String,String], status: Element) ex
 
   var keyDown: Boolean = _
 
-  override def preload(): Unit = {
-  }
-
   override def create(): Unit = {
 
     game.add.bitmapText(game.width/2,300, GlobalRes.FontId, "Game Over", 128).anchor.set(0.5,0.5)
 
-    val button = PhaserButton.add(game, game.width/2-150,game.height-200, "Play")
+    val button = PhaserButton.add(game, game.width/2-150,game.height-200, "", textFrame=PhaserButton.FramePlay)
     button.events.onInputUp.add(gotoPlay _, null, 1)
     keyDown = PhaserKeys.isFireDown(game)
 
-    val buttonMenu = PhaserButton.add(game, game.width/2+150,game.height-200, "Menu")
+    val buttonMenu = PhaserButton.add(game, game.width/2+150,game.height-200, "", textFrame=PhaserButton.FrameExit)
     buttonMenu.events.onInputUp.add(gotoMenu _, null, 1)
 
   }

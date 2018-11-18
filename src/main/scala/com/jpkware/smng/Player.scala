@@ -40,6 +40,19 @@ class Player(game: Game, x: Double, y: Double)
   def rotateRight(): Unit = setRotationSpeed(-scala.math.Pi*2)
   def rotateStop(): Unit = setRotationSpeed(0)
 
+  def rotateToFire(atan2Angle: Double): Unit = {
+    val joystickRotation = atan2Angle - math.Pi
+    val playerRotation = indexRotation
+    if (math.abs(joystickRotation-playerRotation) < rotationStep + 0.001 ) {
+      rotateStop()
+    }
+    else {
+      if ((joystickRotation < playerRotation && math.abs(playerRotation - joystickRotation) < math.Pi)
+        || (joystickRotation > playerRotation && math.abs(playerRotation - joystickRotation) > math.Pi)) rotateLeft()
+      else rotateRight()
+    }
+  }
+
   def rotateOrThrust(atan2Angle: Double): Unit = {
     val joystickRotation = atan2Angle - math.Pi
     val playerRotation = indexRotation

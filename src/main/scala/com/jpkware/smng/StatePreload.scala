@@ -18,7 +18,8 @@ class StatePreload(game: Game, options: Map[String,String]) extends State {
     game.load.setPreloadSprite(preloadBar)
 
     game.load.bitmapFont(GlobalRes.FontId, "res/font.png", "res/font.fnt")
-    game.load.spritesheet(GlobalRes.ButtonId, "res/button.png", 128, 128)
+    // game.load.spritesheet(GlobalRes.ButtonId, "res/button.png", 128, 128)
+    game.load.spritesheet(GlobalRes.ButtonId, "res/buttons.png", 128, 128)
     game.load.atlasJSONHash(GlobalRes.MainAtlasId, s"res/main.png", s"res/main.json")
     game.load.atlasJSONHash(GlobalRes.EnemiesAtlasId, s"res/enemies.png", s"res/enemies.json")
     Scorebox.preloadResources(game)

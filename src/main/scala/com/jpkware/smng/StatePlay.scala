@@ -44,19 +44,21 @@ class StatePlay(game: Game, options: Map[String,String], status: Element) extend
 
   override def create(): Unit = {
 
-    if (options.contains("debug")) {
-      val button = PhaserButton.add(game, game.width/2, game.height-128, "")
-      button.events.onInputUp.add(nextLevel _, null, 1)
-    }
-
     val bgLevel = (StatePlay.scores.level-1)/4
-    val bg = if (bgLevel <= StarMinesNG.maxBackground) bgLevel else bgLevel % (StarMinesNG.maxBackground) + 1
+    val bg = if (bgLevel <= StarMinesNG.maxBackground) bgLevel else (bgLevel % StarMinesNG.maxBackground) + 1
     val space = game.add.sprite(0,0,s"space$bg")
     space.scale.set(2,2)
 
     val gr = game.add.graphics(0,0)
     gr.lineStyle(2, 0xFFFFFF, 1)
     gr.drawRect(0,0,game.width,game.height)
+
+    if (options.contains("debug")) {
+      val button = PhaserButton.add(game, game.width/2, game.height-128, "skip", scale = 1.0)
+      button.events.onInputUp.add(nextLevel _, null, 1)
+    }
+
+    PhaserButton.addMinMax(game)
 
     game.physics.startSystem(PhysicsObj.ARCADE)
 
@@ -220,8 +222,10 @@ class StatePlay(game: Game, options: Map[String,String], status: Element) extend
     else player.rotateStop()
 
     if (cursors.up.isDown || k.isDown('N') || touch.thrust) player.thrust()
-    else if (touch.joystickRotation!=touch.JoystickReleased) player.rotateOrThrust(touch.joystickRotation)
+    else if (touch.thrustRotation!=touch.NoRotation) player.rotateOrThrust(touch.thrustRotation)
     else player.thrustStop()
+
+    if (touch.fireRotation!=touch.NoRotation) player.rotateToFire(touch.fireRotation)
 
     if (PhaserKeys.isFireDown(game) || touch.fire) player.fire()
 

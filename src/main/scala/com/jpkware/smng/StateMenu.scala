@@ -15,25 +15,17 @@ class StateMenu(game: Game, options: Map[String,String], status: Element) extend
     val help = if (game.device.desktop || options.contains("touch")) "Control your ship with arrow keys and space, or z,x,n,m, or mouse"
     else "Use the touch buttons to control your ship"
 
-    game.add.bitmapText(game.width/2,game.height/2-180, GlobalRes.FontId, "StarMines", 128).anchor.set(0.5,0.5)
-    game.add.bitmapText(game.width/2,game.height/2-140, GlobalRes.FontId, "THE NEXT GENERATION", 32).anchor.set(0.5,0.5)
+    game.add.bitmapText(game.width/2,game.height/2-220, GlobalRes.FontId, "StarMines", 128).anchor.set(0.5,0.5)
+    game.add.bitmapText(game.width/2,game.height/2-180, GlobalRes.FontId, "THE NEXT GENERATION", 32).anchor.set(0.5,0.5)
 
     game.add.bitmapText(game.width/2,game.height-200, GlobalRes.FontId, "Collect all Bonusoids for maximum score", 32).anchor.set(0.5,0.5)
     game.add.bitmapText(game.width/2,game.height-150, GlobalRes.FontId, help, 32).anchor.set(0.5,0.5)
 
     game.add.bitmapText(game.width/2,game.height-50, GlobalRes.FontId, "Copyright 2018 Jari.Karjala@iki.fi", 32).anchor.set(0.5,0.5)
 
-    val button = PhaserButton.add(game, game.width/2,game.height/2+40, "Play")
+    val button = PhaserButton.add(game, game.width/2,game.height/2+40, "", textFrame=PhaserButton.FramePlay)
     button.events.onInputUp.add(startGame _, null, 1)
-
-    if (!game.device.iOS) {
-      val button2 = PhaserButton.add(game, 80, 80, "Full\nScreen\nToggle", scale = 1)
-      button2.events.onInputUp.add(() => if (game.scale.isFullScreen) {
-        game.scale.stopFullScreen()
-      } else {
-        game.scale.startFullScreen()
-      }, null, 1)
-    }
+    PhaserButton.addMinMax(game)
   }
 
   override def update(): Unit = {

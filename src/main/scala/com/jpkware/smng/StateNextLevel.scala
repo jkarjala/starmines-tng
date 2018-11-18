@@ -23,7 +23,7 @@ class StateNextLevel(game: Game, options: Map[String,String], status: Element) e
 
   override def create(): Unit = {
 
-    val button = PhaserButton.add(game, game.width/2,game.height-200, "Next")
+    val button = PhaserButton.add(game, game.width/2,game.height-200, "", textFrame=PhaserButton.FramePlay)
     button.events.onInputUp.add(gotoPlay _, null, 1)
     keyDown = PhaserKeys.isFireDown(game)
 

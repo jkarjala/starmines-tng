@@ -17,10 +17,6 @@ class Scorebox(game: Game, scores: ScoreState) extends Sprite(game, 0,0, Scorebo
   anchor.set(0.5,0.5)
   game.physics.enable(this)
   body match { case b: Body => b.immovable = true}
-  inputEnabled = true
-  events.onInputUp.add(() => {
-    if (game.scale.isFullScreen) game.scale.stopFullScreen() else game.scale.startFullScreen()
-  }, null, 1)
 
   game.add.bitmapText(game.width/2,game.height/2-80, GlobalRes.FontId, "StarMines", 96).anchor.set(0.5,0.5)
   game.add.bitmapText(game.width/2,game.height/2-48, GlobalRes.FontId, "THE NEXT GENERATION", 28).anchor.set(0.5,0.5)
