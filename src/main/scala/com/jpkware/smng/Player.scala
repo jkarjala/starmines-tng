@@ -36,8 +36,10 @@ class Player(game: Game, x: Double, y: Double)
   var immortal: Boolean = true
   revive()
 
-  def rotateLeft(): Unit = setRotationSpeed(scala.math.Pi*2)
-  def rotateRight(): Unit = setRotationSpeed(-scala.math.Pi*2)
+  def RotSpeed: Double = scala.math.Pi*2
+
+  def rotateLeft(): Unit = setRotationSpeed(rotationSpeed + RotSpeed/8)
+  def rotateRight(): Unit = setRotationSpeed(rotationSpeed - RotSpeed/8)
   def rotateStop(): Unit = setRotationSpeed(0)
 
   def rotateToFire(atan2Angle: Double): Unit = {
@@ -48,8 +50,8 @@ class Player(game: Game, x: Double, y: Double)
     }
     else {
       if ((joystickRotation < playerRotation && math.abs(playerRotation - joystickRotation) < math.Pi)
-        || (joystickRotation > playerRotation && math.abs(playerRotation - joystickRotation) > math.Pi)) rotateLeft()
-      else rotateRight()
+        || (joystickRotation > playerRotation && math.abs(playerRotation - joystickRotation) > math.Pi)) setRotationSpeed(RotSpeed)
+      else setRotationSpeed(-RotSpeed)
     }
   }
 
@@ -64,8 +66,8 @@ class Player(game: Game, x: Double, y: Double)
     else {
       thrustStop()
       if ((joystickRotation < playerRotation && math.abs(playerRotation - joystickRotation) < math.Pi)
-        || (joystickRotation > playerRotation && math.abs(playerRotation - joystickRotation) > math.Pi)) rotateLeft()
-      else rotateRight()
+        || (joystickRotation > playerRotation && math.abs(playerRotation - joystickRotation) > math.Pi)) setRotationSpeed(RotSpeed)
+      else setRotationSpeed(-RotSpeed)
     }
   }
 

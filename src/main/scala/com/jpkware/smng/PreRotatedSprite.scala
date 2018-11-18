@@ -32,7 +32,10 @@ class PreRotatedSprite(game: Game, x: Double, y: Double, sheet: String, prefix: 
     }
   }
 
-  protected def setRotationSpeed(s: Double): Unit = rotationSpeed = s
+  protected def setRotationSpeed(s: Double): Unit = {
+    if (s >= -scala.math.Pi*3 && s <= scala.math.Pi*3)
+        rotationSpeed = s
+  }
 
   val rotationStep: Double = Pi2/count
   def indexRotation: Double = -(index-1) * rotationStep
