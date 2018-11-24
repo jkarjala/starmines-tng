@@ -25,7 +25,7 @@ class Producer(game: Game, rule: Rule, group: Group) extends Enemy(game, rule, g
   timer.loop(delay, spawnPieces _, null)
   timer.start(100)
 
-  override def bulletHit(bullet: Bullet): Int = {
+  override def bulletHit(bullet: Sprite): Int = {
     damage(0.25)
     if (health>0) {
       Explosion(game, Explosion.TinyExploCount).explode(this)
@@ -69,7 +69,7 @@ class Producer(game: Game, rule: Rule, group: Group) extends Enemy(game, rule, g
 }
 
 class ProducerPiece(game: Game, rule: Rule, pieces: Group) extends Enemy(game, rule, pieces) {
-  override def bulletHit(bullet: Bullet): Int = {
+  override def bulletHit(bullet: Sprite): Int = {
     pieces.add(this)
     super.bulletHit(bullet)
   }
@@ -78,7 +78,7 @@ class ProducerPiece(game: Game, rule: Rule, pieces: Group) extends Enemy(game, r
 object Producer {
   val SfzProduceId = "sfx:produce"
 
-  def spawn(game: Game, rule: Rule, group: Group) : Enemy = new Producer(game, rule, group)
+  def spawn(p: SpawnParams) : Enemy = new Producer(p.game, p.rule, p.group)
 
   def preloadResources(game: Game): Unit = {
     game.load.audio(SfzProduceId, "res/produce.wav")

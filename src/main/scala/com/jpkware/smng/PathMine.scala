@@ -104,5 +104,5 @@ class PathMine(game: Game, rule: Rule, group: Group) extends Enemy(game, rule, g
 }
 
 object PathMine {
-  def spawn(game: Game, rule: Rule, group: Group) : Enemy = new PathMine(game, rule, group)
+  def spawn(p: SpawnParams) : Enemy = new PathMine(p.game, p.rule, p.group)
 }

@@ -3,9 +3,11 @@ package com.jpkware.smng
 import com.definitelyscala.phaser.{Game, Group, Sprite}
 import scala.math.min
 
+case class SpawnParams(game: Game, rule: Rule, group: Group, player: Player)
+
 case class Rule
 (
-  spawn: (Game, Rule, Group) => Enemy, // spawn function
+  spawn: (SpawnParams) => Enemy, // spawn function
   shape: String, // sprite shape name prefix
   frames: Int,   // sprite animation frame count
   fps: Int,      // animation fpx
@@ -32,6 +34,9 @@ class EnemyManager(game: Game, randomSafePosition: (Sprite) => Unit) {
     Rule(PathWorm.spawn, "ballb", 32, 12, 250, minL=6, maxL=31, modL=3, minC=1, maxC=5, div=2, spd=50, Seq("6ALz9i2z9i9ix", "2")),
     Rule(PathWorm.spawn, "ballc", 32, 12, 250, minL=7, maxL=32, modL=3, minC=1, maxC=5, div=2, spd=50, Seq("6AL9ix9ix9iz", "2")),
 
+    Rule(XYShooter.spawn, "xshoot",  32, 8, 300, minL=8, maxL=MAX, modL=2, minC=1, maxC=5, div=4, spd=80, Seq("1","0", "800")),
+    Rule(XYShooter.spawn, "yshoot",  32, 8, 300, minL=9, maxL=MAX, modL=2, minC=1, maxC=5, div=4, spd=80, Seq("0","1", "800")),
+
     Rule(Splitter.spawn, "2atom", 16, 12, 400, minL=10, maxL=40, modL=3, minC=3, maxC=10, div=1, spd=60, Seq("1atom","16","12","2")),
     Rule(Splitter.spawn, "2atomb", 16, 12, 400, minL=11, maxL=41, modL=3, minC=3, maxC=10, div=1, spd=60, Seq("1atom","16","12","2")),
     Rule(Splitter.spawn, "2atomc", 24, 12, 400, minL=12, maxL=42, modL=3, minC=3, maxC=10, div=1, spd=60, Seq("1atom","16","12","2")),
@@ -53,13 +58,13 @@ class EnemyManager(game: Game, randomSafePosition: (Sprite) => Unit) {
     Rule(null,"",0,0,0,0,0,0,0,0,0,0)
   )
 
-  def spawnEnemies(level: Int, count: Int): Group = {
+  def spawnEnemies(player: Player, level: Int, count: Int): Group = {
     val enemies = game.add.group(name = "enemies")
 
     if (count>0) {
       // Test with first rule only, and fixed count
-      val rule = rules(0)
-      spawnEnemies(enemies, count, rule)
+      val rule = rules.head
+      spawnEnemies(player, enemies, count, rule)
     }
     else {
       rules.foreach(rule => {
@@ -70,7 +75,7 @@ class EnemyManager(game: Game, randomSafePosition: (Sprite) => Unit) {
           // Rule matched this level, spawn enemies
           val enemyCount = min((level-rule.minL)/rule.div + rule.minC, rule.maxC)
           Logger.info(s"${rule.shape} $enemyCount")
-          spawnEnemies(enemies, enemyCount, rule)
+          spawnEnemies(player, enemies, enemyCount, rule)
         }
       })
     }
@@ -78,9 +83,9 @@ class EnemyManager(game: Game, randomSafePosition: (Sprite) => Unit) {
     enemies
   }
 
-  def spawnEnemies(group: Group, count: Int, rule: Rule): Unit = {
+  def spawnEnemies(player: Player, group: Group, count: Int, rule: Rule): Unit = {
     (1 to count).foreach(i => {
-      val enemy = rule.spawn(game, rule, group)
+      val enemy = rule.spawn(SpawnParams(game, rule, group, player))
       randomSafePosition(enemy)
     })
   }

@@ -1,9 +1,8 @@
 package com.jpkware.smng
 
-import com.definitelyscala.phaser.{Game, _}
+import com.definitelyscala.phaser._
 import org.scalajs.dom.raw.Element
 
-import scala.annotation.tailrec
 import scala.scalajs.js
 
 
@@ -84,7 +83,7 @@ class StatePlay(game: Game, options: Map[String,String], status: Element) extend
     messages = new Messages(game)
 
     enemyManager = new EnemyManager(game, setStartPosition)
-    enemies = enemyManager.spawnEnemies(StatePlay.scores.level, optionsCount)
+    enemies = enemyManager.spawnEnemies(player, StatePlay.scores.level, optionsCount)
 
     StatePlay.scores.timeBonus = bonusManager.bonusCount * 5000
   }
@@ -129,6 +128,7 @@ class StatePlay(game: Game, options: Map[String,String], status: Element) extend
     game.physics.arcade.overlap(player.weapon.bullets, enemies, bulletVsEnemy _, null, null)
     game.physics.arcade.overlap(player.weapon.bullets, bonusManager.containers, bulletVsBonusoid _, null, null)
     game.physics.arcade.overlap(player.weapon.bullets, bonusManager.bonuses, bulletVsBonus _, null, null)
+    game.physics.arcade.overlap(enemies, enemies, enemyVsEnemy _, null, null)
     game.physics.arcade.collide(enemies, StatePlay.scorebox)
     game.physics.arcade.collide(bonusManager.bonuses, StatePlay.scorebox)
     if (bonusManager.allDead || enemies.countLiving()==0) nextLevel()
@@ -203,6 +203,10 @@ class StatePlay(game: Game, options: Map[String,String], status: Element) extend
       }, null)
       timer.start(0)
     }
+  }
+
+  def enemyVsEnemy(enemy1: Enemy, enemy2: Enemy): Unit = {
+    if (!enemy1.enemyHit(enemy2)) enemy2.enemyHit(enemy1)
   }
 
   def handleGameOver(): Unit = {

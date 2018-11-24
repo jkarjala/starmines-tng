@@ -1,7 +1,7 @@
 package com.jpkware.smng
 
 import com.definitelyscala.phaser.Physics.Arcade.Body
-import com.definitelyscala.phaser.{Bullet, Game, Group, Point}
+import com.definitelyscala.phaser._
 
 class Splitter(game: Game, rule: Rule, group: Group) extends Enemy(game, rule, group) {
   val pieces: Group = game.add.group()
@@ -18,7 +18,7 @@ class Splitter(game: Game, rule: Rule, group: Group) extends Enemy(game, rule, g
     pieces.add(b)
   })
 
-  override def bulletHit(bullet: Bullet): Int = {
+  override def bulletHit(bullet: Sprite): Int = {
     super.bulletHit(bullet)
     (1 to count).foreach(i => {
       val b = pieces.getFirstDead()
@@ -44,5 +44,5 @@ class SplitterPiece(game: Game, rule: Rule, group: Group) extends Enemy(game, ru
 }
 
 object Splitter {
-  def spawn(game: Game, rule: Rule, group: Group) : Enemy = new Splitter(game, rule, group)
+  def spawn(p: SpawnParams) : Enemy = new Splitter(p.game, p.rule, p.group)
 }

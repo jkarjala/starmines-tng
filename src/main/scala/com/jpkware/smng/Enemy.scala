@@ -4,8 +4,10 @@ import com.definitelyscala.phaser.Physics.Arcade.Body
 import com.definitelyscala.phaser._
 
 import scala.scalajs.js
+import scala.util.Random
 
-class Enemy(game: Game, rule: Rule, group: Group) extends Sprite(game, 0,0, GlobalRes.EnemiesAtlasId, rule.shape+"01") {
+class Enemy(game: Game, rule: Rule, group: Group, atlas: String = GlobalRes.EnemiesAtlasId, initialFrame: Int = 1)
+  extends Sprite(game, 0,0, atlas, f"${rule.shape}%s$initialFrame%02d") {
 
   animations.add("rotate", Animation.generateFrameNames(rule.shape, 1, rule.frames, "", 2))
   val animation = animations.play("rotate", rule.fps, loop = true)
@@ -24,15 +26,20 @@ class Enemy(game: Game, rule: Rule, group: Group) extends Sprite(game, 0,0, Glob
     case body: Body => body
   }
 
-  def bulletHit(bullet: Bullet): Int = {
+  def bulletHit(bullet: Sprite): Int = {
     Explosion(game, Explosion.SmallExploCount).explode(this)
     bullet.kill()
     kill()
     killScore
   }
 
+  def enemyHit(theOther: Enemy): Boolean = {
+    false // try enemyHit the other way
+  }
+
   override def reset(x: Double, y: Double, health: Double = 1): Sprite = {
     super.reset(x, y, health)
+    animation.setFrame(rule.shape + s"${Random.nextInt(rule.frames)}")
     physBody.velocity.set(rule.spd-StarMinesNG.rnd.nextDouble()*(2*rule.spd), rule.spd-StarMinesNG.rnd.nextDouble()*(2*rule.spd))
     this
   }
@@ -48,5 +55,5 @@ class Enemy(game: Game, rule: Rule, group: Group) extends Sprite(game, 0,0, Glob
 }
 
 object Enemy {
-  def spawn(game: Game, rule: Rule, group: Group) : Enemy = new Enemy(game, rule, group)
+  def spawn(p: SpawnParams) : Enemy = new Enemy(p.game, p.rule, p.group)
 }
