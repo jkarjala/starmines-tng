@@ -16,6 +16,7 @@ class StateBoot(game: Game, options: Map[String,String]) extends State {
   override def preload(): Unit = {
     game.load.image("preloaderBar", "res/flame.png")
     game.load.image("ship-preload", "res/ship-preload.png")
+    game.load.image(GlobalRes.MenuBg, "res/space0.jpg")
   }
 
   override def create(): Unit = {

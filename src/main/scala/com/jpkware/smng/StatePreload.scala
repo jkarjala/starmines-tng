@@ -9,6 +9,8 @@ class StatePreload(game: Game, options: Map[String,String]) extends State {
   var step: Int = 10
   override def preload(): Unit = {
 
+    game.add.sprite(0,0, GlobalRes.MenuBg).scale.set(2,2)
+
     ship = game.add.sprite(game.width / 4, game.height / 2, "ship-preload")
     ship.anchor.set(0, 0.5)
 
@@ -28,7 +30,7 @@ class StatePreload(game: Game, options: Map[String,String]) extends State {
     Producer.preloadResources(game)
     StatePlay.preloadResources(game)
     StateNextLevel.preloadResources(game)
-    (0 to StarMinesNG.maxBackground).foreach(i => game.load.image(s"space$i", s"res/space$i.jpg"))
+    (1 to StarMinesNG.maxBackground).foreach(i => game.load.image(s"space$i", s"res/space$i.jpg"))
   }
 
   override def create(): Unit = {
@@ -52,4 +54,5 @@ object GlobalRes {
   val EnemiesAtlasId = "enemies"
   val FontId = "font"
   val ButtonId = "button"
+  val MenuBg = "space0"
 }

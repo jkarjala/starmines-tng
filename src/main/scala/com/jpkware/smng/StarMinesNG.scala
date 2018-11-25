@@ -8,15 +8,17 @@ import org.scalajs.dom.raw.Element
 import scala.scalajs.js
 import scala.util.Random
 
+case class Progress(var maxLevel: Int = 1, var highScore: Int = 0)
 
 object StarMinesNG {
   val rnd = new Random(42) // This random should be used only for level generation, reset at level change
   val maxBackground = 48
 
+  val progress: Progress = Progress()
+
   def addBackground(game: Game, level: Int,  x: Double = 0, y: Double = 0): Sprite = {
-    val bgLevel = (level-1) / 4
-    val bg = if (bgLevel <= StarMinesNG.maxBackground) bgLevel else (bgLevel % StarMinesNG.maxBackground) + 1
-    game.add.sprite(x,y,s"space$bg")
+    val bgLevel = (level / 4) % StarMinesNG.maxBackground + 1
+    game.add.sprite(x,y,s"space$bgLevel")
   }
 
   def main(args: Array[String]): Unit = {
@@ -39,6 +41,7 @@ object StarMinesNG {
     game.state.add("play", new StatePlay(game, options, status))
     game.state.add("nextlevel", new StateNextLevel(game, options, status))
     game.state.add("gameover", new StateGameOver(game, options, status))
+    game.state.add("levels", new StateLevels(game, options))
     game.state.start("boot", args = null, clearWorld = true, clearCache = false)
   }
 }

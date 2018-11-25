@@ -12,6 +12,8 @@ class StateMenu(game: Game, options: Map[String,String], status: Element) extend
 
   override def create(): Unit = {
     status.innerHTML = ""
+    game.add.sprite(0,0, GlobalRes.MenuBg).scale.set(2,2)
+
     val help = if (game.device.desktop || options.contains("touch")) "Control your ship with arrow keys and space, or z,x,n,m, or mouse"
     else "Use the touch buttons to control your ship"
 
@@ -23,8 +25,12 @@ class StateMenu(game: Game, options: Map[String,String], status: Element) extend
 
     game.add.bitmapText(game.width/2,game.height-50, GlobalRes.FontId, "Copyright 2018 Jari.Karjala@iki.fi", 32).anchor.set(0.5,0.5)
 
-    val button = PhaserButton.add(game, game.width/2,game.height/2+40, "", textFrame=PhaserButton.FramePlay)
+    val button = PhaserButton.add(game, game.width/2-200,game.height/2+40, "", textFrame=PhaserButton.FramePlay)
     button.events.onInputUp.add(startGame _, null, 1)
+
+    val button2 = PhaserButton.add(game, game.width/2+200,game.height/2+40, "", textFrame=PhaserButton.FrameGrid)
+    button2.events.onInputUp.add(startLevels _, null, 1)
+
     PhaserButton.addMinMax(game)
   }
 
@@ -35,4 +41,9 @@ class StateMenu(game: Game, options: Map[String,String], status: Element) extend
   def startGame(): Unit = {
     game.state.start("play", args = "start", clearCache = false, clearWorld = true)
   }
+
+  def startLevels(): Unit = {
+    game.state.start("levels", args = "start", clearCache = false, clearWorld = true)
+  }
+
 }

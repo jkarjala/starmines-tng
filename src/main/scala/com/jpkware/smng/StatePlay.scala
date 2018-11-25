@@ -25,19 +25,22 @@ class StatePlay(game: Game, options: Map[String,String], status: Element) extend
   override def init(args: js.Any*): Unit = {
     args.headOption match {
       case str: Some[js.Any] =>
-        Logger.info(s"init ${str.get}")
-        if (str.get.asInstanceOf[String]=="nextlevel") {
+        Logger.info(s"Play init ${str.get}")
+        val cmd = str.get.asInstanceOf[String]
+        if (cmd=="nextlevel") {
           StatePlay.scorebox.addToLevel(1)
           StatePlay.scores.bonusesCollected = 0
         }
         else {
           StatePlay.scores = Scorebox.InitialScore
-          if (options.contains("level"))
+          if (cmd(0).isDigit) StatePlay.scores.level = cmd.toInt
+          else if (options.contains("level"))
             StatePlay.scores.level = options("level").toInt
         }
       case _ =>
     }
     StarMinesNG.rnd.setSeed(42+StatePlay.scores.level)
+    if (StatePlay.scores.level > StarMinesNG.progress.maxLevel) StarMinesNG.progress.maxLevel = StatePlay.scores.level
     gameOver = false
   }
 
@@ -56,6 +59,9 @@ class StatePlay(game: Game, options: Map[String,String], status: Element) extend
     }
 
     PhaserButton.addMinMax(game)
+
+    val button = PhaserButton.add(game, game.width - 40, 40, "", textFrame = PhaserButton.FrameExit, scale = 0.5)
+    button.events.onInputUp.add(() => gotoMenu(), null, 1)
 
     game.physics.startSystem(PhysicsObj.ARCADE)
 
@@ -231,7 +237,11 @@ class StatePlay(game: Game, options: Map[String,String], status: Element) extend
 
     if (PhaserKeys.isFireDown(game) || touch.fire) player.fire()
 
-    if (k.isDown(27)) game.state.start("menu", args = "quit", clearCache = false, clearWorld = true)
+    if (k.isDown(27)) gotoMenu()
+  }
+
+  def gotoMenu(): Unit = {
+    game.state.start("menu", args = "quit", clearCache = false, clearWorld = true)
   }
 }
 

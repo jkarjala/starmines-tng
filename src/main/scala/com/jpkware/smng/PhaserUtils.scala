@@ -20,9 +20,12 @@ object PhaserButton {
   val FramePlay = 12
   val FrameFire = 13
   val FrameExit = 14
+  val FrameGrid = 15
+  val FrameLeft = 16
+  val FrameRight = 17
 
   def add(game: Game, x: Double, y: Double, text: String, alpha: Double = 0.75,
-          group: Group = null, scale: Double = 2, frame: Int = FrameBasic, textFrame: Int = -1): Button = {
+          group: Group = null, scale: Double = 1.5, frame: Int = FrameBasic, textFrame: Int = -1): Button = {
     val button = game.add.button(x,y, GlobalRes.ButtonId, null, null, frame, frame+1, frame+2, frame+1)
     button.scale.set(scale,scale)
     button.anchor.set(0.5,0.5)
@@ -36,6 +39,7 @@ object PhaserButton {
     }
     else {
       val t = game.add.sprite(x,y,GlobalRes.ButtonId, textFrame)
+      t.scale.set(scale,scale)
       t.anchor.set(0.5, 0.5)
       t.alpha = alpha
       t
