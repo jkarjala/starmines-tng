@@ -43,9 +43,7 @@ class StatePlay(game: Game, options: Map[String,String], status: Element) extend
 
   override def create(): Unit = {
 
-    val bgLevel = (StatePlay.scores.level-1)/4
-    val bg = if (bgLevel <= StarMinesNG.maxBackground) bgLevel else (bgLevel % StarMinesNG.maxBackground) + 1
-    val space = game.add.sprite(0,0,s"space$bg")
+    val space = StarMinesNG.addBackground(game, StatePlay.scores.level)
     space.scale.set(2,2)
 
     val gr = game.add.graphics(0,0)

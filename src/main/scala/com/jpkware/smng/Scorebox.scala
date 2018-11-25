@@ -29,10 +29,9 @@ class Scorebox(game: Game, scores: ScoreState) extends Sprite(game, 0,0, Scorebo
   bonusText = game.add.bitmapText(game.width/2+280,game.height/2+45, GlobalRes.FontId, "", 48)
   bonusText.anchor.set(1,0)
 
-  game.add.bitmapText(game.width/2-280,game.height/2+90, GlobalRes.FontId, "Ships:", 48)
-  livesText = game.add.bitmapText(game.width/2-96,game.height/2+90, GlobalRes.FontId, "", 48)
+  livesText = game.add.bitmapText(game.width/2-280,game.height/2+90, GlobalRes.FontId, "", 48)
+  livesText.anchor.set(0,0)
 
-  game.add.bitmapText(game.width/2+60,game.height/2+90, GlobalRes.FontId, "Field:", 48)
   levelText = game.add.bitmapText(game.width/2+280,game.height/2+90, GlobalRes.FontId, "", 48)
   levelText.anchor.set(1,0)
 
@@ -53,12 +52,12 @@ class Scorebox(game: Game, scores: ScoreState) extends Sprite(game, 0,0, Scorebo
 
   def addToLives(delta: Int): Unit = {
     this.scores.lives += delta
-    livesText.setText(f"${scores.lives}%d")
+    livesText.setText(f"Ships: ${scores.lives}%d")
   }
 
   def addToLevel(delta: Int): Unit = {
     this.scores.level += delta
-    levelText.setText(f"${scores.level}%d")
+    levelText.setText(f"Field: ${scores.level}%d")
   }
 
   def addToScore(delta: Int): Unit = {

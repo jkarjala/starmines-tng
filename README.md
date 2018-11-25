@@ -21,3 +21,4 @@ The StarMines the Next Generation is licensed under [GNU General Public License 
 - [OpenFameArt](https://opengameart.org/) Button base shape
 - [Moonhouse](https://www.dafont.com/moonhouse.font) Base font
 - [Littera](http://kvazars.com/littera/) Bitmap font generator
+- [Hubblesite](http://hubblesite.org/) Space photographs

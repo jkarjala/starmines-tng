@@ -11,7 +11,13 @@ import scala.util.Random
 
 object StarMinesNG {
   val rnd = new Random(42) // This random should be used only for level generation, reset at level change
-  val maxBackground = 18
+  val maxBackground = 48
+
+  def addBackground(game: Game, level: Int,  x: Double = 0, y: Double = 0): Sprite = {
+    val bgLevel = (level-1) / 4
+    val bg = if (bgLevel <= StarMinesNG.maxBackground) bgLevel else (bgLevel % StarMinesNG.maxBackground) + 1
+    game.add.sprite(x,y,s"space$bg")
+  }
 
   def main(args: Array[String]): Unit = {
 
