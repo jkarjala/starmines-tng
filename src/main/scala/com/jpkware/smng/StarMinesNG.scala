@@ -5,15 +5,11 @@ import com.definitelyscala.phaser._
 import org.scalajs.dom
 import org.scalajs.dom.raw.Element
 
-import scala.scalajs.js
 import scala.util.Random
-
-case class Progress(var maxLevel: Int = 1, var highScore: Int = 0)
 
 object StarMinesNG {
   val rnd = new Random(42) // This random should be used only for level generation, reset at level change
   val maxBackground = 48
-
   val progress: Progress = Progress()
 
   def addBackground(game: Game, level: Int,  x: Double = 0, y: Double = 0): Sprite = {

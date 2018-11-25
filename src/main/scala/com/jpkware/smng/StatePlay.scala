@@ -40,7 +40,10 @@ class StatePlay(game: Game, options: Map[String,String], status: Element) extend
       case _ =>
     }
     StarMinesNG.rnd.setSeed(42+StatePlay.scores.level)
-    if (StatePlay.scores.level > StarMinesNG.progress.maxLevel) StarMinesNG.progress.maxLevel = StatePlay.scores.level
+    if (StatePlay.scores.level > StarMinesNG.progress.maxLevel) {
+      StarMinesNG.progress.maxLevel = StatePlay.scores.level
+      Progress.save(StarMinesNG.progress)
+    }
     gameOver = false
   }
 
@@ -219,7 +222,18 @@ class StatePlay(game: Game, options: Map[String,String], status: Element) extend
     enemies.destroy()
     player.hide()
     messages.clear()
+    saveProgress()
     game.state.start("gameover", args = "gameover", clearCache = false, clearWorld = false)
+  }
+
+  def saveProgress(): Unit = {
+    if (StatePlay.scores.score > StarMinesNG.progress.highScore) {
+      StarMinesNG.progress.highScore = StatePlay.scores.score
+    }
+    if (StatePlay.scores.totalBonuses > StarMinesNG.progress.maxBonusesCollected) {
+      StarMinesNG.progress.maxBonusesCollected = StatePlay.scores.totalBonuses
+    }
+    Progress.save(StarMinesNG.progress)
   }
 
   def handleInput(): Unit = {
@@ -241,6 +255,7 @@ class StatePlay(game: Game, options: Map[String,String], status: Element) extend
   }
 
   def gotoMenu(): Unit = {
+    saveProgress()
     game.state.start("menu", args = "quit", clearCache = false, clearWorld = true)
   }
 }

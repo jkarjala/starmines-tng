@@ -28,7 +28,6 @@ class StateLevels(game: Game, options: Map[String,String]) extends State {
 
     for (y <- 0 to 3; x <- 0 to 3) {
         val bg = StarMinesNG.addBackground(game, level, x * gridW, y * gridH)
-        if (x == 0) Logger.info(s"${bg.frameName}")
         bg.scale.set(gridW / bg.width, gridH / bg.height)
         if (level > maxLevel) {
           bg.alpha = 0.25
