@@ -10,7 +10,6 @@ import scala.util.Random
 object StarMinesNG {
   val rnd = new Random(42) // This random should be used only for level generation, reset at level change
   val maxBackground = 48
-  val progress: Progress = Progress()
 
   def addBackground(game: Game, level: Int,  x: Double = 0, y: Double = 0): Sprite = {
     val bgLevel = (level / 4) % StarMinesNG.maxBackground + 1
@@ -32,7 +31,7 @@ object StarMinesNG {
     val mode = if (options.contains("webgl")) Phaser.WEBGL else Phaser.CANVAS
     val game = new Game(1920, 1080, mode, parent)
     game.state.add("boot", new StateBoot(game, options))
-    game.state.add("preloader", new StatePreload(game, options))
+    game.state.add("preloader", new StatePreload(game, options, status))
     game.state.add("menu", new StateMenu(game, options, status))
     game.state.add("play", new StatePlay(game, options, status))
     game.state.add("nextlevel", new StateNextLevel(game, options, status))

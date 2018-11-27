@@ -12,7 +12,7 @@ class StateLevels(game: Game, options: Map[String,String]) extends State {
   var currentStartLevel = 1
 
   override def create(): Unit = {
-    createGrid(StarMinesNG.progress.maxLevel/64*64 + 1, StarMinesNG.progress.maxLevel)
+    createGrid(Progress.state.maxLevel/64*64 + 1, Progress.state.maxLevel)
   }
 
   override def update(): Unit = {
@@ -31,19 +31,21 @@ class StateLevels(game: Game, options: Map[String,String]) extends State {
         bg.scale.set(gridW / bg.width, gridH / bg.height)
         if (level > maxLevel) {
           bg.alpha = 0.25
-          level += 4
         }
-        else {
-          val deltaX = gridW / 5
-          val marginX = x * gridW + deltaX
-          val marginY = y * gridH + gridH / 2
-          for (bx <- 0 to 3) {
-            if (level <= maxLevel) {
-              val b = PhaserButton.add(game, marginX + deltaX * bx, marginY, level.toString, scale = 0.7)
-              b.events.onInputUp.add( (o: Any, p: Pointer, isOver: Boolean, lvl: Int) => startGame(lvl), null, 1, args=level)
-            }
-            level += 1
+        val deltaX = gridW / 5
+        val marginX = x * gridW + deltaX
+        val marginY = y * gridH + gridH / 2
+        for (bx <- 0 to 3) {
+          if (level <= maxLevel) {
+            val b = PhaserButton.add(game, marginX + deltaX * bx, marginY, level.toString, scale = 0.7)
+            b.events.onInputUp.add( (o: Any, p: Pointer, isOver: Boolean, lvl: Int) => startGame(lvl), null, 1, args=level)
           }
+          else {
+            val t = game.add.bitmapText(marginX + deltaX * bx, marginY, GlobalRes.FontId, level.toString, 32 * 0.7)
+            t.alpha = 0.25
+            t.anchor.set(0.5,0.5)
+          }
+          level += 1
         }
     }
 

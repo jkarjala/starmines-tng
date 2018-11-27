@@ -54,7 +54,8 @@ object PhaserButton {
   def addMinMax(game: Game): Unit = {
     if (!game.device.iOS) {
       game.scale.onFullScreenChange.dispose() // clear all old listeners
-      val button2 = PhaserButton.add(game, 40, 40, " ", scale = 0.5, frame = FrameMax)
+      val frame = if (game.scale.isFullScreen) FrameMin else FrameMax
+      val button2 = PhaserButton.add(game, 32, 32, " ", scale = 0.4, frame = frame)
       game.scale.onFullScreenChange.add(() => if (game.scale.isFullScreen) {
         button2.setFrames(FrameMin, FrameMin+1, FrameMin+2)
       } else {

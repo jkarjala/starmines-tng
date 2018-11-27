@@ -1,8 +1,9 @@
 package com.jpkware.smng
 
 import com.definitelyscala.phaser.{Game, Sprite, State}
+import org.scalajs.dom.raw.Element
 
-class StatePreload(game: Game, options: Map[String,String]) extends State {
+class StatePreload(game: Game, options: Map[String,String], status: Element) extends State {
 
   var preloadBar: Sprite = _
   var ship: Sprite = _
@@ -19,6 +20,10 @@ class StatePreload(game: Game, options: Map[String,String]) extends State {
     preloadBar.scale.set(1.25,1.25)
     game.load.setPreloadSprite(preloadBar)
 
+    game.load.onFileComplete.add((progress: Int) => {
+      status.innerHTML  = "Loading resources " + progress.toString + "%"
+    }, null, 1)
+
     game.load.bitmapFont(GlobalRes.FontId, "res/font.png", "res/font.fnt")
     // game.load.spritesheet(GlobalRes.ButtonId, "res/button.png", 128, 128)
     game.load.spritesheet(GlobalRes.ButtonId, "res/buttons.png", 128, 128)
@@ -31,9 +36,6 @@ class StatePreload(game: Game, options: Map[String,String]) extends State {
     StatePlay.preloadResources(game)
     StateNextLevel.preloadResources(game)
     (1 to StarMinesNG.maxBackground).foreach(i => game.load.image(s"space$i", s"res/space$i.jpg"))
-  }
-
-  override def create(): Unit = {
   }
 
   override def update(): Unit = {

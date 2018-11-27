@@ -40,10 +40,7 @@ class StatePlay(game: Game, options: Map[String,String], status: Element) extend
       case _ =>
     }
     StarMinesNG.rnd.setSeed(42+StatePlay.scores.level)
-    if (StatePlay.scores.level > StarMinesNG.progress.maxLevel) {
-      StarMinesNG.progress.maxLevel = StatePlay.scores.level
-      Progress.save(StarMinesNG.progress)
-    }
+    Progress.updateAndSave(StatePlay.scores)
     gameOver = false
   }
 
@@ -138,27 +135,32 @@ class StatePlay(game: Game, options: Map[String,String], status: Element) extend
     game.physics.arcade.overlap(enemies, enemies, enemyVsEnemy _, null, null)
     game.physics.arcade.collide(enemies, StatePlay.scorebox)
     game.physics.arcade.collide(bonusManager.bonuses, StatePlay.scorebox)
-    if (bonusManager.allDead || enemies.countLiving()==0) nextLevel()
+    if (StatePlay.scores.lives>0 && (bonusManager.allDead || enemies.countLiving()==0)) nextLevel()
   }
 
   def nextLevel(): Unit = {
     val result = if (bonusManager.bonusCount == StatePlay.scores.bonusesCollected) {
       sfxLevelEnd.play()
-      "Field completed perfectly!\nAll Bonusoids collected!"
+      "Field completed perfectly,\nall Bonusoids collected!"
     }
     else {
       sfxLevelClr.play()
+      val ratio = s"${StatePlay.scores.bonusesCollected}/${bonusManager.bonusCount}"
       if (enemies.countLiving()==0)
-        "Mines destroyed, field completed!\nSome Bonusoids not collected..."
+        s"Mines destroyed, field completed,\nbut only $ratio Bonusoids collected..."
       else
-        "Field completed, but\nlost some Bonusoids..."
+        s"Field completed, but only\n$ratio Bonusoids collected..."
     }
+    clearLevel()
+    game.state.start("nextlevel", args = result, clearCache = false, clearWorld = false)
+  }
+
+  def clearLevel(): Unit = {
     touch.disable()
     enemies.destroy()
     messages.clear()
     player.hide()
     bonusManager.bonuses.destroy()
-    game.state.start("nextlevel", args = result, clearCache = false, clearWorld = false)
   }
 
   def bulletVsEnemy(bullet: Bullet, enemy: Sprite): Unit = {
@@ -185,12 +187,12 @@ class StatePlay(game: Game, options: Map[String,String], status: Element) extend
   }
 
   def playerVsBonus(player: Player, bonus: Sprite): Unit = {
-    messages.show("Bonusoid collected!")
     sfxCollect.play()
     bonus.kill()
     StatePlay.scorebox.addToBonusesCollected(1)
     StatePlay.scorebox.addToScore(2000)
     StatePlay.scorebox.addToTimeBonus(2000)
+    messages.show(s"Bonusoid collected! Game total ${StatePlay.scores.totalBonuses}")
   }
 
   def playerVsEnemy(player: Player, enemy: Sprite): Unit = {
@@ -203,9 +205,9 @@ class StatePlay(game: Game, options: Map[String,String], status: Element) extend
       Explosion(game, Explosion.LargeExploCount).explode(player)
       enemy.kill()
       player.kill()
+      StatePlay.scorebox.addToLives(-1)
       val timer = game.time.create(true)
       timer.add(3000, () => {
-        StatePlay.scorebox.addToLives(-1)
         if (StatePlay.scores.lives==0) handleGameOver() else player.revive()
       }, null)
       timer.start(0)
@@ -218,22 +220,9 @@ class StatePlay(game: Game, options: Map[String,String], status: Element) extend
 
   def handleGameOver(): Unit = {
     gameOver = true
-    touch.disable()
-    enemies.destroy()
-    player.hide()
-    messages.clear()
-    saveProgress()
+    clearLevel()
+    Progress.updateAndSave(StatePlay.scores)
     game.state.start("gameover", args = "gameover", clearCache = false, clearWorld = false)
-  }
-
-  def saveProgress(): Unit = {
-    if (StatePlay.scores.score > StarMinesNG.progress.highScore) {
-      StarMinesNG.progress.highScore = StatePlay.scores.score
-    }
-    if (StatePlay.scores.totalBonuses > StarMinesNG.progress.maxBonusesCollected) {
-      StarMinesNG.progress.maxBonusesCollected = StatePlay.scores.totalBonuses
-    }
-    Progress.save(StarMinesNG.progress)
   }
 
   def handleInput(): Unit = {
@@ -255,7 +244,7 @@ class StatePlay(game: Game, options: Map[String,String], status: Element) extend
   }
 
   def gotoMenu(): Unit = {
-    saveProgress()
+    Progress.updateAndSave(StatePlay.scores)
     game.state.start("menu", args = "quit", clearCache = false, clearWorld = true)
   }
 }

@@ -14,12 +14,29 @@ class Progress extends js.Object {
 object Progress {
   val LSProgressKey = "starmines-progress"
 
+  val state: Progress = Progress()
+
   def apply(): Progress = {
     dom.window.localStorage.getItem(LSProgressKey) match {
       case item: String =>
         Logger.info(s"Loaded progress:$item")
         JSON.parse(item).asInstanceOf[Progress]
-      case _ => new Progress()
+      case _ =>
+        Logger.info(s"No local progress found")
+        new Progress()
+    }
+  }
+
+  def update(scores: ScoreState): Unit = {
+    // Logger.info(s"$scores ${JSON.stringify(state)}")
+    if (scores.level > state.maxLevel) {
+      state.maxLevel = scores.level
+    }
+    if (scores.totalBonuses > state.maxBonusesCollected) {
+      state.maxBonusesCollected = scores.totalBonuses
+    }
+    if (scores.score > state.highScore) {
+      state.highScore = scores.score
     }
   }
 
@@ -27,5 +44,10 @@ object Progress {
     val json: String = JSON.stringify(progress)
     Logger.info(s"Saved progress:$json")
     dom.window.localStorage.setItem(Progress.LSProgressKey, json)
+  }
+
+  def updateAndSave(scores: ScoreState): Unit = {
+    update(scores)
+    save(state)
   }
 }
