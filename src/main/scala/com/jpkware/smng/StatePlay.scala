@@ -55,7 +55,7 @@ class StatePlay(game: Game, options: Map[String,String], status: Element) extend
 
     if (debug) {
       val button = PhaserButton.add(game, game.width/2, game.height-128, "skip", scale = 1.0)
-      button.events.onInputUp.add(nextLevel _, null, 1)
+      button.events.onInputUp.add(() => { StatePlay.scores.timeBonus = 0; nextLevel() }, null, 1)
     }
 
     PhaserButton.addMinMax(game)
@@ -65,7 +65,8 @@ class StatePlay(game: Game, options: Map[String,String], status: Element) extend
 
     game.physics.startSystem(PhysicsObj.ARCADE)
 
-    player = new Player(game, 100,100, StatePlay.scores.totalBonusoids)
+    val totalBonusoids = math.max(StatePlay.scores.totalBonusoids, Progress.state.maxBonusoids)
+    player = new Player(game, 100,100, totalBonusoids)
     game.add.existing(player)
 
     touch = new TouchControls(game, options.contains("stick"))
@@ -85,6 +86,8 @@ class StatePlay(game: Game, options: Map[String,String], status: Element) extend
 
     bonusManager = new BonusManager(game, 1 + scala.math.min((StatePlay.scores.level-1)/2, 9), setStartPosition)
     messages = new Messages(game)
+
+    messages.show(s"Ship level ${player.shipLevel+1}")
 
     enemyManager = new EnemyManager(game, setStartPosition)
     enemies = enemyManager.spawnEnemies(player, StatePlay.scores.level, optionsCount)
@@ -186,7 +189,7 @@ class StatePlay(game: Game, options: Map[String,String], status: Element) extend
   }
 
   def bulletVsBonusContainer(bullet: Bullet, bonusoid: Sprite): Unit = {
-    messages.show("Bonusoids released, catch them for upgrades!")
+    messages.show("Bonusoids released, catch them for ship upgrades!")
     Explosion(game, Explosion.SmallExploCount).explode(bonusoid)
     bonusoid.kill()
     bullet.kill()
@@ -206,9 +209,9 @@ class StatePlay(game: Game, options: Map[String,String], status: Element) extend
     bonusoid.kill()
     StatePlay.scorebox.addToBonusoidsCollected(1)
     StatePlay.scorebox.addToScore(2000)
-    messages.show(s"Bonusoid collected! Current total ${StatePlay.scores.totalBonusoids}.")
+    messages.show(s"Bonusoid collected! Current game total ${StatePlay.scores.totalBonusoids}.")
     player.maybeUpgradeShip(StatePlay.scores.totalBonusoids) match {
-      case Some(level) => messages.show(s"Ship upgraded to level $level with Bonusoids!")
+      case Some(level) => messages.show(s"Ship upgraded to level ${level+1}!")
       case None => // Nothing to do
     }
   }
