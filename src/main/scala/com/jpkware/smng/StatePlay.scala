@@ -20,6 +20,7 @@ class StatePlay(game: Game, options: Map[String,String], status: Element) extend
   var sfxCollect: Sound = _
   var messages: Messages = _
 
+  val debug: Boolean = options.contains("debug")
   def optionsCount: Int = if (options.contains("mines")) options("mines").toInt else -1
 
   override def init(args: js.Any*): Unit = {
@@ -29,13 +30,12 @@ class StatePlay(game: Game, options: Map[String,String], status: Element) extend
         val cmd = str.get.asInstanceOf[String]
         if (cmd=="nextlevel") {
           StatePlay.scorebox.addToLevel(1)
-          StatePlay.scores.bonusesCollected = 0
+          StatePlay.scores.bonusoidsCollected = 0
+          StatePlay.scores.stars = 0
         }
         else {
           StatePlay.scores = Scorebox.InitialScore
           if (cmd(0).isDigit) StatePlay.scores.level = cmd.toInt
-          else if (options.contains("level"))
-            StatePlay.scores.level = options("level").toInt
         }
       case _ =>
     }
@@ -53,7 +53,7 @@ class StatePlay(game: Game, options: Map[String,String], status: Element) extend
     gr.lineStyle(2, 0xFFFFFF, 1)
     gr.drawRect(0,0,game.width,game.height)
 
-    if (options.contains("debug")) {
+    if (debug) {
       val button = PhaserButton.add(game, game.width/2, game.height-128, "skip", scale = 1.0)
       button.events.onInputUp.add(nextLevel _, null, 1)
     }
@@ -65,7 +65,7 @@ class StatePlay(game: Game, options: Map[String,String], status: Element) extend
 
     game.physics.startSystem(PhysicsObj.ARCADE)
 
-    player = new Player(game, 100,100)
+    player = new Player(game, 100,100, StatePlay.scores.totalBonusoids)
     game.add.existing(player)
 
     touch = new TouchControls(game, options.contains("stick"))
@@ -83,13 +83,13 @@ class StatePlay(game: Game, options: Map[String,String], status: Element) extend
     sfxLevelClr = game.add.audio(StatePlay.SfxLevelClrId)
     sfxCollect = game.add.audio(StatePlay.SfxSwip)
 
-    bonusManager = new BonusManager(game, 1 + scala.math.min(((StatePlay.scores.level-1)/2).toInt, 8), setStartPosition)
+    bonusManager = new BonusManager(game, 1 + scala.math.min((StatePlay.scores.level-1)/2, 9), setStartPosition)
     messages = new Messages(game)
 
     enemyManager = new EnemyManager(game, setStartPosition)
     enemies = enemyManager.spawnEnemies(player, StatePlay.scores.level, optionsCount)
 
-    StatePlay.scores.timeBonus = bonusManager.bonusCount * 5000
+    StatePlay.scores.timeBonus = bonusManager.bonusoidCount * 5000
   }
 
   override def update(): Unit = {
@@ -127,32 +127,47 @@ class StatePlay(game: Game, options: Map[String,String], status: Element) extend
   def handleCollisions(): Unit = {
     game.physics.arcade.collide(player, StatePlay.scorebox)
     game.physics.arcade.overlap(player, enemies, playerVsEnemy _, null, null)
-    game.physics.arcade.overlap(player, bonusManager.bonuses, playerVsBonus _, null, null)
-    game.physics.arcade.collide(player.weapon.bullets, StatePlay.scorebox)
-    game.physics.arcade.overlap(player.weapon.bullets, enemies, bulletVsEnemy _, null, null)
-    game.physics.arcade.overlap(player.weapon.bullets, bonusManager.containers, bulletVsBonusoid _, null, null)
-    game.physics.arcade.overlap(player.weapon.bullets, bonusManager.bonuses, bulletVsBonus _, null, null)
+    game.physics.arcade.overlap(player, bonusManager.bonusoids, playerVsBonusoid _, null, null)
+
+    game.physics.arcade.collide(player.weapon1.bullets, StatePlay.scorebox)
+    game.physics.arcade.overlap(player.weapon1.bullets, enemies, bulletVsEnemy _, null, null)
+    game.physics.arcade.overlap(player.weapon1.bullets, bonusManager.containers, bulletVsBonusContainer _, null, null)
+    game.physics.arcade.overlap(player.weapon1.bullets, bonusManager.bonusoids, bulletVsBonusoid _, null, null)
+
+    game.physics.arcade.collide(player.weapon2.bullets, StatePlay.scorebox)
+    game.physics.arcade.overlap(player.weapon2.bullets, enemies, bulletVsEnemy _, null, null)
+    game.physics.arcade.overlap(player.weapon2.bullets, bonusManager.containers, bulletVsBonusContainer _, null, null)
+    game.physics.arcade.overlap(player.weapon2.bullets, bonusManager.bonusoids, bulletVsBonusoid _, null, null)
+
     game.physics.arcade.overlap(enemies, enemies, enemyVsEnemy _, null, null)
     game.physics.arcade.collide(enemies, StatePlay.scorebox)
-    game.physics.arcade.collide(bonusManager.bonuses, StatePlay.scorebox)
+    game.physics.arcade.collide(bonusManager.bonusoids, StatePlay.scorebox)
     if (StatePlay.scores.lives>0 && (bonusManager.allDead || enemies.countLiving()==0)) nextLevel()
   }
 
   def nextLevel(): Unit = {
-    val result = if (bonusManager.bonusCount == StatePlay.scores.bonusesCollected) {
+    StatePlay.scores.stars = 1
+
+    val timeBonusMsg: String = if (StatePlay.scores.timeBonus>0) {
+      StatePlay.scores.stars += 1
+      "* Field completed!\n* Time bonus achieved!\n"
+    } else {
+      "* Field completed!\n  Time bonus missed...\n"
+    }
+
+    val result: String = if (bonusManager.bonusoidCount == StatePlay.scores.bonusoidsCollected) {
       sfxLevelEnd.play()
-      "Field completed perfectly,\nall Bonusoids collected!"
+      StatePlay.scores.stars += 1
+      "* All Bonusoids collected!\n"
     }
     else {
       sfxLevelClr.play()
-      val ratio = s"${StatePlay.scores.bonusesCollected}/${bonusManager.bonusCount}"
-      if (enemies.countLiving()==0)
-        s"Mines destroyed, field completed,\nbut only $ratio Bonusoids collected..."
-      else
-        s"Field completed, but only\n$ratio Bonusoids collected..."
+      val ratio = s"${StatePlay.scores.bonusoidsCollected}/${bonusManager.bonusoidCount}"
+      s"  Only $ratio Bonusoids..."
     }
     clearLevel()
-    game.state.start("nextlevel", args = result, clearCache = false, clearWorld = false)
+    Progress.updateAndSave(StatePlay.scores)
+    game.state.start("nextlevel", args = timeBonusMsg + result, clearCache = false, clearWorld = false)
   }
 
   def clearLevel(): Unit = {
@@ -160,7 +175,7 @@ class StatePlay(game: Game, options: Map[String,String], status: Element) extend
     enemies.destroy()
     messages.clear()
     player.hide()
-    bonusManager.bonuses.destroy()
+    bonusManager.bonusoids.destroy()
   }
 
   def bulletVsEnemy(bullet: Bullet, enemy: Sprite): Unit = {
@@ -170,15 +185,15 @@ class StatePlay(game: Game, options: Map[String,String], status: Element) extend
     }
   }
 
-  def bulletVsBonusoid(bullet: Bullet, bonusoid: Sprite): Unit = {
-    messages.show("Bonusoids released, go catch them!")
+  def bulletVsBonusContainer(bullet: Bullet, bonusoid: Sprite): Unit = {
+    messages.show("Bonusoids released, catch them for upgrades!")
     Explosion(game, Explosion.SmallExploCount).explode(bonusoid)
     bonusoid.kill()
     bullet.kill()
     StatePlay.scorebox.addToScore(1000)
   }
 
-  def bulletVsBonus(bullet: Bullet, bonus: Sprite): Unit = {
+  def bulletVsBonusoid(bullet: Bullet, bonus: Sprite): Unit = {
     messages.show("Bonusoid lost!")
     Explosion(game, Explosion.SmallExploCount).explode(bonus)
     bonus.kill()
@@ -186,13 +201,16 @@ class StatePlay(game: Game, options: Map[String,String], status: Element) extend
     StatePlay.scorebox.addToScore(100)
   }
 
-  def playerVsBonus(player: Player, bonus: Sprite): Unit = {
+  def playerVsBonusoid(player: Player, bonusoid: Sprite): Unit = {
     sfxCollect.play()
-    bonus.kill()
-    StatePlay.scorebox.addToBonusesCollected(1)
+    bonusoid.kill()
+    StatePlay.scorebox.addToBonusoidsCollected(1)
     StatePlay.scorebox.addToScore(2000)
-    StatePlay.scorebox.addToTimeBonus(2000)
-    messages.show(s"Bonusoid collected! Game total ${StatePlay.scores.totalBonuses}")
+    messages.show(s"Bonusoid collected! Current total ${StatePlay.scores.totalBonusoids}.")
+    player.maybeUpgradeShip(StatePlay.scores.totalBonusoids) match {
+      case Some(level) => messages.show(s"Ship upgraded to level $level with Bonusoids!")
+      case None => // Nothing to do
+    }
   }
 
   def playerVsEnemy(player: Player, enemy: Sprite): Unit = {
@@ -241,11 +259,21 @@ class StatePlay(game: Game, options: Map[String,String], status: Element) extend
     if (PhaserKeys.isFireDown(game) || touch.fire) player.fire()
 
     if (k.isDown(27)) gotoMenu()
+    if (debug && k.isDown('U')) debugUpgrade()
   }
 
   def gotoMenu(): Unit = {
     Progress.updateAndSave(StatePlay.scores)
     game.state.start("menu", args = "quit", clearCache = false, clearWorld = true)
+  }
+
+  def debugUpgrade(): Unit = {
+    StatePlay.scores.totalBonusoids += 1
+    messages.show(s"DEBUG: totalBonusoids ${StatePlay.scores.totalBonusoids}")
+    player.maybeUpgradeShip(StatePlay.scores.totalBonusoids) match {
+      case Some(level) => messages.show(s"Ship systems upgraded to level $level!")
+      case None => // Nothing to do
+    }
   }
 }
 

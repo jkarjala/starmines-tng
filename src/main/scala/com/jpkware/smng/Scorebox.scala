@@ -4,7 +4,8 @@ import com.definitelyscala.phaser.{BitmapText, Game, Sprite}
 import com.definitelyscala.phaser.Physics.Arcade.Body
 
 case class ScoreState(var score: Int, var lives: Int, var level: Int,
-                      var bonusesCollected: Int, var totalBonuses: Int, var timeBonus: Int)
+                      var bonusoidsCollected: Int, var totalBonusoids: Int,
+                      var timeBonus: Int, var stars: Int)
 
 class Scorebox(game: Game, scores: ScoreState) extends Sprite(game, 0,0, Scorebox.ScoreboxId) {
 
@@ -47,9 +48,9 @@ class Scorebox(game: Game, scores: ScoreState) extends Sprite(game, 0,0, Scorebo
   }, null)
   timer.start(0)
 
-  def addToBonusesCollected(delta: Int): Unit = {
-    this.scores.bonusesCollected += delta
-    this.scores.totalBonuses += delta
+  def addToBonusoidsCollected(delta: Int): Unit = {
+    this.scores.bonusoidsCollected += delta
+    this.scores.totalBonusoids += delta
   }
 
   def addToLives(delta: Int): Unit = {
@@ -82,7 +83,7 @@ class Scorebox(game: Game, scores: ScoreState) extends Sprite(game, 0,0, Scorebo
 
 object Scorebox {
   def ScoreboxId = "scorebox"
-  def InitialScore = ScoreState(score = 0, lives = 5, level = 1, bonusesCollected = 0, totalBonuses = 0, timeBonus = 0)
+  def InitialScore = ScoreState(score = 0, lives = 5, level = 1, bonusoidsCollected = 0, totalBonusoids = 0, timeBonus = 0, stars = 0)
   def preloadResources(game: Game): Unit = {
     game.load.image(ScoreboxId, "res/scorebox.png")
   }

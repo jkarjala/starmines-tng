@@ -3,25 +3,35 @@ package com.jpkware.smng
 import com.definitelyscala.phaser.Physics.Arcade.Body
 import com.definitelyscala.phaser._
 
-class Player(game: Game, x: Double, y: Double)
+case class ShipLevelInfo(bulletLifespan: Int, fireRate: Int, bulletSpeed: Int, shield: Double)
+
+class Player(game: Game, x: Double, y: Double, bonusoidCount: Int)
   extends PreRotatedSprite(game, x,y, GlobalRes.MainAtlasId, Player.ShipPrefix, 64) {
+
+  val ShipLevelInfos = Seq(
+    ShipLevelInfo(700, 300, 1000, 1.0),
+    ShipLevelInfo(800, 300, 1000, 1.0),
+    ShipLevelInfo(800, 250, 1000, 1.0),
+    ShipLevelInfo(900, 250, 1000, 1.0),
+    ShipLevelInfo(900, 200, 1000, 1.0),
+    ShipLevelInfo(1000, 200, 1000, 1.0),
+    ShipLevelInfo(1000, 150, 1000, 1.0),
+    ShipLevelInfo(1000, 100, 1000, 1.0),
+  )
+
   game.physics.arcade.enable(this)
   physBody.drag.set(10,10)
   physBody.maxVelocity.set(750,750)
   physBody.collideWorldBounds = true
   physBody.bounce.set(1,1)
 
-  val weapon: Weapon = game.add.weapon(10, GlobalRes.MainAtlasId, Player.MissileId)
-  weapon.bulletKillType = Weapon.KILL_LIFESPAN
-  weapon.bulletLifespan = 1000
-  weapon.bulletCollideWorldBounds = true
-  weapon.bulletRotateToVelocity = true
-  weapon.bulletSpeed = 1000
-  weapon.bulletInheritSpriteSpeed = true
-  weapon.fireRate = 300
-  weapon.autofire = false
-  weapon.bullets.forEach(setBounce _, null, checkExists = false)
-  weapon.trackSprite(this, 0,0, trackRotation = false)
+  val weapon1: Weapon = game.add.weapon(10, GlobalRes.MainAtlasId, Player.MissileId)
+  weapon1.trackSprite(this, 0, 0, trackRotation = false)
+  val weapon2: Weapon = game.add.weapon(10, GlobalRes.MainAtlasId, Player.MissileId)
+  weapon2.trackSprite(this, 0, 0, trackRotation = false)
+  var shipLevel: Int = 0
+  resetWeapon(weapon1, ShipLevelInfos.head)
+  maybeUpgradeShip(bonusoidCount)
 
   val FlameScalaMax: Double = fullWidth/80
   val flame: Sprite = game.add.sprite(x,y,Player.FlameId)
@@ -35,6 +45,43 @@ class Player(game: Game, x: Double, y: Double)
 
   var immortal: Boolean = true
   revive()
+
+  def dualMissiles: Boolean = shipLevel >= ShipLevelInfos.length
+
+  def maybeUpgradeShip(bonusoidCount: Int): Option[Int] = {
+    val level = math.max(0, bonusoidCount/16)
+    if (level>shipLevel) {
+      shipLevel = level
+      if (!dualMissiles) {
+        val levelInfo = ShipLevelInfos(level)
+        Logger.info(s"Single missiles $level $levelInfo")
+        resetWeapon(weapon1, levelInfo)
+        Some(level)
+      }
+      else {
+        // Drop the weapon level slightly when dual missiles enabled
+        val newLevel = math.min(level - ShipLevelInfos.length + 3, ShipLevelInfos.length-1)
+        val levelInfo = ShipLevelInfos(newLevel)
+        Logger.info(s"Dual missiles $newLevel $levelInfo")
+        resetWeapon(weapon1, levelInfo)
+        resetWeapon(weapon2, levelInfo)
+        if (newLevel<ShipLevelInfos.length) Some(level) else None
+      }
+    }
+    else None
+  }
+
+  def resetWeapon(weapon: Weapon, shipLevel: ShipLevelInfo): Unit = {
+    weapon.bulletKillType = Weapon.KILL_LIFESPAN
+    weapon.bulletLifespan = shipLevel.bulletLifespan
+    weapon.bulletCollideWorldBounds = true
+    weapon.bulletRotateToVelocity = true
+    weapon.bulletSpeed = shipLevel.bulletSpeed
+    weapon.bulletInheritSpriteSpeed = true
+    weapon.fireRate = shipLevel.fireRate
+    weapon.autofire = false
+    weapon.bullets.forEach(setBounce _, null, checkExists = false)
+  }
 
   def RotSpeed: Double = scala.math.Pi*2
 
@@ -100,12 +147,20 @@ class Player(game: Game, x: Double, y: Double)
     stop()
     visible = false
   }
-  def fire(): Bullet = {
-    if (!this.visible) return null
-    weapon.fireAngle = indexAngle
-    val bullet = weapon.fire(headPoint(fullWidth/2))
-    if (bullet!=null) sfxZap.play()
-    bullet
+  def fire(): Unit = {
+    if (!this.visible) return
+    weapon1.fireAngle = indexAngle
+    weapon2.fireAngle = indexAngle
+
+    if (dualMissiles) {
+      val bullet1 = weapon1.fire(rotatedPoint(fullWidth/4, indexRotation + math.Pi/2))
+      val bullet2 = weapon2.fire(rotatedPoint(fullWidth/4, indexRotation - math.Pi/2))
+      if (bullet1!=null || bullet2!=null) sfxZap.play()
+    }
+    else {
+      val bullet = weapon1.fire(headPoint(fullWidth/2))
+      if (bullet!=null) sfxZap.play()
+    }
   }
 
   def setBounce(bullet: Bullet): Unit = {

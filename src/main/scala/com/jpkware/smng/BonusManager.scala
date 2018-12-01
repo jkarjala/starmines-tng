@@ -14,7 +14,7 @@ class BonusoidContainer(manager: BonusManager, game: Game, x: Double, y: Double)
     val v = 150
     val directions: Array[Point] = Array(new Point(v,v),new Point(-v,v),new Point(v,-v),new Point(-v,-v))
     (0 to 3).foreach(i => {
-      val b = manager.bonuses.getFirstDead()
+      val b = manager.bonusoids.getFirstDead()
       b match {
         case b: Bonusoid =>
           b.reset(position.x, position.y, 1)
@@ -44,8 +44,8 @@ class Bonusoid(game: Game, x: Double, y: Double)
 
 class BonusManager(game: Game, containerCount: Int, randomSafePosition: (Sprite) => Unit) {
   val containers: Group = game.add.group()
-  val bonuses: Group = game.add.group()
-  val bonusCount = containerCount*4
+  val bonusoids: Group = game.add.group()
+  val bonusoidCount = containerCount*4
 
   (1 to containerCount).foreach(i => {
     val b = new BonusoidContainer(this, game, 0, 0)
@@ -53,11 +53,11 @@ class BonusManager(game: Game, containerCount: Int, randomSafePosition: (Sprite)
     containers.add(b)
   })
 
-  (1 to bonusCount).foreach(i => {
+  (1 to bonusoidCount).foreach(i => {
     val b = new Bonusoid(game, 0, 0)
     b.kill()
-    bonuses.add(b)
+    bonusoids.add(b)
   })
 
-  def allDead: Boolean = containers.countLiving()==0 && bonuses.countLiving()==0
+  def allDead: Boolean = containers.countLiving()==0 && bonusoids.countLiving()==0
 }

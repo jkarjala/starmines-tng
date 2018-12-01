@@ -3,12 +3,14 @@ package com.jpkware.smng
 import org.scalajs.dom
 
 import scala.scalajs.js
-import scala.scalajs.js.JSON
+import scala.scalajs.js.{Dictionary, JSON}
+import scala.collection.mutable
 
 class Progress extends js.Object {
   var maxLevel: Int = 1
-  var maxBonusesCollected : Int = 0
+  var maxBonusoids : Int = 0
   var highScore: Int = 0
+  var stars: js.Dictionary[Int] = Dictionary()
 }
 
 object Progress {
@@ -28,15 +30,26 @@ object Progress {
   }
 
   def update(scores: ScoreState): Unit = {
-    // Logger.info(s"$scores ${JSON.stringify(state)}")
+    Logger.info(s"$scores ${JSON.stringify(state)}")
     if (scores.level > state.maxLevel) {
       state.maxLevel = scores.level
     }
-    if (scores.totalBonuses > state.maxBonusesCollected) {
-      state.maxBonusesCollected = scores.totalBonuses
+    if (scores.totalBonusoids > state.maxBonusoids) {
+      state.maxBonusoids = scores.totalBonusoids
     }
     if (scores.score > state.highScore) {
       state.highScore = scores.score
+    }
+
+    val key = scores.level.toString
+    val scalaStars: mutable.Map[String, Int] = state.stars
+    scalaStars.get(key) match {
+      case Some(old) =>
+        Logger.info(s"stars $old")
+        if (old < scores.stars) scalaStars(key) = scores.stars
+      case None =>
+        Logger.info(s"stars none")
+        scalaStars(key) = scores.stars
     }
   }
 

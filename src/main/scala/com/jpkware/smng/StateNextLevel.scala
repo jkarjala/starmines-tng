@@ -9,7 +9,7 @@ class StateNextLevel(game: Game, options: Map[String,String], status: Element) e
 
   var keyDown: Boolean = _
   var result: String = _
-  var text: BitmapText = _
+  var resultText: BitmapText = _
   var sfxTick: Sound = _
 
   override def init(args: js.Any*): Unit = {
@@ -27,8 +27,8 @@ class StateNextLevel(game: Game, options: Map[String,String], status: Element) e
     button.events.onInputUp.add(gotoPlay _, null, 1)
     keyDown = PhaserKeys.isFireDown(game)
 
-    text = game.add.bitmapText(game.width/2,300, GlobalRes.FontId, "Collecting time bonus...", 64)
-    text.anchor.set(0.5,0.5)
+    resultText = game.add.bitmapText(game.width/2,250, GlobalRes.FontId, "Collecting time bonus...", 64)
+    resultText.anchor.set(0.5,0.5)
 
     sfxTick = game.add.audio(StateNextLevel.SfxTick)
 
@@ -50,7 +50,7 @@ class StateNextLevel(game: Game, options: Map[String,String], status: Element) e
 
   override def update(): Unit = {
     if (StatePlay.scores.timeBonus>0) return
-    else text.text = result
+    else resultText.text = result
 
     if (keyDown) keyDown = !PhaserKeys.isFireDown(game)
     if (!keyDown && PhaserKeys.isFireDown(game)) gotoPlay()

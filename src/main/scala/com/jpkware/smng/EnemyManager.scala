@@ -79,7 +79,7 @@ class EnemyManager(game: Game, randomSafePosition: (Sprite) => Unit) {
         }
       })
     }
-    enemies.forEach((c: Sprite) => { Logger.info(s"${c.frameName} ${c.alive}  ${c.centerX} ${c.centerX}")}, null, false)
+    Logger.info(s"Live enemies: ${enemies.countLiving()}")
     enemies
   }
 

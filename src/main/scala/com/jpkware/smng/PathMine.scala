@@ -33,7 +33,7 @@ class PathMine(game: Game, rule: Rule, group: Group) extends Enemy(game, rule, g
       }
       i += 1
     }
-    Logger.info(s"prepared path: $res $loopIndex")
+    // Logger.info(s"prepared path: $res $loopIndex")
     res.toString
   }
 

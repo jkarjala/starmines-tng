@@ -9,10 +9,11 @@ class StateLevels(game: Game, options: Map[String,String]) extends State {
   lazy val gridW = game.width/4
   lazy val gridH = game.height/4
 
-  var currentStartLevel = 1
+  var initialStartLevel: Int = Progress.state.maxLevel/64*64 + 1
+  var currentStartLevel: Int = Progress.state.maxLevel/64*64 + 1
 
   override def create(): Unit = {
-    createGrid(Progress.state.maxLevel/64*64 + 1, Progress.state.maxLevel)
+    createGrid(initialStartLevel, Progress.state.maxLevel, Progress.state.stars.toMap)
   }
 
   override def update(): Unit = {
@@ -20,7 +21,7 @@ class StateLevels(game: Game, options: Map[String,String]) extends State {
     if (game.input.keyboard.isDown(27)) gotoMenu()
   }
 
-  def createGrid(startLevel: Int, maxLevel: Int): Unit = {
+  def createGrid(startLevel: Int, maxLevel: Int, starMap: Map[String, Int]): Unit = {
 
     var level = startLevel
     currentStartLevel = startLevel
@@ -39,6 +40,10 @@ class StateLevels(game: Game, options: Map[String,String]) extends State {
           if (level <= maxLevel) {
             val b = PhaserButton.add(game, marginX + deltaX * bx, marginY, level.toString, scale = 0.7)
             b.events.onInputUp.add( (o: Any, p: Pointer, isOver: Boolean, lvl: Int) => startGame(lvl), null, 1, args=level)
+            val starCount = starMap(level.toString)
+            val stars = "*" * starCount
+            val t = game.add.bitmapText(marginX + deltaX * bx, marginY + 32, GlobalRes.FontId, stars, 32)
+            t.anchor.set(0.5,0.5)
           }
           else {
             val t = game.add.bitmapText(marginX + deltaX * bx, marginY, GlobalRes.FontId, level.toString, 32 * 0.7)
@@ -52,14 +57,14 @@ class StateLevels(game: Game, options: Map[String,String]) extends State {
     if (currentStartLevel > 64) {
       val button = PhaserButton.add(game, 40, game.height / 2, "", textFrame = PhaserButton.FrameLeft, scale = 0.5)
       button.events.onInputUp.add(() => {
-        createGrid(currentStartLevel - 64, maxLevel)
+        createGrid(currentStartLevel - 64, maxLevel, starMap)
       }, null, 1)
     }
 
     if (currentStartLevel + 64 < maxLevel) {
       val button = PhaserButton.add(game, game.width - 40, game.height / 2, "", textFrame = PhaserButton.FrameRight, scale = 0.5)
       button.events.onInputUp.add(() => {
-        createGrid(currentStartLevel + 64, maxLevel)
+        createGrid(currentStartLevel + 64, maxLevel, starMap)
       }, null, 1)
     }
     else {
@@ -74,6 +79,7 @@ class StateLevels(game: Game, options: Map[String,String]) extends State {
   }
 
   def startGame(level: Int): Unit = {
+    initialStartLevel = currentStartLevel
     game.state.start("play", args = level.toString, clearCache = false, clearWorld = true)
   }
 

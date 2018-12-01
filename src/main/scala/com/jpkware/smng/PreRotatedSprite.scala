@@ -42,10 +42,11 @@ class PreRotatedSprite(game: Game, x: Double, y: Double, sheet: String, prefix: 
 
   def indexAngle: Double = scala.math.toDegrees(indexRotation)
 
+  def rotatedPoint(radius: Double, rot: Double): Point = {
+    new Point(centerX + scala.math.cos(rot)*radius, centerY + scala.math.sin(rot)*radius)
+  }
   def headPoint(radius: Double): Point = {
-    val rot = indexRotation
-    val pt = new Point(centerX + scala.math.cos(rot)*radius, centerY + scala.math.sin(rot)*radius)
-    pt
+    rotatedPoint(radius, indexRotation)
   }
   override def update(): Unit = {
     super.update()
