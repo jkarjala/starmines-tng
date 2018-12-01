@@ -22,7 +22,9 @@ object Progress {
     dom.window.localStorage.getItem(LSProgressKey) match {
       case item: String =>
         Logger.info(s"Loaded progress:$item")
-        JSON.parse(item).asInstanceOf[Progress]
+        val p = JSON.parse(item).asInstanceOf[Progress]
+        if (p.stars==null) p.stars = Dictionary() // old state does not have this
+        p
       case _ =>
         Logger.info(s"No local progress found")
         new Progress()
