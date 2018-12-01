@@ -595,6 +595,19 @@
                 <key>scale9FromFile</key>
                 <false/>
             </struct>
+            <key type="filename">tmp/enemies/missile01.png</key>
+            <struct type="IndividualSpriteSettings">
+                <key>pivotPoint</key>
+                <point_f>0.5,0.5</point_f>
+                <key>scale9Enabled</key>
+                <false/>
+                <key>scale9Borders</key>
+                <rect>8,3,15,6</rect>
+                <key>scale9Paddings</key>
+                <rect>8,3,15,6</rect>
+                <key>scale9FromFile</key>
+                <false/>
+            </struct>
             <key type="filename">tmp/enemies/prdta01.png</key>
             <key type="filename">tmp/enemies/prdta02.png</key>
             <key type="filename">tmp/enemies/prdta03.png</key>
@@ -639,38 +652,38 @@
                 <key>scale9FromFile</key>
                 <false/>
             </struct>
-            <key type="filename">tmp/enemies/xhoot01.png</key>
-            <key type="filename">tmp/enemies/xhoot02.png</key>
-            <key type="filename">tmp/enemies/xhoot03.png</key>
-            <key type="filename">tmp/enemies/xhoot04.png</key>
-            <key type="filename">tmp/enemies/xhoot05.png</key>
-            <key type="filename">tmp/enemies/xhoot06.png</key>
-            <key type="filename">tmp/enemies/xhoot07.png</key>
-            <key type="filename">tmp/enemies/xhoot08.png</key>
-            <key type="filename">tmp/enemies/xhoot09.png</key>
-            <key type="filename">tmp/enemies/xhoot10.png</key>
-            <key type="filename">tmp/enemies/xhoot11.png</key>
-            <key type="filename">tmp/enemies/xhoot12.png</key>
-            <key type="filename">tmp/enemies/xhoot13.png</key>
-            <key type="filename">tmp/enemies/xhoot14.png</key>
-            <key type="filename">tmp/enemies/xhoot15.png</key>
-            <key type="filename">tmp/enemies/xhoot16.png</key>
-            <key type="filename">tmp/enemies/xhoot17.png</key>
-            <key type="filename">tmp/enemies/xhoot18.png</key>
-            <key type="filename">tmp/enemies/xhoot19.png</key>
-            <key type="filename">tmp/enemies/xhoot20.png</key>
-            <key type="filename">tmp/enemies/xhoot21.png</key>
-            <key type="filename">tmp/enemies/xhoot22.png</key>
-            <key type="filename">tmp/enemies/xhoot23.png</key>
-            <key type="filename">tmp/enemies/xhoot24.png</key>
-            <key type="filename">tmp/enemies/xhoot25.png</key>
-            <key type="filename">tmp/enemies/xhoot26.png</key>
-            <key type="filename">tmp/enemies/xhoot27.png</key>
-            <key type="filename">tmp/enemies/xhoot28.png</key>
-            <key type="filename">tmp/enemies/xhoot29.png</key>
-            <key type="filename">tmp/enemies/xhoot30.png</key>
-            <key type="filename">tmp/enemies/xhoot31.png</key>
-            <key type="filename">tmp/enemies/xhoot32.png</key>
+            <key type="filename">tmp/enemies/xshoot01.png</key>
+            <key type="filename">tmp/enemies/xshoot02.png</key>
+            <key type="filename">tmp/enemies/xshoot03.png</key>
+            <key type="filename">tmp/enemies/xshoot04.png</key>
+            <key type="filename">tmp/enemies/xshoot05.png</key>
+            <key type="filename">tmp/enemies/xshoot06.png</key>
+            <key type="filename">tmp/enemies/xshoot07.png</key>
+            <key type="filename">tmp/enemies/xshoot08.png</key>
+            <key type="filename">tmp/enemies/xshoot09.png</key>
+            <key type="filename">tmp/enemies/xshoot10.png</key>
+            <key type="filename">tmp/enemies/xshoot11.png</key>
+            <key type="filename">tmp/enemies/xshoot12.png</key>
+            <key type="filename">tmp/enemies/xshoot13.png</key>
+            <key type="filename">tmp/enemies/xshoot14.png</key>
+            <key type="filename">tmp/enemies/xshoot15.png</key>
+            <key type="filename">tmp/enemies/xshoot16.png</key>
+            <key type="filename">tmp/enemies/xshoot17.png</key>
+            <key type="filename">tmp/enemies/xshoot18.png</key>
+            <key type="filename">tmp/enemies/xshoot19.png</key>
+            <key type="filename">tmp/enemies/xshoot20.png</key>
+            <key type="filename">tmp/enemies/xshoot21.png</key>
+            <key type="filename">tmp/enemies/xshoot22.png</key>
+            <key type="filename">tmp/enemies/xshoot23.png</key>
+            <key type="filename">tmp/enemies/xshoot24.png</key>
+            <key type="filename">tmp/enemies/xshoot25.png</key>
+            <key type="filename">tmp/enemies/xshoot26.png</key>
+            <key type="filename">tmp/enemies/xshoot27.png</key>
+            <key type="filename">tmp/enemies/xshoot28.png</key>
+            <key type="filename">tmp/enemies/xshoot29.png</key>
+            <key type="filename">tmp/enemies/xshoot30.png</key>
+            <key type="filename">tmp/enemies/xshoot31.png</key>
+            <key type="filename">tmp/enemies/xshoot32.png</key>
             <key type="filename">tmp/enemies/yshoot01.png</key>
             <key type="filename">tmp/enemies/yshoot02.png</key>
             <key type="filename">tmp/enemies/yshoot03.png</key>
