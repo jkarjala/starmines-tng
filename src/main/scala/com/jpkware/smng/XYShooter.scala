@@ -1,11 +1,8 @@
 package com.jpkware.smng
 
-import com.definitelyscala.phaser.Physics.Arcade.Body
 import com.definitelyscala.phaser._
 
-import scala.util.Random
-
-class XYShooter(game: Game, rule: Rule, group: Group, player: Player) extends Enemy(game, rule, group) {
+class XYShooter(game: Game, rule: Rule, group: Group, enemyMissiles: Group, player: Player) extends Enemy(game, rule, group) {
   val xMul: Int = rule.args(0).toInt
   val yMul: Int = rule.args(1).toInt
   val missileSpeed: Int = rule.args(2).toInt
@@ -53,7 +50,7 @@ class XYShooter(game: Game, rule: Rule, group: Group, player: Player) extends En
         case b: EnemyMissile =>
           b.reset(position.x, position.y, 1)
           sfxZap.play(volume = 0.2)
-          group.add(b)
+          enemyMissiles.add(b)
         case _ => Logger.warn("No more EnemyMissiles")
       }
     }
@@ -95,5 +92,5 @@ class EnemyMissile (game: Game, rule: Rule, missiles: Group, velo: Point, player
 }
 
 object XYShooter {
-  def spawn(p: SpawnParams) : Enemy = new XYShooter(p.game, p.rule, p.group, p.player)
+  def spawn(p: SpawnParams) : Enemy = new XYShooter(p.game, p.rule, p.group, p.enemyMissiles, p.player)
 }

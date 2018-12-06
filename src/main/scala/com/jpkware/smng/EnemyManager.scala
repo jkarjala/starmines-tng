@@ -3,7 +3,7 @@ package com.jpkware.smng
 import com.definitelyscala.phaser.{Game, Group, Sprite}
 import scala.math.min
 
-case class SpawnParams(game: Game, rule: Rule, group: Group, player: Player)
+case class SpawnParams(game: Game, rule: Rule, group: Group, enemyMissiles: Group, player: Player)
 
 case class Rule
 (
@@ -58,13 +58,14 @@ class EnemyManager(game: Game, randomSafePosition: (Sprite) => Unit) {
     Rule(null,"",0,0,0,0,0,0,0,0,0,0)
   )
 
-  def spawnEnemies(player: Player, level: Int, count: Int): Group = {
+  def spawnEnemies(player: Player, level: Int, count: Int): (Group, Group) = {
     val enemies = game.add.group(name = "enemies")
+    val enemyMissiles = game.add.group(name = "enemyMissiles") // these will be collision checked against other enemies
 
     if (count>0) {
       // Test with first rule only, and fixed count
       val rule = rules.head
-      spawnEnemies(player, enemies, count, rule)
+      spawnEnemies(player, enemies, enemyMissiles, count, rule)
     }
     else {
       rules.foreach(rule => {
@@ -75,17 +76,17 @@ class EnemyManager(game: Game, randomSafePosition: (Sprite) => Unit) {
           // Rule matched this level, spawn enemies
           val enemyCount = min((level-rule.minL)/rule.div + rule.minC, rule.maxC)
           Logger.info(s"${rule.shape} $enemyCount")
-          spawnEnemies(player, enemies, enemyCount, rule)
+          spawnEnemies(player, enemies, enemyMissiles, enemyCount, rule)
         }
       })
     }
     Logger.info(s"Live enemies: ${enemies.countLiving()}")
-    enemies
+    (enemies, enemyMissiles)
   }
 
-  def spawnEnemies(player: Player, group: Group, count: Int, rule: Rule): Unit = {
+  def spawnEnemies(player: Player, group: Group, enemyMissiles: Group, count: Int, rule: Rule): Unit = {
     (1 to count).foreach(i => {
-      val enemy = rule.spawn(SpawnParams(game, rule, group, player))
+      val enemy = rule.spawn(SpawnParams(game, rule, group, enemyMissiles, player))
       randomSafePosition(enemy)
     })
   }

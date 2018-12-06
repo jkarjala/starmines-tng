@@ -9,6 +9,7 @@ import scala.scalajs.js
 class StatePlay(game: Game, options: Map[String,String], status: Element) extends State {
   var player: Player = _
   var enemies: Group = _
+  var enemyMissiles: Group = _
   var bonusManager: BonusManager = _
   var enemyManager: EnemyManager = _
   var cursors: CursorKeys = _
@@ -90,7 +91,9 @@ class StatePlay(game: Game, options: Map[String,String], status: Element) extend
     messages.show(s"Ship level ${player.shipLevel+1}")
 
     enemyManager = new EnemyManager(game, setStartPosition)
-    enemies = enemyManager.spawnEnemies(player, StatePlay.scores.level, optionsCount)
+    val (e, m) = enemyManager.spawnEnemies(player, StatePlay.scores.level, optionsCount)
+    enemies = e
+    enemyMissiles = m
 
     StatePlay.scores.timeBonus = bonusManager.bonusoidCount * 5000
   }
@@ -130,6 +133,7 @@ class StatePlay(game: Game, options: Map[String,String], status: Element) extend
   def handleCollisions(): Unit = {
     game.physics.arcade.collide(player, StatePlay.scorebox)
     game.physics.arcade.overlap(player, enemies, playerVsEnemy _, null, null)
+    game.physics.arcade.overlap(player, enemyMissiles, playerVsEnemy _, null, null)
     game.physics.arcade.overlap(player, bonusManager.bonusoids, playerVsBonusoid _, null, null)
 
     game.physics.arcade.collide(player.weapon1.bullets, StatePlay.scorebox)
@@ -142,9 +146,13 @@ class StatePlay(game: Game, options: Map[String,String], status: Element) extend
     game.physics.arcade.overlap(player.weapon2.bullets, bonusManager.containers, bulletVsBonusContainer _, null, null)
     game.physics.arcade.overlap(player.weapon2.bullets, bonusManager.bonusoids, bulletVsBonusoid _, null, null)
 
-    game.physics.arcade.overlap(enemies, enemies, enemyVsEnemy _, null, null)
+    game.physics.arcade.collide(enemyMissiles, StatePlay.scorebox)
+    game.physics.arcade.overlap(enemyMissiles, enemies, enemyMissileVsEnemy _, null, null)
+
     game.physics.arcade.collide(enemies, StatePlay.scorebox)
+
     game.physics.arcade.collide(bonusManager.bonusoids, StatePlay.scorebox)
+
     if (StatePlay.scores.lives>0 && (bonusManager.allDead || enemies.countLiving()==0)) nextLevel()
   }
 
@@ -229,13 +237,13 @@ class StatePlay(game: Game, options: Map[String,String], status: Element) extend
       StatePlay.scorebox.addToLives(-1)
       val timer = game.time.create(true)
       timer.add(3000, () => {
-        if (StatePlay.scores.lives==0) handleGameOver() else player.revive()
+        if (StatePlay.scores.lives<=0) handleGameOver() else player.revive()
       }, null)
       timer.start(0)
     }
   }
 
-  def enemyVsEnemy(enemy1: Enemy, enemy2: Enemy): Unit = {
+  def enemyMissileVsEnemy(enemy1: Enemy, enemy2: Enemy): Unit = {
     if (!enemy1.enemyHit(enemy2)) enemy2.enemyHit(enemy1)
   }
 
