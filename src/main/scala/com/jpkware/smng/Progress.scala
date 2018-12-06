@@ -11,6 +11,8 @@ class Progress extends js.Object {
   var maxBonusoids : Int = 0
   var highScore: Int = 0
   var stars: js.Dictionary[Int] = Dictionary()
+  var startDate: js.UndefOr[js.Date] = new js.Date()
+  var playDate: js.UndefOr[js.Date] = new js.Date()
 }
 
 object Progress {
@@ -23,7 +25,9 @@ object Progress {
       case item: String =>
         Logger.info(s"Loaded progress:$item")
         val p = JSON.parse(item).asInstanceOf[Progress]
-        if (p.stars==null) p.stars = Dictionary() // old state does not have this
+        // old state may not have these
+        if (js.isUndefined(p.stars)) p.stars = Dictionary()
+        if (js.isUndefined(p.startDate)) p.startDate = new js.Date()
         p
       case _ =>
         Logger.info(s"No local progress found")
@@ -53,6 +57,7 @@ object Progress {
         Logger.info(s"stars none")
         scalaStars(key) = scores.stars
     }
+    state.playDate = new js.Date()
   }
 
   def save(progress: Progress): Unit = {

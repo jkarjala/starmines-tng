@@ -51,8 +51,8 @@ class PreRotatedSprite(game: Game, x: Double, y: Double, sheet: String, prefix: 
   override def update(): Unit = {
     super.update()
     direction += rotationSpeed * game.time.physicsElapsed
-    if (direction<0) direction = Pi2 - 0.001
-    if (direction>2*scala.math.Pi) direction = 0
+    if (direction < 0) direction = Pi2 - 0.001
+    if (direction >= Pi2) direction = 0
     selectFrame()
   }
 }

@@ -12,7 +12,7 @@ object StarMinesNG {
   val maxBackground = 48
 
   def addBackground(game: Game, level: Int,  x: Double = 0, y: Double = 0): Sprite = {
-    val bgLevel = (level / 4) % StarMinesNG.maxBackground + 1
+    val bgLevel = ((level-1) / 4) % StarMinesNG.maxBackground + 1
     game.add.sprite(x,y,s"space$bgLevel")
   }
 
