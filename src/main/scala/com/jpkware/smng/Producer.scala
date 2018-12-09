@@ -4,16 +4,16 @@ import com.definitelyscala.phaser.Physics.Arcade.Body
 import com.definitelyscala.phaser._
 
 class Producer(game: Game, rule: Rule, group: Group) extends Enemy(game, rule, group) {
-  val pieces: Group = game.add.group()
-  val shape: String = rule.args(0)
-  val frames: Int = rule.args(1).toInt
-  val fps: Int = rule.args(2).toInt
-  val count: Int = rule.args(3).toInt
-  val delay: Int = rule.args(4).toInt
-  val score: Int = rule.score/count
-  val pieceRule: Rule = Rule(null, shape, frames, fps, score, spd = rule.spd)
+  private val pieces: Group = game.add.group()
+  private val shape: String = rule.args(0)
+  private val frames: Int = rule.args(1).toInt
+  private val fps: Int = rule.args(2).toInt
+  private val count: Int = rule.args(3).toInt
+  private val delay: Int = rule.args(4).toInt
+  private val score: Int = rule.score/count
+  private val pieceRule: Rule = Rule(null, shape, frames, fps, score, spd = rule.spd)
 
-  val sfxProduce: Sound = game.add.audio(Producer.SfzProduceId)
+  private val sfxProduce: Sound = game.add.audio(Producer.SfzProduceId)
   sfxProduce.allowMultiple = true
 
   (1 to count * 4).foreach(i => {
@@ -26,10 +26,10 @@ class Producer(game: Game, rule: Rule, group: Group) extends Enemy(game, rule, g
   timer.start(100)
 
   override def bulletHit(bullet: Sprite): Int = {
-    damage(0.25)
+    damage(0.1)
     if (health>0) {
-      Explosion(game, Explosion.TinyExploCount).explode(this)
-      animation.speed *= 0.5
+      Explosion(game, Explosion.TinyExploCount, this)
+      animation.speed *= 0.75
       bullet.kill()
       0
     } else {

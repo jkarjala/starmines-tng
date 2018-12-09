@@ -85,11 +85,15 @@ object Explosion {
   val SfzExploId = "sfx:explo"
   val SfzTinyExploId = "sfx:tinyexp"
 
-  def apply(game: Game, count:Int): Explosion = {
+  def apply(game: Game, count:Int, sprite: Sprite): Explosion = {
     val group = groupMap.getOrElse(count, sys.error(s"Explosion size $count was not initialized"))
     group.getFirstDead() match {
-      case exp : Explosion => exp
-      case _ => null
+      case exp : Explosion =>
+        exp.explode(sprite)
+        exp
+      case _ =>
+        Logger.warn(s"No more explosions for size $count")
+        null
     }
   }
 

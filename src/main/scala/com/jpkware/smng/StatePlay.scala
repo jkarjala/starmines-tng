@@ -5,24 +5,23 @@ import org.scalajs.dom.raw.Element
 
 import scala.scalajs.js
 
-
 class StatePlay(game: Game, options: Map[String,String], status: Element) extends State {
-  var player: Player = _
-  var enemies: Group = _
-  var enemyMissiles: Group = _
-  var bonusManager: BonusManager = _
-  var enemyManager: EnemyManager = _
-  var cursors: CursorKeys = _
-  var fpsText: BitmapText = _
-  var touch: TouchControls = _
-  var gameOver = false
-  var sfxLevelEnd: Sound = _
-  var sfxLevelClr: Sound = _
-  var sfxCollect: Sound = _
-  var messages: Messages = _
+  private var player: Player = _
+  private var enemies: Group = _
+  private var enemyMissiles: Group = _
+  private var bonusManager: BonusManager = _
+  private var enemyManager: EnemyManager = _
+  private var cursors: CursorKeys = _
+  private var fpsText: BitmapText = _
+  private var touch: TouchControls = _
+  private var gameOver = false
+  private var sfxLevelEnd: Sound = _
+  private var sfxLevelClr: Sound = _
+  private var sfxCollect: Sound = _
+  private var messages: Messages = _
 
-  val debug: Boolean = options.contains("debug")
-  def optionsCount: Int = if (options.contains("mines")) options("mines").toInt else -1
+  private val debug: Boolean = options.contains("debug")
+  private def optionsCount: Int = if (options.contains("mines")) options("mines").toInt else -1
 
   override def init(args: js.Any*): Unit = {
     args.headOption match {
@@ -76,6 +75,8 @@ class StatePlay(game: Game, options: Map[String,String], status: Element) extend
     cursors = game.input.keyboard.createCursorKeys()
 
     Explosion.initGroups(game, Seq(Explosion.LargeExploCount, Explosion.SmallExploCount, Explosion.TinyExploCount))
+
+    StatePlay.scores.shipLevel = player.shipLevel+1
 
     StatePlay.scorebox = new Scorebox(game, StatePlay.scores)
 
@@ -153,7 +154,7 @@ class StatePlay(game: Game, options: Map[String,String], status: Element) extend
 
     game.physics.arcade.collide(bonusManager.bonusoids, StatePlay.scorebox)
 
-    if (StatePlay.scores.lives>0 && (bonusManager.allDead || enemies.countLiving()==0)) nextLevel()
+    if (player.visible && StatePlay.scores.lives>0 && (bonusManager.allDead || enemies.countLiving()==0)) nextLevel()
   }
 
   def nextLevel(): Unit = {
@@ -197,16 +198,16 @@ class StatePlay(game: Game, options: Map[String,String], status: Element) extend
   }
 
   def bulletVsBonusContainer(bullet: Bullet, bonusoid: Sprite): Unit = {
-    messages.show("Bonusoids released, catch them for ship upgrades!")
-    Explosion(game, Explosion.SmallExploCount).explode(bonusoid)
+    messages.show("Bonusoids released, go catch them!")
+    Explosion(game, Explosion.SmallExploCount, bonusoid)
     bonusoid.kill()
     bullet.kill()
     StatePlay.scorebox.addToScore(1000)
   }
 
   def bulletVsBonusoid(bullet: Bullet, bonus: Sprite): Unit = {
-    messages.show("Bonusoid lost!")
-    Explosion(game, Explosion.SmallExploCount).explode(bonus)
+    messages.show("Bonusoid destroyed!")
+    Explosion(game, Explosion.TinyExploCount, bonus)
     bonus.kill()
     bullet.kill()
     StatePlay.scorebox.addToScore(100)
@@ -217,26 +218,28 @@ class StatePlay(game: Game, options: Map[String,String], status: Element) extend
     bonusoid.kill()
     StatePlay.scorebox.addToBonusoidsCollected(1)
     StatePlay.scorebox.addToScore(2000)
-    messages.show(s"Bonusoid collected! Current game total ${StatePlay.scores.totalBonusoids}.")
+    messages.show(s"Bonusoid collected!")
     player.maybeUpgradeShip(StatePlay.scores.totalBonusoids) match {
-      case Some(level) => messages.show(s"Ship upgraded to level ${level+1}!")
+      case Some(level) =>
+        messages.show(s"SHIP SYSTEMS UPGRADED TO LEVEL ${level+1}!")
+        StatePlay.scores.shipLevel = level+1
       case None => // Nothing to do
     }
   }
 
   def playerVsEnemy(player: Player, enemy: Sprite): Unit = {
     if (player.immortal) {
-      Explosion(game, Explosion.SmallExploCount).explode(enemy)
+      Explosion(game, Explosion.SmallExploCount, enemy)
       enemy.kill()
     }
     else {
       messages.show("SHIP LOST!")
-      Explosion(game, Explosion.LargeExploCount).explode(player)
+      Explosion(game, Explosion.LargeExploCount, player)
       enemy.kill()
       player.kill()
-      StatePlay.scorebox.addToLives(-1)
       val timer = game.time.create(true)
       timer.add(3000, () => {
+        StatePlay.scorebox.addToLives(-1)
         if (StatePlay.scores.lives<=0) handleGameOver() else player.revive()
       }, null)
       timer.start(0)
@@ -279,8 +282,7 @@ class StatePlay(game: Game, options: Map[String,String], status: Element) extend
   }
 
   def debugUpgrade(): Unit = {
-    StatePlay.scores.totalBonusoids += 1
-    messages.show(s"DEBUG: totalBonusoids ${StatePlay.scores.totalBonusoids}")
+    StatePlay.scorebox.addToBonusoidsCollected(1)
     player.maybeUpgradeShip(StatePlay.scores.totalBonusoids) match {
       case Some(level) => messages.show(s"Ship systems upgraded to level $level!")
       case None => // Nothing to do

@@ -1,18 +1,19 @@
 package com.jpkware.smng
 
-import com.definitelyscala.phaser.{BitmapText, Game, Sprite}
+import com.definitelyscala.phaser._
 import com.definitelyscala.phaser.Physics.Arcade.Body
 
 case class ScoreState(var score: Int, var lives: Int, var level: Int,
                       var bonusoidsCollected: Int, var totalBonusoids: Int,
-                      var timeBonus: Int, var stars: Int)
+                      var timeBonus: Int, var stars: Int, var shipLevel: Int)
 
 class Scorebox(game: Game, scores: ScoreState) extends Sprite(game, 0,0, Scorebox.ScoreboxId) {
 
-  var scoreText: BitmapText = _
-  var livesText: BitmapText = _
-  var levelText: BitmapText = _
-  var bonusText: BitmapText = _
+  private var scoreText: BitmapText = _
+  private var livesImage: Image = _
+  private var levelText: BitmapText = _
+  private var bonusText: BitmapText = _
+  private var bonusoidText: BitmapText = _
 
   game.add.existing(this)
   position.set(game.width/2,game.height/2)
@@ -23,24 +24,29 @@ class Scorebox(game: Game, scores: ScoreState) extends Sprite(game, 0,0, Scorebo
   game.add.bitmapText(game.width/2,game.height/2-80, GlobalRes.FontId, "StarMines", 96).anchor.set(0.5,0.5)
   game.add.bitmapText(game.width/2,game.height/2-48, GlobalRes.FontId, "THE NEXT GENERATION", 28).anchor.set(0.5,0.5)
 
-  game.add.bitmapText(game.width/2-280,game.height/2, GlobalRes.FontId, "Score:", 48)
+  game.add.bitmapText(game.width/2-280,game.height/2+16, GlobalRes.FontId, "SCORE:", 28)
   scoreText = game.add.bitmapText(game.width/2+280,game.height/2, GlobalRes.FontId, "", 48)
   scoreText.anchor.set(1,0)
 
-  game.add.bitmapText(game.width/2-280,game.height/2+45, GlobalRes.FontId, "Bonus:", 48)
+  game.add.bitmapText(game.width/2-280,game.height/2+45+16, GlobalRes.FontId, "TIME BONUS:", 28)
   bonusText = game.add.bitmapText(game.width/2+280,game.height/2+45, GlobalRes.FontId, "", 48)
   bonusText.anchor.set(1,0)
 
-  livesText = game.add.bitmapText(game.width/2-280,game.height/2+90, GlobalRes.FontId, "", 48)
-  livesText.anchor.set(0,0)
+  livesImage = game.add.image(game.width/2-25,game.height/2+110, Scorebox.ShipsId)
+  livesImage.scale.set(0.5,0.5)
+  livesImage.anchor.set(0,0.25)
 
-  levelText = game.add.bitmapText(game.width/2+280,game.height/2+90, GlobalRes.FontId, "", 48)
+  bonusoidText = game.add.bitmapText(game.width/2-280,game.height/2+110, GlobalRes.FontId, "", 28)
+  bonusoidText.anchor.set(0,0)
+
+  levelText = game.add.bitmapText(game.width/2+280,game.height/2+110, GlobalRes.FontId, "", 28)
   levelText.anchor.set(1,0)
 
   addToScore(0)
   addToLives(0)
   addToLevel(0)
   addToTimeBonus(0)
+  addToBonusoidsCollected(0)
 
   private val timer = game.time.create(true)
   timer.loop(500, () => {
@@ -49,17 +55,19 @@ class Scorebox(game: Game, scores: ScoreState) extends Sprite(game, 0,0, Scorebo
   timer.start(0)
 
   def addToBonusoidsCollected(delta: Int): Unit = {
-    this.scores.bonusoidsCollected += delta
-    this.scores.totalBonusoids += delta
+    scores.bonusoidsCollected += delta
+    scores.totalBonusoids += delta
+    bonusoidText.setText(f"B'soids: ${scores.totalBonusoids}%d")
   }
 
   def addToLives(delta: Int): Unit = {
-    this.scores.lives += delta
-    livesText.setText(f"Ships: ${scores.lives}%d")
+    scores.lives += delta
+    cropRect = new Rectangle(0, 0, math.max(0, (scores.lives-1)*36), livesImage.height*2)
+    livesImage.crop(cropRect)
   }
 
   def addToLevel(delta: Int): Unit = {
-    this.scores.level += delta
+    scores.level += delta
     levelText.setText(f"Field: ${scores.level}%d")
   }
 
@@ -82,9 +90,11 @@ class Scorebox(game: Game, scores: ScoreState) extends Sprite(game, 0,0, Scorebo
 }
 
 object Scorebox {
-  def ScoreboxId = "scorebox"
-  def InitialScore = ScoreState(score = 0, lives = 5, level = 1, bonusoidsCollected = 0, totalBonusoids = 0, timeBonus = 0, stars = 0)
+  val ScoreboxId = "scorebox"
+  val ShipsId = "ships"
+  val InitialScore = ScoreState(score = 0, lives = 5, level = 1, bonusoidsCollected = 0, totalBonusoids = 0, timeBonus = 0, stars = 0, shipLevel = 0)
   def preloadResources(game: Game): Unit = {
     game.load.image(ScoreboxId, "res/scorebox.png")
+    game.load.image(ShipsId, "res/ships.png")
   }
 }

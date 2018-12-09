@@ -3,9 +3,9 @@ package com.jpkware.smng
 import com.definitelyscala.phaser._
 
 class XYShooter(game: Game, rule: Rule, group: Group, enemyMissiles: Group, player: Player) extends Enemy(game, rule, group) {
-  val xMul: Int = rule.args(0).toInt
-  val yMul: Int = rule.args(1).toInt
-  val missileSpeed: Int = rule.args(2).toInt
+  private val xMul: Int = rule.args(0).toInt
+  private val yMul: Int = rule.args(1).toInt
+  private val missileSpeed: Int = rule.args(2).toInt
 
   private val velo = new Point(xMul, yMul)
   private var lastFrame = ""
@@ -26,10 +26,10 @@ class XYShooter(game: Game, rule: Rule, group: Group, enemyMissiles: Group, play
       || frameName.contains(s"${rule.frames}") || frameName.contains(s"${rule.frames-1}"))
       damage(1.0)
     else
-      damage(0.25)
+      damage(0.2)
 
     if (health>0) {
-      Explosion(game, Explosion.TinyExploCount).explode(this)
+      Explosion(game, Explosion.TinyExploCount, this)
       animation.speed *= 0.5
       bullet.kill()
       0

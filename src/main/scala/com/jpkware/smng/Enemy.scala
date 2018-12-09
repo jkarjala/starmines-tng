@@ -10,7 +10,8 @@ class Enemy(game: Game, rule: Rule, group: Group, atlas: String = GlobalRes.Enem
   extends Sprite(game, 0,0, atlas, f"${rule.shape}%s$initialFrame%02d") {
 
   animations.add("rotate", Animation.generateFrameNames(rule.shape, 1, rule.frames, "", 2))
-  val animation = animations.play("rotate", rule.fps, loop = true)
+  val animation: Animation = animations.play("rotate", rule.fps, loop = true)
+
   anchor.set(0.5,0.5)
   group.add(this)
   // Logger.info(s"Added $frameName to ${group.name}")
@@ -27,7 +28,7 @@ class Enemy(game: Game, rule: Rule, group: Group, atlas: String = GlobalRes.Enem
   }
 
   def bulletHit(bullet: Sprite): Int = {
-    Explosion(game, Explosion.SmallExploCount).explode(this)
+    Explosion(game, Explosion.SmallExploCount, this)
     bullet.kill()
     kill()
     killScore
