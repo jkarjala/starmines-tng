@@ -7,6 +7,13 @@ p {
     font-family: "Arial"
 }
 
+#version {
+    text-align:left;
+    color: gray;
+    margin:4px auto 4px auto;
+    float: left;
+}
+
 #sharebutton {
     text-align:right;
     margin:4px auto 4px auto;

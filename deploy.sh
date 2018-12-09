@@ -15,4 +15,4 @@ zip -rp $ZIP index* styles* manifest* lib/* res/*
 popd
 popd
 scp $ZIP ${DEPLOY_HOST}:public_html
-ssh $DEPLOY_HOST "cd public_html && mkdir smtng-dev/$DT && cd smtng-dev/$DT && unzip -o ../../smtng.zip && cd ../.. && rm smtng && ln -s smtng-dev/$DT smtng"
+ssh $DEPLOY_HOST "cd public_html && mkdir smtng-dev/$DT && cd smtng-dev/$DT && echo "$DT" > build.txt && unzip -o ../../smtng.zip && cd ../.. && rm smtng && ln -s smtng-dev/$DT smtng"

@@ -22,16 +22,17 @@
     <meta property="og:title" content="StarMines: The Next Generation">
     <meta property="og:description" content="A space shooter inspired by old classics like Asteroids and Omega Race.">
     <meta property="og:type" content="game">
-    <meta property="og:image" content="https://jpkware.com/smtng/res/demo.jpg">
+    <meta property="og:image" content="https://smtng.jpkware.com/res/demo.jpg">
     <meta property="og:image:width" content="480">
     <meta property="og:image:height" content="300">
-    <meta property="og:url" content="https://jpkware.com/smtng/">
+    <meta property="og:url" content="https://smtng.jpkware.com/">
 </head>
 <body>
 <p><span id="status">StarMines loading...</span>&nbsp;</p>
 <div id="container"><div id="game"></div></div>
 <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/phaser-ce/2.11.1/phaser.min.js"></script>
 <script type="text/javascript" src="starmines-the-next-generation-opt.js"></script>
+<span id="version"></span>
 <!-- AddToAny BEGIN -->
 <div id="sharebutton">
     <a class="a2a_dd" href="https://www.addtoany.com/share"><img src="https://static.addtoany.com/buttons/share_save_171_16.png" width="171" height="16" border="0" alt="Share"></a>
@@ -39,5 +40,11 @@
 </div>
 <script>var a2a_config = a2a_config || {}; a2a_config.onclick = 1;</script>
 <!-- AddToAny END -->
+<script>
+var client = new XMLHttpRequest();
+client.open('GET', 'build.txt');
+client.onreadystatechange = function() { document.getElementById('version').innerHTML = "Version: "+client.responseText; }
+client.send();
+</script>
 </body>
 </html>
