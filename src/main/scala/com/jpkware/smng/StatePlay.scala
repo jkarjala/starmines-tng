@@ -34,7 +34,7 @@ class StatePlay(game: Game, options: Map[String,String], status: Element) extend
           StatePlay.scores.stars = 0
         }
         else {
-          StatePlay.scores = Scorebox.InitialScore
+          StatePlay.scores = Scorebox.InitialScore.copy()
           if (cmd(0).isDigit) StatePlay.scores.level = cmd.toInt
         }
       case _ =>
