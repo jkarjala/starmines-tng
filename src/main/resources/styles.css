@@ -9,6 +9,7 @@ p {
 
 #version {
     text-align:left;
+    font-family: "Arial";
     color: gray;
     margin:4px auto 4px auto;
     float: left;
