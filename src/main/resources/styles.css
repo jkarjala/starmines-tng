@@ -1,5 +1,5 @@
 body {
-    background-color: "#000020";
+    background-color: black;
 }
 p {
     text-align: center;
@@ -7,9 +7,15 @@ p {
     font-family: "Arial"
 }
 
+#sharebutton {
+    text-align:right;
+    margin:4px auto 4px auto;
+    float: right;
+}
+
 #container {
     text-align: center;
-    width: 98vw;
+    width: 99vw;
     margin: 0 auto;
 }}
 
