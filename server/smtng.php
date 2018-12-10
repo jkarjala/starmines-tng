@@ -1,36 +1,50 @@
 <?php
-error_reporting(0);
-function cors() {
+// error_reporting(0);
 
-    // Allow from any origin
-    if (isset($_SERVER['HTTP_ORIGIN'])) {
-        $s = $_SERVER['HTTP_ORIGIN'];
-        if ($s=='https://jpkware.com' || $s=='http://jpkware.com'
-        || substr($s, 0, strlen('http://127.0.0.1:')) === 'http://127.0.0.1:') {
-            header("Access-Control-Allow-Origin: {$_SERVER['HTTP_ORIGIN']}");
-            header('Access-Control-Allow-Credentials: false');
-            header('Access-Control-Max-Age: 86400');    // cache for 1 day
-        }
-        else {
-            $err = "CORS from not allowed from:".$s.PHP_EOL;
-            file_put_contents('../smtng.err', $err , FILE_APPEND | LOCK_EX);
-            exit(0);
-        }
+function startsWith($haystack, $needle)
+{
+     $length = strlen($needle);
+     return (substr($haystack, 0, $length) === $needle);
+}
+function endsWith($haystack, $needle)
+{
+    $length = strlen($needle);
+    if ($length == 0) {
+        return true;
     }
 
-    // Access-Control headers are received during OPTIONS requests
-    if ($_SERVER['REQUEST_METHOD'] == 'OPTIONS') {
+    return (substr($haystack, -$length) === $needle);
+}
 
-        if (isset($_SERVER['HTTP_ACCESS_CONTROL_REQUEST_METHOD']))
-            header("Access-Control-Allow-Methods: POST");
-
-        if (isset($_SERVER['HTTP_ACCESS_CONTROL_REQUEST_HEADERS']))
-            header("Access-Control-Allow-Headers: {$_SERVER['HTTP_ACCESS_CONTROL_REQUEST_HEADERS']}");
-
+// Allow from any origin
+if (isset($_SERVER['HTTP_ORIGIN'])) {
+    $s = $_SERVER['HTTP_ORIGIN'];
+    if (endsWith($s, ".jpkware.com")
+    || startsWith($s, 'http://127.0.0.1:') ) {
+        header("Access-Control-Allow-Origin: $s");
+        header('Access-Control-Allow-Credentials: false');
+        header('Access-Control-Max-Age: 86400');    // cache for 1 day
+    }
+    else {
+        $err = date(DATE_ATOM)." CORS denied for:".$s.PHP_EOL;
+        file_put_contents('../smtng.err', $err , FILE_APPEND | LOCK_EX);
+        echo($err);
         exit(0);
     }
 }
-cors();
+
+// Access-Control headers are received during OPTIONS requests
+if ($_SERVER['REQUEST_METHOD'] == 'OPTIONS') {
+
+    if (isset($_SERVER['HTTP_ACCESS_CONTROL_REQUEST_METHOD']))
+        header("Access-Control-Allow-Methods: POST");
+
+    if (isset($_SERVER['HTTP_ACCESS_CONTROL_REQUEST_HEADERS']))
+        header("Access-Control-Allow-Headers: {$_SERVER['HTTP_ACCESS_CONTROL_REQUEST_HEADERS']}");
+
+    exit(0);
+}
+
 $data = file_get_contents("php://input");
 if (strlen($data) > 1024) {
     http_response_code(413);
