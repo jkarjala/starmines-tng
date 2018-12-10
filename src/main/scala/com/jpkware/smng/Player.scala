@@ -40,8 +40,13 @@ class Player(game: Game, x: Double, y: Double, bonusoidCount: Int)
   var flameScale = 0.25
   game.physics.arcade.enable(flame)
 
+  val sfxThrust: Sound = game.add.audio(Player.SfxThrustId)
+  sfxThrust.allowMultiple = false
+  sfxThrust.volume = 0.4
+
   val sfxZap: Sound = game.add.audio(Player.SfxZapId)
   sfxZap.allowMultiple = true
+  sfxZap.volume = 0.5
 
   var immortal: Boolean = true
   revive()
@@ -132,11 +137,13 @@ class Player(game: Game, x: Double, y: Double, bonusoidCount: Int)
         body.acceleration = physBody.acceleration
         body.velocity = physBody.velocity
     }
+    sfxThrust.play(forceRestart = false)
   }
   def thrustStop(): Unit = {
     physBody.acceleration.set(0,0)
     flame.kill()
     flameScale = 0.25
+    sfxThrust.stop()
   }
   def stop(): Unit = {
     thrustStop()
@@ -193,10 +200,12 @@ object Player {
   def MissileId = "missile"
   def FlameId = "flame"
   def SfxZapId = "sfx:zap"
+  def SfxThrustId = "sfx:thrust"
   def ShipPrefix = "ship"
 
   def preloadResources(game: Game): Unit = {
     game.load.image(FlameId, "res/flame.png")
     game.load.audio(SfxZapId, "res/zap.wav")
+    game.load.audio(SfxThrustId, "res/thrust.wav")
   }
 }
