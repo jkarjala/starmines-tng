@@ -40,7 +40,7 @@ class StatePlay(game: Game, options: Map[String,String], status: Element) extend
       case _ =>
     }
     StarMinesNG.rnd.setSeed(42+StatePlay.scores.level)
-    Progress.updateAndSave(StatePlay.scores)
+    Progress.updateAndSave(StatePlay.scores, debug)
     gameOver = false
   }
 
@@ -178,7 +178,7 @@ class StatePlay(game: Game, options: Map[String,String], status: Element) extend
       s"  Only $ratio Bonusoids..."
     }
     clearLevel()
-    Progress.updateAndSave(StatePlay.scores)
+    Progress.updateAndSave(StatePlay.scores, debug)
     game.state.start("nextlevel", args = timeBonusMsg + result, clearCache = false, clearWorld = false)
   }
 
@@ -253,7 +253,7 @@ class StatePlay(game: Game, options: Map[String,String], status: Element) extend
   def handleGameOver(): Unit = {
     gameOver = true
     clearLevel()
-    Progress.updateAndSave(StatePlay.scores)
+    Progress.updateAndSave(StatePlay.scores, debug)
     game.state.start("gameover", args = "gameover", clearCache = false, clearWorld = false)
   }
 
@@ -277,7 +277,7 @@ class StatePlay(game: Game, options: Map[String,String], status: Element) extend
   }
 
   def gotoMenu(): Unit = {
-    Progress.updateAndSave(StatePlay.scores)
+    Progress.updateAndSave(StatePlay.scores, debug)
     game.state.start("menu", args = "quit", clearCache = false, clearWorld = true)
   }
 

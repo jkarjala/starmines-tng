@@ -71,13 +71,13 @@ object Progress {
     dom.window.localStorage.setItem(Progress.LSProgressKey, json)
   }
 
-  def updateAndSave(scores: ScoreState): Unit = {
+  def updateAndSave(scores: ScoreState, debug: Boolean): Unit = {
     update(scores)
     save(state)
-    postScores(state, scores)
+    postScores(state, scores, debug)
   }
 
-  def postScores(progress: Progress, scores: ScoreState): Unit = {
+  def postScores(progress: Progress, scores: ScoreState, debug: Boolean): Unit = {
     val sd = progress.startTime.get
     val pd = progress.playTime.get
     val tsv = sd +
@@ -91,7 +91,7 @@ object Progress {
       "\t" + scores.totalBonusoids +
       // Once in production, add new items here!
       ""
-    postData(progress.id.get, tsv, (str: String) => { progress.id = str })
+    postData(progress.id.get, tsv, (str: String) => { progress.id = if (debug) "!"+str else str})
   }
   private val hostUrl = "https://jpkware.com"
 
