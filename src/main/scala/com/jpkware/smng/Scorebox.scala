@@ -3,9 +3,18 @@ package com.jpkware.smng
 import com.definitelyscala.phaser._
 import com.definitelyscala.phaser.Physics.Arcade.Body
 
-case class ScoreState(var score: Int, var lives: Int, var level: Int,
-                      var bonusoidsCollected: Int, var totalBonusoids: Int,
-                      var timeBonus: Int, var stars: Int, var shipLevel: Int)
+import scala.scalajs.js
+
+class ScoreState extends js.Object {
+  var score: Int = 0
+  var lives: Int = 5
+  var level: Int = 1
+  var bonusoidsCollected: Int = 0
+  var totalBonusoids: Int = 0
+  var timeBonus: Int = 0
+  var stars: Int = 0
+  var shipLevel: Int = 0
+}
 
 class Scorebox(game: Game, scores: ScoreState) extends Sprite(game, 0,0, Scorebox.ScoreboxId) {
 
@@ -92,7 +101,7 @@ class Scorebox(game: Game, scores: ScoreState) extends Sprite(game, 0,0, Scorebo
 object Scorebox {
   val ScoreboxId = "scorebox"
   val ShipsId = "ships"
-  val InitialScore = ScoreState(score = 0, lives = 5, level = 1, bonusoidsCollected = 0, totalBonusoids = 0, timeBonus = 0, stars = 0, shipLevel = 0)
+  def InitialScore = new ScoreState
   def preloadResources(game: Game): Unit = {
     game.load.image(ScoreboxId, "res/scorebox.png")
     game.load.image(ShipsId, "res/ships.png")

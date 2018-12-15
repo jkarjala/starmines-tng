@@ -11,7 +11,6 @@ class StateMenu(game: Game, options: Map[String,String], status: Element) extend
   }
 
   override def create(): Unit = {
-    status.innerHTML = ""
     game.add.sprite(0,0, GlobalRes.MenuBg).scale.set(2,2)
 
     val help = if (game.device.desktop || options.contains("touch")) "Control your ship with arrow keys and space, or z,x,n,m, or mouse"
@@ -40,6 +39,7 @@ class StateMenu(game: Game, options: Map[String,String], status: Element) extend
   }
 
   def startGame(): Unit = {
+    Progress.resetCheckpoint()
     game.state.start("play", args = "start", clearCache = false, clearWorld = true)
   }
 

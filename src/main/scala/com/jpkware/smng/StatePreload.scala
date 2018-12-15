@@ -43,9 +43,13 @@ class StatePreload(game: Game, options: Map[String,String], status: Element) ext
     preloadBar.x += step
     step += 2
     if (ship.x>game.width) {
-      game.state.start("menu", args = null, clearCache = false, clearWorld = false)
+      if (Progress.hasCheckpoint)
+        game.state.start("play", args = "restore", clearCache = false, clearWorld = false)
+      else
+        game.state.start("menu", args = null, clearCache = false, clearWorld = false)
       ship.destroy(true)
       preloadBar.destroy(true)
+      status.innerHTML = ""
     }
   }
 

@@ -41,11 +41,14 @@ class StateNextLevel(game: Game, options: Map[String,String], status: Element) e
           StatePlay.scorebox.addToScore((StatePlay.scores.timeBonus).toInt)
         StatePlay.scorebox.addToTimeBonus((-2000).toInt)
         sfxTick.play()
-        if (StatePlay.scores.timeBonus==0) timer.stop(true)
+        if (StatePlay.scores.timeBonus==0) {
+          timer.stop(true)
+          game.add.bitmapText(game.width/2,game.height-50, GlobalRes.FontId, "Saved a Checkpoint", 48).anchor.set(0.5,0.5)
+          Progress.saveCheckpoint(StatePlay.scores)
+        }
       }, null)
       timer.start(0)
     }
-
   }
 
   override def update(): Unit = {

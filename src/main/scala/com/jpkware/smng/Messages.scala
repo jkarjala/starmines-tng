@@ -26,7 +26,7 @@ class Messages(game: Game) {
 
   def tick(): Unit = {
     val toDelete: mutable.Seq[BitmapText] = texts.flatMap {text =>
-        text.alpha -= 0.025
+        text.alpha -= 0.02
         if (text.alpha<0) {
           text.destroy()
           Some(text)

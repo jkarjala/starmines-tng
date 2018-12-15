@@ -19,23 +19,31 @@ class StatePlay(game: Game, options: Map[String,String], status: Element) extend
   private var sfxLevelClr: Sound = _
   private var sfxCollect: Sound = _
   private var messages: Messages = _
+  private var checkpointRestored: Boolean = _
 
   private val debug: Boolean = options.contains("debug")
   private def optionsCount: Int = if (options.contains("mines")) options("mines").toInt else -1
 
   override def init(args: js.Any*): Unit = {
+    checkpointRestored = false
     args.headOption match {
       case str: Some[js.Any] =>
         Logger.info(s"Play init ${str.get}")
-        val cmd = str.get.asInstanceOf[String]
-        if (cmd=="nextlevel") {
-          StatePlay.scorebox.addToLevel(1)
-          StatePlay.scores.bonusoidsCollected = 0
-          StatePlay.scores.stars = 0
-        }
-        else {
-          StatePlay.scores = Scorebox.InitialScore.copy()
-          if (cmd(0).isDigit) StatePlay.scores.level = cmd.toInt
+        str.get.asInstanceOf[String] match {
+          case "start" =>
+            StatePlay.scores = Scorebox.InitialScore
+          case "nextlevel" =>
+            StatePlay.scorebox.addToLevel(1)
+            StatePlay.scores.bonusoidsCollected = 0
+            StatePlay.scores.stars = 0
+          case "restore" =>
+            StatePlay.scores = Progress.restoreCheckpoint(None)
+            checkpointRestored = StatePlay.scores.score!=0
+          case num if num(0).isDigit =>
+            StatePlay.scores = Progress.restoreCheckpoint(Some(num.toInt))
+            checkpointRestored = StatePlay.scores.score!=0
+          case cmd =>
+            Logger.warn("Unknown init cmd!")
         }
       case _ =>
     }
@@ -88,6 +96,11 @@ class StatePlay(game: Game, options: Map[String,String], status: Element) extend
 
     bonusManager = new BonusManager(game, 1 + scala.math.min((StatePlay.scores.level-1)/2, 9), setStartPosition)
     messages = new Messages(game)
+
+    if (checkpointRestored) {
+      StatePlay.scorebox.addToLevel(1)
+      messages.show(s"Restarted Field ${StatePlay.scores.level} from Checkpoint!")
+    }
 
     messages.show(s"Ship level ${player.shipLevel+1}")
 

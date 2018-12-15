@@ -19,6 +19,7 @@ class Progress extends js.Object {
 
 object Progress {
   val LSProgressKey = "starmines-progress"
+  val LSCheckpointKey = "starmines-checkpoint"
 
   val state: Progress = Progress()
 
@@ -36,6 +37,41 @@ object Progress {
         Logger.info(s"No local progress found")
         new Progress()
     }
+  }
+
+  def saveCheckpoint(scores: ScoreState): Unit = {
+    val json: String = JSON.stringify(scores)
+    Logger.info(s"Saved checkpoint:$json")
+    dom.window.localStorage.setItem(Progress.LSCheckpointKey, json)
+  }
+
+  def restoreCheckpoint(level: Option[Int]): ScoreState = {
+    val scores = dom.window.localStorage.getItem(LSCheckpointKey) match {
+      case item: String if level.isEmpty =>
+        Logger.info(s"Loaded checkpoint:$item")
+        JSON.parse(item).asInstanceOf[ScoreState]
+      case _ =>
+        Logger.info(s"No local checkpoint found for level $level")
+        resetCheckpoint()
+        Scorebox.InitialScore
+    }
+    if (level.isDefined) {
+      scores.level = level.get
+      saveCheckpoint(scores)
+    }
+    scores.stars = 0
+    scores.bonusoidsCollected = 0
+    Logger.info(s"Scores:${JSON.stringify(scores)}")
+    scores
+  }
+
+  def hasCheckpoint: Boolean = dom.window.localStorage.getItem(LSProgressKey) match {
+    case s: String => true
+    case _ => false
+  }
+
+  def resetCheckpoint(): Unit = {
+    dom.window.localStorage.removeItem(Progress.LSCheckpointKey)
   }
 
   def update(scores: ScoreState): Unit = {
@@ -65,7 +101,7 @@ object Progress {
     }
   }
 
-  def save(progress: Progress): Unit = {
+  def save(progress: Progress, scores: ScoreState): Unit = {
     val json: String = JSON.stringify(progress)
     Logger.info(s"Saved progress:$json")
     dom.window.localStorage.setItem(Progress.LSProgressKey, json)
@@ -73,7 +109,7 @@ object Progress {
 
   def updateAndSave(scores: ScoreState, debug: Boolean): Unit = {
     update(scores)
-    save(state)
+    save(state, scores)
     postScores(state, scores, debug)
   }
 
@@ -91,7 +127,7 @@ object Progress {
       "\t" + scores.totalBonusoids +
       // Once in production, add new items here!
       ""
-    postData(progress.id.get, tsv, (str: String) => { progress.id = if (debug) "!"+str else str})
+    postData(progress.id.get, tsv, (str: String) => { progress.id = if (debug && !str.startsWith("!")) "!"+str else str})
   }
   private val hostUrl = "https://jpkware.com"
 

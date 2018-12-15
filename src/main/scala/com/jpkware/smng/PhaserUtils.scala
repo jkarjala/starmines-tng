@@ -23,6 +23,7 @@ object PhaserButton {
   val FrameGrid = 15
   val FrameLeft = 16
   val FrameRight = 17
+  val FrameRetry = 18
 
   def add(game: Game, x: Double, y: Double, text: String, alpha: Double = 0.75,
           group: Group = null, scale: Double = 1.5, frame: Int = FrameBasic, textFrame: Int = -1): Button = {

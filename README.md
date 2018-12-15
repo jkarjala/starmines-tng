@@ -18,7 +18,9 @@ The StarMines the Next Generation is licensed under [GNU General Public License 
 - [TexturePacker](https://www.codeandweb.com/texturepacker) Sprite packer
 - [Persistence of Vision Raytraces](http://www.povray.org/) 3D renderer
 - [OpenIconic](https://useiconic.com/open) Source for most icons
-- [OpenFameArt](https://opengameart.org/) Button base shape
+- [OpenGameArt](https://opengameart.org/) Button base shape
 - [Moonhouse](https://www.dafont.com/moonhouse.font) Base font
 - [Littera](http://kvazars.com/littera/) Bitmap font generator
+- [Freesound](http://freesound.org/) Some sound effects
 - [Hubblesite](http://hubblesite.org/) Space photographs
+- Some Icons made by Freepik from www.flaticon.com 
