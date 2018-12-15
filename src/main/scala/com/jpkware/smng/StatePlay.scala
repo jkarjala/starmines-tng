@@ -40,7 +40,7 @@ class StatePlay(game: Game, options: Map[String,String], status: Element) extend
             StatePlay.scores = Progress.restoreCheckpoint(None)
             checkpointRestored = StatePlay.scores.score!=0
           case num if num(0).isDigit =>
-            StatePlay.scores = Progress.restoreCheckpoint(Some(num.toInt))
+            StatePlay.scores = if (num.toInt>1) Progress.restoreCheckpoint(Some(num.toInt-1)) else Scorebox.InitialScore
             checkpointRestored = StatePlay.scores.score!=0
           case cmd =>
             Logger.warn("Unknown init cmd!")
@@ -73,8 +73,7 @@ class StatePlay(game: Game, options: Map[String,String], status: Element) extend
 
     game.physics.startSystem(PhysicsObj.ARCADE)
 
-    val totalBonusoids = math.max(StatePlay.scores.totalBonusoids, Progress.state.maxBonusoids)
-    player = new Player(game, 100,100, totalBonusoids)
+    player = new Player(game, 100,100, StatePlay.scores.totalBonusoids)
     game.add.existing(player)
 
     touch = new TouchControls(game, options.contains("stick"))
@@ -173,17 +172,19 @@ class StatePlay(game: Game, options: Map[String,String], status: Element) extend
   def nextLevel(): Unit = {
     StatePlay.scores.stars = 1
 
+    val fieldMsg = if (enemies.countLiving()==0) "* All Enemies Destroyed!" else "* No More Bonusoids!"
+
     val timeBonusMsg: String = if (StatePlay.scores.timeBonus>0) {
       StatePlay.scores.stars += 1
-      "* Field completed!\n* Time bonus achieved!\n"
+      "* Time Bonus Achieved!"
     } else {
-      "* Field completed!\n  Time bonus missed...\n"
+      "  Time Bonus Missed..."
     }
 
-    val result: String = if (bonusManager.bonusoidCount == StatePlay.scores.bonusoidsCollected) {
+    val bonusoidMsg: String = if (bonusManager.bonusoidCount == StatePlay.scores.bonusoidsCollected) {
       sfxLevelEnd.play()
       StatePlay.scores.stars += 1
-      "* All Bonusoids collected!\n"
+      "* All Bonusoids Collected!"
     }
     else {
       sfxLevelClr.play()
@@ -192,7 +193,8 @@ class StatePlay(game: Game, options: Map[String,String], status: Element) extend
     }
     clearLevel()
     Progress.updateAndSave(StatePlay.scores, debug)
-    game.state.start("nextlevel", args = timeBonusMsg + result, clearCache = false, clearWorld = false)
+    val result = fieldMsg + "\n" + timeBonusMsg + "\n" + bonusoidMsg
+    game.state.start("nextlevel", args = result, clearCache = false, clearWorld = false)
   }
 
   def clearLevel(): Unit = {
@@ -290,6 +292,7 @@ class StatePlay(game: Game, options: Map[String,String], status: Element) extend
   }
 
   def gotoMenu(): Unit = {
+    Progress.resetCheckpoint()
     Progress.updateAndSave(StatePlay.scores, debug)
     game.state.start("menu", args = "quit", clearCache = false, clearWorld = true)
   }

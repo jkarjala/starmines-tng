@@ -20,7 +20,7 @@ class StateMenu(game: Game, options: Map[String,String], status: Element) extend
     game.add.bitmapText(game.width/2,game.height/2-180, GlobalRes.FontId, "THE NEXT GENERATION", 32).anchor.set(0.5,0.5)
 
     game.add.bitmapText(game.width/2,game.height-200, GlobalRes.FontId,
-      "Collect all Bonusoids for maximum score and permanent ship upgrades", 32).anchor.set(0.5,0.5)
+      "Collect all Bonusoids for maximum score and ship upgrades", 32).anchor.set(0.5,0.5)
     game.add.bitmapText(game.width/2,game.height-150, GlobalRes.FontId, help, 32).anchor.set(0.5,0.5)
 
     game.add.bitmapText(game.width/2,game.height-50, GlobalRes.FontId, "Copyright 2018 Jari.Karjala@iki.fi", 32).anchor.set(0.5,0.5)

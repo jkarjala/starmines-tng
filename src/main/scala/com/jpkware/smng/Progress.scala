@@ -16,12 +16,26 @@ class Progress extends js.Object {
   var playTime: js.UndefOr[Double] = new js.Date().getTime()
   var id: js.UndefOr[String] = ""
 }
+class Checkpoints extends js.Object {
+  var scores: js.Dictionary[String] = Dictionary()
+}
 
 object Progress {
   val LSProgressKey = "starmines-progress"
   val LSCheckpointKey = "starmines-checkpoint"
+  val LSLevelCheckpointsKey = "starmines-level-checkpoints"
 
   val state: Progress = Progress()
+  val checkpoints: Checkpoints = {
+    dom.window.localStorage.getItem(LSLevelCheckpointsKey) match {
+      case item: String =>
+        Logger.info(s"Loaded level checkpoints:$item")
+        JSON.parse(item).asInstanceOf[Checkpoints]
+      case _ =>
+        Logger.info(s"No level checkpoints found")
+        new Checkpoints
+    }
+  }
 
   def apply(): Progress = {
     dom.window.localStorage.getItem(LSProgressKey) match {
@@ -43,21 +57,38 @@ object Progress {
     val json: String = JSON.stringify(scores)
     Logger.info(s"Saved checkpoint:$json")
     dom.window.localStorage.setItem(Progress.LSCheckpointKey, json)
+
+    checkpoints.scores(scores.level.toString) = JSON.stringify(scores)
+    val json2 = JSON.stringify(checkpoints)
+    Logger.info(s"Saved level checkpoints:$json2")
+    dom.window.localStorage.setItem(Progress.LSLevelCheckpointsKey, json2)
   }
 
   def restoreCheckpoint(level: Option[Int]): ScoreState = {
-    val scores = dom.window.localStorage.getItem(LSCheckpointKey) match {
-      case item: String if level.isEmpty =>
-        Logger.info(s"Loaded checkpoint:$item")
-        JSON.parse(item).asInstanceOf[ScoreState]
-      case _ =>
-        Logger.info(s"No local checkpoint found for level $level")
-        resetCheckpoint()
-        Scorebox.InitialScore
+    val scores = if (level.isEmpty) {
+      dom.window.localStorage.getItem(LSCheckpointKey) match {
+        case item: String =>
+          Logger.info(s"Loaded active checkpoint:$item")
+          JSON.parse(item).asInstanceOf[ScoreState]
+        case _ =>
+          Logger.info(s"No active checkpoint found")
+          Scorebox.InitialScore
+      }
     }
-    if (level.isDefined) {
-      scores.level = level.get
-      saveCheckpoint(scores)
+    else {
+      val lvl = math.max(1, level.get)
+      val scores = checkpoints.scores.get(lvl.toString) match {
+        case Some(s) =>
+          Logger.info(s"Local checkpoint found for level $level: $s")
+          JSON.parse(s).asInstanceOf[ScoreState]
+        case _ =>
+          Logger.info(s"NO local checkpoint found for level $level")
+          val s = Scorebox.InitialScore
+          s.level = lvl
+          s
+      }
+      if (level.get>0) saveCheckpoint(scores) // next retry starts from this point, except on level 1
+      scores
     }
     scores.stars = 0
     scores.bonusoidsCollected = 0
@@ -65,8 +96,10 @@ object Progress {
     scores
   }
 
-  def hasCheckpoint: Boolean = dom.window.localStorage.getItem(LSProgressKey) match {
-    case s: String => true
+  def hasCheckpoint: Boolean = dom.window.localStorage.getItem(LSCheckpointKey) match {
+    case _: String =>
+      Logger.info("hasCheckpoint TRUE")
+      true
     case _ => false
   }
 
@@ -137,7 +170,7 @@ object Progress {
     Logger.info(s"XHR POST $data")
     xhr.open("POST", s"$hostUrl/smtng.php/$path", async = true)
     xhr.setRequestHeader("Content-Type", "application/tsv")
-    xhr.onreadystatechange = { (e: Event) => { // Call a function when the state changes.
+    xhr.onreadystatechange = { (_: Event) => { // Call a function when the state changes.
       if (xhr.status == 200) {
         if (xhr.readyState==4) {
           Logger.info(s"XHR POST response '${xhr.response}'")

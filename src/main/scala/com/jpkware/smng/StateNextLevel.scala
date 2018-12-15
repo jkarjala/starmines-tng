@@ -11,6 +11,7 @@ class StateNextLevel(game: Game, options: Map[String,String], status: Element) e
   var result: String = _
   var resultText: BitmapText = _
   var sfxTick: Sound = _
+  var saved: Boolean = _
 
   override def init(args: js.Any*): Unit = {
     args.headOption match {
@@ -31,6 +32,7 @@ class StateNextLevel(game: Game, options: Map[String,String], status: Element) e
     resultText.anchor.set(0.5,0.5)
 
     sfxTick = game.add.audio(StateNextLevel.SfxTick)
+    saved = false
 
     if (StatePlay.scores.timeBonus>0) {
       val timer = game.time.create(true)
@@ -43,8 +45,6 @@ class StateNextLevel(game: Game, options: Map[String,String], status: Element) e
         sfxTick.play()
         if (StatePlay.scores.timeBonus==0) {
           timer.stop(true)
-          game.add.bitmapText(game.width/2,game.height-50, GlobalRes.FontId, "Saved a Checkpoint", 48).anchor.set(0.5,0.5)
-          Progress.saveCheckpoint(StatePlay.scores)
         }
       }, null)
       timer.start(0)
@@ -53,7 +53,14 @@ class StateNextLevel(game: Game, options: Map[String,String], status: Element) e
 
   override def update(): Unit = {
     if (StatePlay.scores.timeBonus>0) return
-    else resultText.text = result
+    else {
+      resultText.text = result
+      if (!saved) {
+        game.add.bitmapText(game.width / 2, game.height - 50, GlobalRes.FontId, "Saved a Checkpoint", 48).anchor.set(0.5, 0.5)
+        Progress.saveCheckpoint(StatePlay.scores)
+        saved = true
+      }
+    }
 
     if (keyDown) keyDown = !PhaserKeys.isFireDown(game)
     if (!keyDown && PhaserKeys.isFireDown(game)) gotoPlay()
