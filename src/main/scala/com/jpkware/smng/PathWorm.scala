@@ -10,7 +10,7 @@ class PathWorm(game: Game, rule: Rule, group: Group) extends PathMine(game, rule
     this.y = y
     animation.setFrame(rule.shape + "01")
     (1 to count).foreach(i => {
-      val tailRule = rule.copy(args = Seq(s"i"*(i*rule.spd/10) + rule.args.head))
+      val tailRule = rule.copy(args = Seq(s"i"*(i*5) + rule.args.head))
       val b = new PathMine(game, tailRule, group)
       b.x = x
       b.y = y

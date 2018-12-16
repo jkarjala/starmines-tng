@@ -64,8 +64,15 @@ class StatePlay(game: Game, options: Map[String,String], status: Element) extend
     gr.drawRect(0,0,game.width,game.height)
 
     if (debug) {
+      val sums = (1 to 20).map(containersPerLevel(_)*4).scan(0)(_ + _)
+      Logger.info(s"Bonusoid sums: $sums")
+
       val button = PhaserButton.add(game, game.width/2, game.height-128, "skip", scale = 1.0)
-      button.events.onInputUp.add(() => { StatePlay.scores.timeBonus = 0; nextLevel() }, null, 1)
+      button.events.onInputUp.add(() => {
+        StatePlay.scores.timeBonus = 0
+        StatePlay.scorebox.addToScore(1)
+        nextLevel()
+      }, null, 1)
     }
 
     PhaserButton.addMinMax(game)
@@ -97,7 +104,7 @@ class StatePlay(game: Game, options: Map[String,String], status: Element) extend
     sfxLevelClr = game.add.audio(StatePlay.SfxLevelClrId)
     sfxCollect = game.add.audio(StatePlay.SfxSwip)
 
-    bonusManager = new BonusManager(game, 1 + scala.math.min((StatePlay.scores.level-1)/2, 9), setStartPosition)
+    bonusManager = new BonusManager(game, containersPerLevel(StatePlay.scores.level), setStartPosition)
     messages = new Messages(game)
 
     game.onPause.add(() => { pausedText.text = "Game Paused" }, null, 1, null)
@@ -119,6 +126,8 @@ class StatePlay(game: Game, options: Map[String,String], status: Element) extend
 
     StatePlay.scores.timeBonus = bonusManager.bonusoidCount * 5000
   }
+
+  def containersPerLevel(level: Int): Int = 1 + math.min((level-1)/2, 9)
 
   override def update(): Unit = {
     if (gameOver) return
@@ -310,7 +319,7 @@ class StatePlay(game: Game, options: Map[String,String], status: Element) extend
   def debugUpgrade(): Unit = {
     StatePlay.scorebox.addToBonusoidsCollected(1)
     player.maybeUpgradeShip(StatePlay.scores.totalBonusoids) match {
-      case Some(level) => messages.show(s"Ship systems upgraded to level $level!")
+      case Some(level) => messages.show(s"Ship upgraded to level $level with ${StatePlay.scores.totalBonusoids} B'soids!")
       case None => // Nothing to do
     }
   }

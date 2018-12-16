@@ -3,21 +3,23 @@ package com.jpkware.smng
 import com.definitelyscala.phaser.Physics.Arcade.Body
 import com.definitelyscala.phaser._
 
-case class ShipLevelInfo(bulletLifespan: Int, fireRate: Int, bulletSpeed: Int, shield: Double)
+case class ShipLevelInfo(bonusoidLimit: Int, bulletLifespan: Int, fireRate: Int, bulletSpeed: Int, shield: Double)
 
 class Player(game: Game, x: Double, y: Double, bonusoidCount: Int)
   extends PreRotatedSprite(game, x,y, GlobalRes.MainAtlasId, Player.ShipPrefix, 64) {
 
   val ShipLevelInfos = Seq(
-    ShipLevelInfo(700, 300, 1000, 1.0),
-    ShipLevelInfo(800, 300, 1000, 1.0),
-    ShipLevelInfo(800, 250, 1000, 1.0),
-    ShipLevelInfo(900, 250, 1000, 1.0),
-    ShipLevelInfo(900, 200, 1000, 1.0),
-    ShipLevelInfo(1000, 200, 1000, 1.0),
-    ShipLevelInfo(1000, 150, 1000, 1.0),
-    ShipLevelInfo(1000, 100, 1000, 1.0),
+    ShipLevelInfo(0, 700, 300, 1000, 1.0),
+    ShipLevelInfo(16, 800, 300, 1000, 1.0),
+    ShipLevelInfo(32, 800, 250, 1000, 1.0),
+    ShipLevelInfo(64, 900, 250, 1000, 1.0),
+    ShipLevelInfo(100, 900, 200, 1000, 1.0),
+    ShipLevelInfo(150, 1000, 200, 1000, 1.0),
+    ShipLevelInfo(200, 1000, 150, 1000, 1.0),
+    ShipLevelInfo(300, 1000, 125, 1000, 1.0),
+    ShipLevelInfo(400, 1000, 100, 1000, 1.0),
   )
+  val dualMissileBonusoidLimit: Int = 500
 
   game.physics.arcade.enable(this)
   physBody.drag.set(10,10)
@@ -54,20 +56,26 @@ class Player(game: Game, x: Double, y: Double, bonusoidCount: Int)
   def dualMissiles: Boolean = shipLevel >= ShipLevelInfos.length
 
   def maybeUpgradeShip(bonusoidCount: Int): Option[Int] = {
-    val level = math.max(0, bonusoidCount/16)
+    val level = if (bonusoidCount<dualMissileBonusoidLimit) {
+      ShipLevelInfos.count(_.bonusoidLimit <= bonusoidCount) - 1
+    }
+    else {
+      // Drop the weapon level only partly when dual missiles enabled
+      val count = bonusoidCount - dualMissileBonusoidLimit + 100
+      ShipLevelInfos.length + ShipLevelInfos.count(_.bonusoidLimit <= count) - 1
+    }
     if (level>shipLevel) {
       shipLevel = level
       if (!dualMissiles) {
         val levelInfo = ShipLevelInfos(level)
-        Logger.info(s"Single missiles $level $levelInfo")
+        Logger.info(s"$bonusoidCount => Single missiles $level $levelInfo")
         resetWeapon(weapon1, levelInfo)
         Some(level)
       }
       else {
-        // Drop the weapon level slightly when dual missiles enabled
-        val newLevel = math.min(level - ShipLevelInfos.length + 3, ShipLevelInfos.length-1)
+        val newLevel = math.min(level - ShipLevelInfos.length, ShipLevelInfos.length-1)
         val levelInfo = ShipLevelInfos(newLevel)
-        Logger.info(s"Dual missiles $newLevel $levelInfo")
+        Logger.info(s"$bonusoidCount => Dual missiles $level $newLevel $levelInfo")
         resetWeapon(weapon1, levelInfo)
         resetWeapon(weapon2, levelInfo)
         if (newLevel<ShipLevelInfos.length) Some(level) else None
