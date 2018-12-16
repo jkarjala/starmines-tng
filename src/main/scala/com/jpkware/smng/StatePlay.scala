@@ -1,7 +1,8 @@
 package com.jpkware.smng
 
 import com.definitelyscala.phaser._
-import org.scalajs.dom.raw.Element
+import org.scalajs.dom
+import org.scalajs.dom.raw.{Element, KeyboardEvent}
 
 import scala.scalajs.js
 
@@ -13,6 +14,7 @@ class StatePlay(game: Game, options: Map[String,String], status: Element) extend
   private var enemyManager: EnemyManager = _
   private var cursors: CursorKeys = _
   private var fpsText: BitmapText = _
+  private var pausedText: BitmapText = _
   private var touch: TouchControls = _
   private var gameOver = false
   private var sfxLevelEnd: Sound = _
@@ -88,6 +90,8 @@ class StatePlay(game: Game, options: Map[String,String], status: Element) extend
     StatePlay.scorebox = new Scorebox(game, StatePlay.scores)
 
     fpsText = game.add.bitmapText(5,5, GlobalRes.FontId, "", 18)
+    pausedText = game.add.bitmapText(game.width/2,game.height-20, GlobalRes.FontId, "", 36)
+    pausedText.anchor.set(0.5,0.5)
 
     sfxLevelEnd = game.add.audio(StatePlay.SfxLevelEndId)
     sfxLevelClr = game.add.audio(StatePlay.SfxLevelClrId)
@@ -95,6 +99,11 @@ class StatePlay(game: Game, options: Map[String,String], status: Element) extend
 
     bonusManager = new BonusManager(game, 1 + scala.math.min((StatePlay.scores.level-1)/2, 9), setStartPosition)
     messages = new Messages(game)
+
+    game.onPause.add(() => { pausedText.text = "Game Paused" }, null, 1, null)
+    game.onResume.add(() => { pausedText.text = "" }, null, 1, null)
+
+    dom.window.onkeydown = (e: KeyboardEvent) => if (e.keyCode=='P') game.paused = !game.paused
 
     if (checkpointRestored) {
       StatePlay.scorebox.addToLevel(1)
@@ -115,6 +124,7 @@ class StatePlay(game: Game, options: Map[String,String], status: Element) extend
     if (gameOver) return
     handleCollisions()
     handleInput()
+
     if (options.contains("fps")) fpsText.setText(s"${game.time.fps.toString} ${enemies.countLiving()}")
   }
 
