@@ -3,13 +3,15 @@ package com.jpkware.smng
 import com.definitelyscala.phaser.Physics.Arcade.Body
 import com.definitelyscala.phaser._
 
+import scala.util.Random
+
 class Producer(game: Game, rule: Rule, group: Group) extends Enemy(game, rule, group) {
   private val pieces: Group = game.add.group()
   private val shape: String = rule.args(0)
   private val frames: Int = rule.args(1).toInt
   private val fps: Int = rule.args(2).toInt
   private val count: Int = rule.args(3).toInt
-  private val delay: Int = rule.args(4).toInt
+  private val delay: Int = rule.args(4).toInt + StarMinesNG.rnd.nextInt(10000)
   private val score: Int = rule.score/count
   private val pieceRule: Rule = Rule(null, shape, frames, fps, score, spd = rule.spd)
 

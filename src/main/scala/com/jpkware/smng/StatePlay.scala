@@ -70,6 +70,7 @@ class StatePlay(game: Game, options: Map[String,String], status: Element) extend
       val button = PhaserButton.add(game, game.width/2, game.height-128, "skip", scale = 1.0)
       button.events.onInputUp.add(() => {
         StatePlay.scores.timeBonus = 0
+        StatePlay.scores.lives = 5
         StatePlay.scorebox.addToScore(1)
         nextLevel()
       }, null, 1)
