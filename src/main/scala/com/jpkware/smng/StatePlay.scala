@@ -14,7 +14,6 @@ class StatePlay(game: Game, options: Map[String,String], status: Element) extend
   private var enemyManager: EnemyManager = _
   private var cursors: CursorKeys = _
   private var fpsText: BitmapText = _
-  private var pausedText: BitmapText = _
   private var touch: TouchControls = _
   private var gameOver = false
   private var sfxLevelEnd: Sound = _
@@ -22,6 +21,7 @@ class StatePlay(game: Game, options: Map[String,String], status: Element) extend
   private var sfxCollect: Sound = _
   private var messages: Messages = _
   private var checkpointRestored: Boolean = _
+  private var pauseMenu: Group = _
 
   private val debug: Boolean = options.contains("debug")
   private def optionsCount: Int = if (options.contains("mines")) options("mines").toInt else -1
@@ -76,10 +76,26 @@ class StatePlay(game: Game, options: Map[String,String], status: Element) extend
       }, null, 1)
     }
 
+    val pauseButtonGroup = game.add.group(name="pausebutton")
+    PhaserButton.addPause(game, game.width - 40, 40, scale = 0.5, group = pauseButtonGroup)
     PhaserButton.addMinMax(game)
 
-    val button = PhaserButton.add(game, game.width - 40, 40, "", textFrame = PhaserButton.FrameExit, scale = 0.5)
-    button.events.onInputUp.add(() => gotoMenu(), null, 1)
+    val pausedText = game.add.bitmapText(game.width/2, game.height/4*3, GlobalRes.FontId, "", 36)
+    pausedText.anchor.set(0.5,0.5)
+
+    pauseMenu = PhaserButton.createPauseMenu(game)
+    pauseMenu.visible = false
+
+    game.onPause.add(() => {
+      pausedText.text = "Game Paused"
+      pauseMenu.visible = true
+      pauseButtonGroup.destroy(soft = true)
+    }, null, 1, null)
+    game.onResume.add(() => {
+      pausedText.text = ""
+      pauseMenu.visible = false
+      PhaserButton.addPause(game, game.width - 40, 40, scale = 0.5, group = pauseButtonGroup)
+    }, null, 1, null)
 
     game.physics.startSystem(PhysicsObj.ARCADE)
 
@@ -98,8 +114,6 @@ class StatePlay(game: Game, options: Map[String,String], status: Element) extend
     StatePlay.scorebox = new Scorebox(game, StatePlay.scores)
 
     fpsText = game.add.bitmapText(5,5, GlobalRes.FontId, "", 18)
-    pausedText = game.add.bitmapText(game.width/2,game.height-20, GlobalRes.FontId, "", 36)
-    pausedText.anchor.set(0.5,0.5)
 
     sfxLevelEnd = game.add.audio(StatePlay.SfxLevelEndId)
     sfxLevelClr = game.add.audio(StatePlay.SfxLevelClrId)
@@ -107,11 +121,6 @@ class StatePlay(game: Game, options: Map[String,String], status: Element) extend
 
     bonusManager = new BonusManager(game, containersPerLevel(StatePlay.scores.level), setStartPosition)
     messages = new Messages(game)
-
-    game.onPause.add(() => { pausedText.text = "Game Paused" }, null, 1, null)
-    game.onResume.add(() => { pausedText.text = "" }, null, 1, null)
-
-    dom.window.onkeydown = (e: KeyboardEvent) => if (e.keyCode=='P') game.paused = !game.paused
 
     if (checkpointRestored) {
       StatePlay.scorebox.addToLevel(1)
@@ -307,16 +316,27 @@ class StatePlay(game: Game, options: Map[String,String], status: Element) extend
 
     if (PhaserKeys.isFireDown(game) || touch.fire) player.fire()
 
-    if (k.isDown(27)) gotoMenu()
+    if (k.isDown(27)) PhaserButton.gotoMenu(game)
+    if (k.isDown('P')) {
+      justPaused = true
+      game.paused = true // un-pause in pauseUpdate
+    }
+
     if (debug && k.isDown('U')) debugUpgrade()
   }
 
-  def gotoMenu(): Unit = {
-    Progress.resetCheckpoint()
-    Progress.updateAndSave(StatePlay.scores, debug)
-    game.state.start("menu", args = "quit", clearCache = false, clearWorld = true)
-  }
+  var justPaused = true
+  override def pauseUpdate(): Unit = {
+    super.pauseUpdate()
+    pauseMenu.preUpdate()
+    pauseMenu.update()
+    pauseMenu.postUpdate()
 
+    val k = game.input.keyboard
+    if (justPaused && k.isDown('P')) return
+    justPaused = false
+    if (k.isDown('P') || PhaserKeys.isFireDown(game)) game.paused = false
+  }
   def debugUpgrade(): Unit = {
     StatePlay.scorebox.addToBonusoidsCollected(1)
     player.maybeUpgradeShip(StatePlay.scores.totalBonusoids) match {

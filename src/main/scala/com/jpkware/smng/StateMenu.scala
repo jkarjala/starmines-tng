@@ -28,8 +28,7 @@ class StateMenu(game: Game, options: Map[String,String], status: Element) extend
     val button = PhaserButton.add(game, game.width/2-150,game.height/2+40, "", textFrame=PhaserButton.FramePlay)
     button.events.onInputUp.add(startGame _, null, 1)
 
-    val button2 = PhaserButton.add(game, game.width/2+150,game.height/2+40, "", textFrame=PhaserButton.FrameGrid)
-    button2.events.onInputUp.add(startLevels _, null, 1)
+    val button2 = PhaserButton.addLevels(game, game.width/2+150,game.height/2+40, scale = 1.5)
 
     PhaserButton.addMinMax(game)
   }
@@ -42,9 +41,4 @@ class StateMenu(game: Game, options: Map[String,String], status: Element) extend
     Progress.resetCheckpoint()
     game.state.start("play", args = "start", clearCache = false, clearWorld = true)
   }
-
-  def startLevels(): Unit = {
-    game.state.start("levels", args = "start", clearCache = false, clearWorld = true)
-  }
-
 }
