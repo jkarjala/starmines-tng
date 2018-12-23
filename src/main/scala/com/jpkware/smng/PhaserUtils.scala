@@ -25,6 +25,7 @@ object PhaserButton {
   val FrameRight = 17
   val FrameRetry = 18
   val FramePause = 19
+  val FrameButton = 20
 
   private var pauseMenu: Group = _
 
@@ -59,7 +60,7 @@ object PhaserButton {
     if (!game.device.iOS) {
       game.scale.onFullScreenChange.dispose() // clear all old listeners
       val frame = if (game.scale.isFullScreen) FrameMin else FrameMax
-      val button2 = PhaserButton.add(game, 32, 32, " ", scale = 0.4, frame = frame)
+      val button2 = PhaserButton.add(game, 50, 50, " ", scale = 0.4, frame = frame)
       game.scale.onFullScreenChange.add(() => if (game.scale.isFullScreen) {
         button2.setFrames(FrameMin, FrameMin+1, FrameMin+2)
       } else {
@@ -89,26 +90,32 @@ object PhaserButton {
     button
   }
 
-  def addPause(game: Game, x: Double, y: Double, scale: Double = 1.0, group: Group = null): Button = {
+  def addPause(game: Game, x: Double, y: Double, scale: Double = 0.6, group: Group = null): Button = {
     val button = PhaserButton.add(game, x,y, "", textFrame=PhaserButton.FramePause, scale = scale, group = group)
     button.events.onInputUp.add(() => game.paused = true, null, 1)
     button
   }
 
-  def createPauseMenu(game: Game): Group = {
-    val step = 80
-    val y = 40
-    val x = game.width - 40
-    val scale = 0.5
+  def createPauseMenu(game: Game, touchControls: TouchControls): Group = {
+    val step = 100
+    val y = 64
+    var x = game.width - 64
+    val scale = 0.6
     val group = game.add.group(name = "pausemenu")
-    val button = PhaserButton.add(game, x,y, "",
-      textFrame=PhaserButton.FramePlay, scale = scale, group = group)
+    val button = PhaserButton.add(game, x,y, "", textFrame=PhaserButton.FramePlay, scale = scale, group = group)
     group.add(button)
-    group.add(PhaserButton.addRetry(game, x,y+step, scale = scale, group = group))
-    group.add(PhaserButton.addExit(game, x,y+step*2, scale = scale, group = group))
+    group.add(PhaserButton.addRetry(game, x-step,y, scale = scale, group = group))
+    group.add(PhaserButton.addExit(game, x-2*step,y, scale = scale, group = group))
+
     group.forEach((button: Button) => button.events.onInputUp.add(() => {
       game.paused = false
     }, null, 1), null, false)
+
+    if (touchControls.touchButtons.visible) {
+      val buttonLayout = PhaserButton.add(game, x-3*step, y, "", textFrame = PhaserButton.FrameButton, scale = scale, group = group)
+      buttonLayout.events.onInputUp.add(() => touchControls.nextLayout(), null, 1)
+      group.add(buttonLayout)
+    }
     group
   }
 

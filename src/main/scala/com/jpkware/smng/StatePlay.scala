@@ -1,8 +1,7 @@
 package com.jpkware.smng
 
 import com.definitelyscala.phaser._
-import org.scalajs.dom
-import org.scalajs.dom.raw.{Element, KeyboardEvent}
+import org.scalajs.dom.raw.Element
 
 import scala.scalajs.js
 
@@ -77,13 +76,16 @@ class StatePlay(game: Game, options: Map[String,String], status: Element) extend
     }
 
     val pauseButtonGroup = game.add.group(name="pausebutton")
-    PhaserButton.addPause(game, game.width - 40, 40, scale = 0.5, group = pauseButtonGroup)
+    PhaserButton.addPause(game, game.width - 64, 64, group = pauseButtonGroup)
     PhaserButton.addMinMax(game)
 
     val pausedText = game.add.bitmapText(game.width/2, game.height/4*3, GlobalRes.FontId, "", 36)
     pausedText.anchor.set(0.5,0.5)
 
-    pauseMenu = PhaserButton.createPauseMenu(game)
+    touch = new TouchControls(game)
+    if (options.contains("touch") || !game.device.desktop) touch.enable() else touch.addMouseControls(space, player)
+
+    pauseMenu = PhaserButton.createPauseMenu(game, touch)
     pauseMenu.visible = false
 
     game.onPause.add(() => {
@@ -94,16 +96,13 @@ class StatePlay(game: Game, options: Map[String,String], status: Element) extend
     game.onResume.add(() => {
       pausedText.text = ""
       pauseMenu.visible = false
-      PhaserButton.addPause(game, game.width - 40, 40, scale = 0.5, group = pauseButtonGroup)
+      PhaserButton.addPause(game, game.width - 64, 64, group = pauseButtonGroup)
     }, null, 1, null)
 
     game.physics.startSystem(PhysicsObj.ARCADE)
 
     player = new Player(game, 100,100, StatePlay.scores.totalBonusoids)
     game.add.existing(player)
-
-    touch = new TouchControls(game, options.contains("stick"))
-    if (options.contains("touch") || options.contains("stick") || !game.device.desktop) touch.enable() else touch.addMouseControls(space, player)
 
     cursors = game.input.keyboard.createCursorKeys()
 
@@ -335,7 +334,7 @@ class StatePlay(game: Game, options: Map[String,String], status: Element) extend
     val k = game.input.keyboard
     if (justPaused && k.isDown('P')) return
     justPaused = false
-    if (k.isDown('P') || PhaserKeys.isFireDown(game)) game.paused = false
+    if (k.isDown('P') || k.isDown(27) || PhaserKeys.isFireDown(game)) game.paused = false
   }
   def debugUpgrade(): Unit = {
     StatePlay.scorebox.addToBonusoidsCollected(1)

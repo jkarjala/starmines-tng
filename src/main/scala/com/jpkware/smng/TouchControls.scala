@@ -1,10 +1,77 @@
 package com.jpkware.smng
 
 import com.definitelyscala.phaser._
+import org.scalajs.dom
 
-class TouchControls(game: Game, stick: Boolean) {
+import scala.scalajs.js
+
+class ButtonPositions extends js.Object{
+  var rightX: Double = 0.0
+  var rightY: Double = 0.0
+  var leftX: Double = 0.0
+  var leftY: Double = 0.0
+  var thrustX: Double = 0.0
+  var thrustY: Double = 0.0
+  var fireX: Double = 0.0
+  var fireY: Double = 0.0
+}
+
+object ButtonPositions {
+  val radius = 128
+  val margin = 24
+  def apply(game: Game): Seq[ButtonPositions] = {
+    val buttonY: Double = game.height - radius - margin
+    val positions = Seq(
+      new ButtonPositions {
+        rightX = radius + margin
+        rightY = buttonY
+        leftX = radius * 3 + margin*2
+        leftY = buttonY
+        thrustX = game.width - radius * 3 - margin*2
+        thrustY = buttonY
+        fireX = game.width - radius - margin
+        fireY = buttonY
+      },
+      new ButtonPositions {
+        rightX = radius + margin
+        rightY = game.height/2 - radius - margin
+        leftX = radius + margin
+        leftY = game.height/2 + radius + margin
+        fireX = game.width - radius - margin
+        fireY = game.height/2 - radius - margin
+        thrustX = game.width - radius - margin
+        thrustY = game.height/2 + radius + margin
+      },
+      new ButtonPositions {
+        thrustX = radius + margin
+        thrustY = game.height/2 - radius - margin
+        rightX = radius + margin
+        rightY = game.height/2 + radius + margin
+        fireX = game.width - radius - margin
+        fireY = game.height/2 - radius - margin
+        leftX = game.width - radius - margin
+        leftY = game.height/2 + radius + margin
+      },
+      new ButtonPositions {
+        thrustX = radius + margin
+        thrustY = game.height/2 + radius + margin
+        rightX = radius + margin
+        rightY = game.height/2 - radius - margin
+        fireX = game.width - radius - margin
+        fireY = game.height/2 + radius + margin
+        leftX = game.width - radius - margin
+        leftY = game.height/2 - radius - margin
+      }
+    )
+    positions
+  }
+  var current: ButtonPositions = _
+}
+
+class TouchControls(game: Game) {
   val touchButtons: Group = game.add.group()
   touchButtons.visible = false
+  var stick: Boolean = false
 
   var rotateRight = false
   var rotateLeft = false
@@ -12,10 +79,38 @@ class TouchControls(game: Game, stick: Boolean) {
   var thrust = false
   var fire = false
 
+  val LSControlIndex = "starmines-control-index"
   val NoRotation = 100.0  // Indicating "no action"
   var thrustRotation: Double = NoRotation
   var fireRotation: Double = NoRotation
   def isEnabled: Boolean = touchButtons.visible
+
+  var currentLayout: Int = dom.window.localStorage.getItem(LSControlIndex) match {
+    case item: String =>
+      item.toInt
+    case _ =>
+      0
+  }
+  val positions: Seq[ButtonPositions] = ButtonPositions(game)
+  if (currentLayout<0) stick = true else {
+    ButtonPositions.current = positions(currentLayout)
+  }
+
+  def nextLayout(): Unit = {
+    currentLayout += 1
+    if (currentLayout==positions.length) {
+      currentLayout = -1
+      stick = true
+    }
+    else {
+      ButtonPositions.current = positions(currentLayout)
+      stick = false
+    }
+    touchButtons.destroy(destroyChildren = true, soft = true)
+    addTouchButtons()
+    enable()
+    dom.window.localStorage.setItem(LSControlIndex, currentLayout.toString)
+  }
 
   def enable(): Unit = {
     if (touchButtons.countLiving()==0) addTouchButtons()
@@ -34,42 +129,42 @@ class TouchControls(game: Game, stick: Boolean) {
   }
 
   def addTouchButtons(): Unit = {
-    val radius = 128
-    val buttonY = game.height - radius - 32
     if (!stick) {
-      addTouchButton(radius +32 , buttonY, "", () => {
+      addTouchButton(ButtonPositions.current.rightX,ButtonPositions.current.rightY, "", () => {
         rotateLeft = true
       }, () => {
         rotateLeft = false
         rotateStop = true
       }, textFrame=PhaserButton.FrameRotLeft)
-      addTouchButton(radius * 3 + 64, buttonY, "", () => {
+      addTouchButton(ButtonPositions.current.leftX, ButtonPositions.current.leftY, "", () => {
         rotateRight = true
       }, () => {
         rotateRight = false
         rotateStop = true
       }, textFrame=PhaserButton.FrameRotRight)
-      addTouchButton(game.width - radius - 32, buttonY, "", () => {
-        fire = true
-      }, () => {
-        fire = false
-      }, textFrame=PhaserButton.FrameFire)
-      addTouchButton(game.width - radius * 3 - 64, buttonY, "", () => {
+      addTouchButton(ButtonPositions.current.thrustX, ButtonPositions.current.thrustY, "", () => {
         thrust = true
       }, () => {
         thrust = false
       }, textFrame=PhaserButton.FrameThrust)
+      addTouchButton(ButtonPositions.current.fireX, ButtonPositions.current.fireY, "", () => {
+        fire = true
+      }, () => {
+        fire = false
+      }, textFrame=PhaserButton.FrameFire)
     }
-    else
+    else {
       addTouchButton(game.width - 256, game.height-256, "", () => {
         fire = true
       }, () => {
         fire = false
       }, textFrame=PhaserButton.FrameFire)
+    }
+
   }
 
   def addTouchButton(x: Double, y: Double, text: String, down: () => Unit, up: () => Unit, textFrame: Int = 0): Button = {
-    val button = PhaserButton.add(game, x, y, text, 0.25, touchButtons, textFrame=textFrame)
+    val button = PhaserButton.add(game, x, y, text, 0.25, touchButtons, textFrame=textFrame, scale = 1.75 )
     button.events.onInputOver.add(down, null, 1)
     button.events.onInputOut.add(up, null, 1)
     button.events.onInputDown.add(down, null, 1)
