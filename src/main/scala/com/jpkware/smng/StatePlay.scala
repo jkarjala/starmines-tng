@@ -34,7 +34,7 @@ class StatePlay(game: Game, options: Map[String,String], status: Element) extend
           case "start" =>
             StatePlay.scores = Scorebox.InitialScore
           case "nextlevel" =>
-            StatePlay.scorebox.addToLevel(1)
+            StatePlay.scores.level += 1
             StatePlay.scores.bonusoidsCollected = 0
             StatePlay.scores.stars = 0
           case "restore" =>
@@ -48,6 +48,8 @@ class StatePlay(game: Game, options: Map[String,String], status: Element) extend
         }
       case _ =>
     }
+    if (checkpointRestored) StatePlay.scores.level += 1
+
     StarMinesNG.rnd.setSeed(42+StatePlay.scores.level)
     Progress.updateAndSave(StatePlay.scores, debug)
     gameOver = false
@@ -91,12 +93,12 @@ class StatePlay(game: Game, options: Map[String,String], status: Element) extend
     game.onPause.add(() => {
       pausedText.text = "Game Paused"
       pauseMenu.visible = true
-      pauseButtonGroup.destroy(soft = true)
+      pauseButtonGroup.visible = false
     }, null, 1, null)
     game.onResume.add(() => {
       pausedText.text = ""
       pauseMenu.visible = false
-      PhaserButton.addPause(game, game.width - 64, 64, group = pauseButtonGroup)
+      pauseButtonGroup.visible = true
     }, null, 1, null)
 
     game.physics.startSystem(PhysicsObj.ARCADE)
@@ -122,7 +124,6 @@ class StatePlay(game: Game, options: Map[String,String], status: Element) extend
     messages = new Messages(game)
 
     if (checkpointRestored) {
-      StatePlay.scorebox.addToLevel(1)
       messages.show(s"Restarted Field ${StatePlay.scores.level} from Checkpoint!")
     }
 
