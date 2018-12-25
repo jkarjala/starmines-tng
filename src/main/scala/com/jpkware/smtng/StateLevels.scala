@@ -1,8 +1,10 @@
-package com.jpkware.smng
+/*
+ * This file is part of StarMines: The Next Generation - Copyright 2018-2019 Jari Karjala - www.jpkware.com
+ * SPDX-License-Identifier: GPLv3-only
+ */
+package com.jpkware.smtng
 
-import com.definitelyscala.phaser.{Game, Pointer, Sprite, State}
-import com.definitelyscala.phaserpixi.Event
-import org.scalajs.dom.raw.Element
+import com.definitelyscala.phaser.{Game, Pointer, State}
 
 class StateLevels(game: Game, options: Map[String,String]) extends State {
 

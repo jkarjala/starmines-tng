@@ -1,4 +1,4 @@
-# StarMines the Next Generation (SM:TNG)
+# StarMines: The Next Generation (SM:TNG)
 
 StarMines is a space shooter inspired by old classics like Asteroids and Omega Race.
 
@@ -7,7 +7,7 @@ using the HTML5 technology and modern tools.
 
 You can play the game at my [website](https://www.jpkware.com/smtng/).
 
-The StarMines the Next Generation is licensed under [GNU General Public License v3](LICENSE).
+StarMines: The Next Generation Copyright Jari Karjala 1999-2019 - licensed under [GNU General Public License v3](LICENSE).
 
 ### Tools and resources used
 

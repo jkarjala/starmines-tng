@@ -1,4 +1,4 @@
-// POV Ray StarMines models - COpyright 1999-2018 Jari Karjala <jka@iki.fi>
+// POV Ray StarMines models - Copyright 1999-2019 Jari Karjala - https://www.jpkware.com/
 
 #version 3.0
 global_settings { assumed_gamma 2.2 }

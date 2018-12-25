@@ -1,4 +1,8 @@
-package com.jpkware.smng
+/*
+ * This file is part of StarMines: The Next Generation - Copyright 2018-2019 Jari Karjala - www.jpkware.com
+ * SPDX-License-Identifier: GPLv3-only
+ */
+package com.jpkware.smtng
 
 import com.definitelyscala.phaser.Physics.Arcade.Body
 import com.definitelyscala.phaser._

@@ -1,3 +1,4 @@
+#!/usr/bin/env bash
 if [[ $# -eq 0 ]] ; then
     echo 'Need user@host as argument'
     exit 1
