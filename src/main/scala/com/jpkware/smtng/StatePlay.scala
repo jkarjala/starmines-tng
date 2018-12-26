@@ -25,6 +25,7 @@ class StatePlay(game: Game, options: Map[String,String], status: Element) extend
   private var messages: Messages = _
   private var checkpointRestored: Boolean = _
   private var pauseMenu: Group = _
+  private var pauseButtonGroup: Group = _
 
   private val debug: Boolean = options.contains("debug")
   private def optionsCount: Int = if (options.contains("mines")) options("mines").toInt else -1
@@ -69,9 +70,6 @@ class StatePlay(game: Game, options: Map[String,String], status: Element) extend
     gr.drawRect(0,0,game.width,game.height)
 
     if (debug) {
-      val sums = (1 to 20).map(containersPerLevel(_)*4).scan(0)(_ + _)
-      Logger.info(s"Bonusoid sums: $sums")
-
       val button = PhaserButton.add(game, game.width/2, game.height-128, "skip", scale = 1.0)
       button.events.onInputUp.add(() => {
         StatePlay.scores.timeBonus = 0
@@ -80,16 +78,50 @@ class StatePlay(game: Game, options: Map[String,String], status: Element) extend
         nextLevel()
       }, null, 1)
     }
+    fpsText = game.add.bitmapText(5,5, GlobalRes.FontId, "", 18)
 
-    val pauseButtonGroup = game.add.group(name="pausebutton")
-    PhaserButton.addPause(game, game.width - 64, 64, group = pauseButtonGroup)
-    PhaserButton.addMinMax(game)
+    game.physics.startSystem(PhysicsObj.ARCADE)
 
-    val pausedText = game.add.bitmapText(game.width/2, game.height/4*3, GlobalRes.FontId, "", 36)
-    pausedText.anchor.set(0.5,0.5)
+    player = new Player(game, 100,100, StatePlay.scores.totalBonusoids)
+    game.add.existing(player)
 
     touch = new TouchControls(game)
     if (options.contains("touch") || !game.device.desktop) touch.enable() else touch.addMouseControls(space, player)
+    cursors = game.input.keyboard.createCursorKeys()
+
+    createPauseMenu
+
+    Explosion.initGroups(game, Seq(Explosion.LargeExploCount, Explosion.SmallExploCount, Explosion.TinyExploCount))
+
+    sfxLevelEnd = game.add.audio(StatePlay.SfxLevelEndId)
+    sfxLevelClr = game.add.audio(StatePlay.SfxLevelClrId)
+    sfxCollect = game.add.audio(StatePlay.SfxSwip)
+
+    StatePlay.scorebox = new Scorebox(game, StatePlay.scores)
+    bonusManager = new BonusManager(game, containersPerLevel(StatePlay.scores.level), setStartPosition)
+    enemyManager = new EnemyManager(game, setStartPosition)
+    val (e, m) = enemyManager.spawnEnemies(player, StatePlay.scores.level, optionsCount)
+    enemies = e
+    enemyMissiles = m
+
+    StatePlay.scores.shipLevel = player.shipLevel+1
+    StatePlay.scores.timeBonus = bonusManager.bonusoidCount * 5000
+
+    messages = new Messages(game)
+
+    if (checkpointRestored) {
+      messages.show(s"Restarted Field ${StatePlay.scores.level} from Checkpoint!")
+    }
+    messages.show(s"Ship level ${player.shipLevel+1}")
+  }
+
+  private def createPauseMenu = {
+    pauseButtonGroup = game.add.group(name = "pausebutton")
+    PhaserButton.addPause(game, game.width - 64, 64, group = pauseButtonGroup)
+    PhaserButton.addMinMax(game)
+
+    val pausedText = game.add.bitmapText(game.width / 2, game.height / 4 * 3, GlobalRes.FontId, "", 36)
+    pausedText.anchor.set(0.5, 0.5)
 
     pauseMenu = PhaserButton.createPauseMenu(game, touch)
     pauseMenu.visible = false
@@ -104,41 +136,6 @@ class StatePlay(game: Game, options: Map[String,String], status: Element) extend
       pauseMenu.visible = false
       pauseButtonGroup.visible = true
     }, null, 1, null)
-
-    game.physics.startSystem(PhysicsObj.ARCADE)
-
-    player = new Player(game, 100,100, StatePlay.scores.totalBonusoids)
-    game.add.existing(player)
-
-    cursors = game.input.keyboard.createCursorKeys()
-
-    Explosion.initGroups(game, Seq(Explosion.LargeExploCount, Explosion.SmallExploCount, Explosion.TinyExploCount))
-
-    StatePlay.scores.shipLevel = player.shipLevel+1
-
-    StatePlay.scorebox = new Scorebox(game, StatePlay.scores)
-
-    fpsText = game.add.bitmapText(5,5, GlobalRes.FontId, "", 18)
-
-    sfxLevelEnd = game.add.audio(StatePlay.SfxLevelEndId)
-    sfxLevelClr = game.add.audio(StatePlay.SfxLevelClrId)
-    sfxCollect = game.add.audio(StatePlay.SfxSwip)
-
-    bonusManager = new BonusManager(game, containersPerLevel(StatePlay.scores.level), setStartPosition)
-    messages = new Messages(game)
-
-    if (checkpointRestored) {
-      messages.show(s"Restarted Field ${StatePlay.scores.level} from Checkpoint!")
-    }
-
-    messages.show(s"Ship level ${player.shipLevel+1}")
-
-    enemyManager = new EnemyManager(game, setStartPosition)
-    val (e, m) = enemyManager.spawnEnemies(player, StatePlay.scores.level, optionsCount)
-    enemies = e
-    enemyMissiles = m
-
-    StatePlay.scores.timeBonus = bonusManager.bonusoidCount * 5000
   }
 
   def containersPerLevel(level: Int): Int = 1 + math.min((level-1)/2, 9)
@@ -235,6 +232,8 @@ class StatePlay(game: Game, options: Map[String,String], status: Element) extend
     enemies.destroy()
     messages.clear()
     player.hide()
+    pauseMenu.visible = false
+    pauseButtonGroup.visible = false
     bonusManager.bonusoids.destroy()
   }
 
@@ -269,7 +268,7 @@ class StatePlay(game: Game, options: Map[String,String], status: Element) extend
     messages.show(s"Bonusoid collected!")
     player.maybeUpgradeShip(StatePlay.scores.totalBonusoids) match {
       case Some(level) =>
-        messages.show(s"SHIP SYSTEMS UPGRADED TO LEVEL ${level+1}!")
+        messages.show(s"SHIP SYSTEMS UPGRADED TO LEVEL ${level+1}")
         StatePlay.scores.shipLevel = level+1
       case None => // Nothing to do
     }
@@ -322,14 +321,11 @@ class StatePlay(game: Game, options: Map[String,String], status: Element) extend
 
     if (k.isDown(27)) PhaserButton.gotoMenu(game)
     if (k.isDown('P')) {
-      justPaused = true
       game.paused = true // un-pause in pauseUpdate
     }
-
     if (debug && k.isDown('U')) debugUpgrade()
   }
 
-  var justPaused = true
   override def pauseUpdate(): Unit = {
     super.pauseUpdate()
     pauseMenu.preUpdate()
@@ -337,10 +333,9 @@ class StatePlay(game: Game, options: Map[String,String], status: Element) extend
     pauseMenu.postUpdate()
 
     val k = game.input.keyboard
-    if (justPaused && k.isDown('P')) return
-    justPaused = false
-    if (k.isDown('P') || k.isDown(27) || PhaserKeys.isFireDown(game)) game.paused = false
+    if (k.isDown(27) || PhaserKeys.isFireDown(game)) game.paused = false
   }
+
   def debugUpgrade(): Unit = {
     StatePlay.scorebox.addToBonusoidsCollected(1)
     player.maybeUpgradeShip(StatePlay.scores.totalBonusoids) match {
