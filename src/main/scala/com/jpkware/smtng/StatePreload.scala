@@ -7,6 +7,8 @@ package com.jpkware.smtng
 import com.definitelyscala.phaser.{Game, Sprite, State}
 import org.scalajs.dom.raw.Element
 
+import scala.scalajs.js
+
 class StatePreload(game: Game, options: Map[String,String], status: Element) extends State {
 
   var preloadBar: Sprite = _
@@ -51,8 +53,12 @@ class StatePreload(game: Game, options: Map[String,String], status: Element) ext
       game.stage.disableVisibilityChange = false
       if (Progress.hasCheckpoint)
         game.state.start("play", args = "restore", clearCache = false, clearWorld = false)
-      else
-        game.state.start("menu", args = null, clearCache = false, clearWorld = false)
+      else {
+        if (Progress.state.name.get.isEmpty)
+          game.state.start("name", args = null, clearCache = false, clearWorld = false)
+        else
+          game.state.start("menu", args = null, clearCache = false, clearWorld = false)
+      }
       ship.destroy(true)
       preloadBar.destroy(true)
       status.innerHTML = ""

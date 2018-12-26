@@ -37,6 +37,7 @@ object StarMinesNG {
     game.state.add("boot", new StateBoot(game, options))
     game.state.add("preloader", new StatePreload(game, options, status))
     game.state.add("menu", new StateMenu(game, options, status))
+    game.state.add("name", new StateName(game, options, status))
     game.state.add("play", new StatePlay(game, options, status))
     game.state.add("nextlevel", new StateNextLevel(game, options, status))
     game.state.add("gameover", new StateGameOver(game, options, status))

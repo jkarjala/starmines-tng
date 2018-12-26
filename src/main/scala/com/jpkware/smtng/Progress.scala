@@ -18,6 +18,7 @@ class Progress extends js.Object {
   var stars: js.Dictionary[Int] = Dictionary()
   var startTime: js.UndefOr[Double] = new js.Date().getTime()
   var playTime: js.UndefOr[Double] = new js.Date().getTime()
+  var name: js.UndefOr[String] = ""
   var id: js.UndefOr[String] = ""
 }
 class Checkpoints extends js.Object {
@@ -49,12 +50,18 @@ object Progress {
         // old state may not have these
         if (js.isUndefined(p.stars)) p.stars = Dictionary()
         if (js.isUndefined(p.startTime)) p.startTime = new js.Date().getTime()
+        if (js.isUndefined(p.name)) p.name = ""
         if (js.isUndefined(p.id)) p.id = ""
         p
       case _ =>
         Logger.info(s"No local progress found")
         new Progress()
     }
+  }
+
+  def saveName(name: String): Unit = {
+    state.name = name
+    save(state)
   }
 
   def saveCheckpoint(scores: ScoreState): Unit = {
@@ -138,7 +145,7 @@ object Progress {
     }
   }
 
-  def save(progress: Progress, scores: ScoreState): Unit = {
+  def save(progress: Progress): Unit = {
     val json: String = JSON.stringify(progress)
     Logger.info(s"Saved progress:$json")
     dom.window.localStorage.setItem(Progress.LSProgressKey, json)
@@ -146,7 +153,7 @@ object Progress {
 
   def updateAndSave(scores: ScoreState, debug: Boolean): Unit = {
     update(scores)
-    save(state, scores)
+    save(state)
     postScores(state, scores, debug)
   }
 
@@ -162,6 +169,7 @@ object Progress {
       "\t" + scores.timeBonus +
       "\t" + scores.bonusoidsCollected +
       "\t" + scores.totalBonusoids +
+      "\t" + progress.name +
       // Once in production, add new items here!
       ""
     postData(progress.id.get, tsv, (str: String) => { progress.id = if (debug && !str.startsWith("!")) "!"+str else str})
