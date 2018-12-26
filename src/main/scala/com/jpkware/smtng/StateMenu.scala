@@ -29,10 +29,15 @@ class StateMenu(game: Game, options: Map[String,String], status: Element) extend
 
     game.add.bitmapText(game.width/2,game.height-50, GlobalRes.FontId, "Copyright 2018 Jari.Karjala@iki.fi", 32).anchor.set(0.5,0.5)
 
-    val button = PhaserButton.add(game, game.width/2-150,game.height/2+40, "", textFrame=PhaserButton.FramePlay)
+    val (b1x,b2x,b3x) = if (Progress.hasCheckpoint) (-200,0,200) else (-100, 0, 100)
+    val buttonY = game.height/2
+
+    val button = PhaserButton.add(game, game.width/2+b1x, buttonY, "", scale = 1.0, textFrame=PhaserButton.FramePlay)
     button.events.onInputUp.add(startGame _, null, 1)
 
-    val button2 = PhaserButton.addLevels(game, game.width/2+150,game.height/2+40, scale = 1.5)
+    if (Progress.hasCheckpoint) PhaserButton.addRetry(game, game.width/2+b2x, buttonY)
+
+    PhaserButton.addLevels(game, game.width/2+b3x, buttonY)
 
     PhaserButton.addMinMax(game)
   }
