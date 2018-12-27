@@ -7,7 +7,7 @@ package com.jpkware.smtng
 import com.definitelyscala.phaser.{Game, State}
 import org.scalajs.dom.raw.Element
 
-class StateGameOver(game: Game, options: Map[String,String], status: Element) extends State {
+class StateGameOver(game: Game, options: Map[String,String]) extends State {
 
   var keyDown: Boolean = _
 

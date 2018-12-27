@@ -9,7 +9,7 @@ import org.scalajs.dom.raw.Element
 
 import scala.scalajs.js
 
-class StatePlay(game: Game, options: Map[String,String], status: Element) extends State {
+class StatePlay(game: Game, options: Map[String,String]) extends State {
   private var player: Player = _
   private var enemies: Group = _
   private var enemyMissiles: Group = _

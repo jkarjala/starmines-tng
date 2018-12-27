@@ -6,8 +6,7 @@ package com.jpkware.smtng
 
 import com.definitelyscala.phaser.{Game, Sprite, State}
 import org.scalajs.dom.raw.Element
-
-import scala.scalajs.js
+import org.scalajs.dom
 
 class StatePreload(game: Game, options: Map[String,String], status: Element) extends State {
 
@@ -27,7 +26,7 @@ class StatePreload(game: Game, options: Map[String,String], status: Element) ext
     game.load.setPreloadSprite(preloadBar)
 
     game.load.onFileComplete.add((progress: Int) => {
-      status.innerHTML  = "Loading resources " + progress.toString + "%"
+      status.innerHTML  = "<p>Loading resources " + progress.toString + "%&nbsp;</p>"
     }, null, 1)
 
     game.load.bitmapFont(GlobalRes.FontId, "res/font.png", "res/font.fnt")
@@ -61,7 +60,7 @@ class StatePreload(game: Game, options: Map[String,String], status: Element) ext
       }
       ship.destroy(true)
       preloadBar.destroy(true)
-      status.innerHTML = ""
+      status.innerHTML = if (dom.window.innerHeight<540) "" else "<p>&nbsp</p>"
     }
   }
 

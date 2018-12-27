@@ -9,7 +9,7 @@ import org.scalajs.dom.raw.Element
 
 import scala.scalajs.js
 
-class StateNextLevel(game: Game, options: Map[String,String], status: Element) extends State {
+class StateNextLevel(game: Game, options: Map[String,String]) extends State {
 
   var keyDown: Boolean = _
   var result: String = _

@@ -1,5 +1,6 @@
 body {
     background-color: black;
+    margin: 0px;
 }
 p {
     text-align: center;
@@ -23,15 +24,11 @@ p {
 
 #container {
     text-align: center;
-    width: 99vw;
+    width: 100vw;
     margin: 0 auto;
-}}
-
-#game {
-    display: inline-block;
 }
 
- /* unvisited link */
+/* unvisited link */
 a:link {
     color: aqua;
 }

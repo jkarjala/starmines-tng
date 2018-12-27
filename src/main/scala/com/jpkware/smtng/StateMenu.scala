@@ -7,7 +7,7 @@ package com.jpkware.smtng
 import com.definitelyscala.phaser.{Game, Sprite, State}
 import org.scalajs.dom.raw.Element
 
-class StateMenu(game: Game, options: Map[String,String], status: Element) extends State {
+class StateMenu(game: Game, options: Map[String,String]) extends State {
 
   var preloadBar: Sprite = _
 
