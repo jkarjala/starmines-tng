@@ -174,13 +174,15 @@ object Progress {
       ""
     postData(progress.id.get, tsv, (str: String) => { progress.id = if (debug && !str.startsWith("!")) "!"+str else str})
   }
+
   private val hostUrl = "https://jpkware.com"
+  private val script = if (dom.document.location.host.startsWith("smtng.")) "smtng.php" else "smtng-dev.php"
 
   def postData(path: String, data: String, callback: (String) => Unit): Unit = {
     val xhr = new XMLHttpRequest()
 
     Logger.info(s"XHR POST $data")
-    xhr.open("POST", s"$hostUrl/smtng.php/$path", async = true)
+    xhr.open("POST", s"$hostUrl/$script/$path", async = true)
     xhr.setRequestHeader("Content-Type", "application/tsv")
     xhr.onreadystatechange = { (_: Event) => { // Call a function when the state changes.
       if (xhr.status == 200) {
