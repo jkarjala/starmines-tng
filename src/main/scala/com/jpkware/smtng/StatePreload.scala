@@ -60,7 +60,7 @@ class StatePreload(game: Game, options: Map[String,String], status: Element) ext
       }
       ship.destroy(true)
       preloadBar.destroy(true)
-      status.innerHTML = if (dom.window.innerHeight<540) "" else "<p>&nbsp</p>"
+      status.innerHTML = ""
     }
   }
 

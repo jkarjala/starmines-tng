@@ -24,8 +24,9 @@ p {
 
 #container {
     text-align: center;
-    width: 100vw;
-    margin: 0 auto;
+    height: 95vh;
+    max-height: 95vh;
+    margin: auto auto;
 }
 
 /* unvisited link */
