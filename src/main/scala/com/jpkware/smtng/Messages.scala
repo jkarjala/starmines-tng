@@ -10,7 +10,7 @@ import scala.collection.mutable
 
 class Messages(game: Game) {
   var limit: Int = 5
-  var fontSize = 48
+  var fontSize = 40
   private val texts = mutable.ArrayBuffer[BitmapText]()
   private val timer: Timer = game.time.create(false)
 

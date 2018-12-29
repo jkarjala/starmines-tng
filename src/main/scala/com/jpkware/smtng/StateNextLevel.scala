@@ -32,7 +32,7 @@ class StateNextLevel(game: Game, options: Map[String,String]) extends State {
     button.events.onInputUp.add(gotoPlay _, null, 1)
     keyDown = PhaserKeys.isFireDown(game)
 
-    resultText = game.add.bitmapText(game.width/2,250, GlobalRes.FontId, "Collecting time bonus...", 64)
+    resultText = game.add.bitmapText(game.width/2,250, GlobalRes.FontId, "Collecting time bonus...", 48)
     resultText.anchor.set(0.5,0.5)
 
     sfxTick = game.add.audio(StateNextLevel.SfxTick)
@@ -60,7 +60,7 @@ class StateNextLevel(game: Game, options: Map[String,String]) extends State {
     else {
       resultText.text = result
       if (!saved) {
-        game.add.bitmapText(game.width / 2, game.height - 50, GlobalRes.FontId, "Saved a Checkpoint", 48).anchor.set(0.5, 0.5)
+        game.add.bitmapText(game.width / 2, game.height - 50, GlobalRes.FontId, "Saved a Checkpoint", 40).anchor.set(0.5, 0.5)
         Progress.saveCheckpoint(StatePlay.scores)
         saved = true
       }

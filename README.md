@@ -20,7 +20,8 @@ StarMines: The Next Generation copyright [Jari Karjala](https://www.jarikarjala.
 - [Persistence of Vision Raytraces](http://www.povray.org/) 3D renderer
 - [OpenIconic](https://useiconic.com/open) Source for most icons
 - [OpenGameArt](https://opengameart.org/) Button base shape
-- [Moonhouse](https://www.dafont.com/moonhouse.font) Base font
+- [Xolonium](https://www.dafont.com/xolonium.font) Base font
+- [Moonhouse](https://www.dafont.com/moonhouse.font) Logo font
 - [Littera](http://kvazars.com/littera/) Bitmap font generator
 - [Freesound](http://freesound.org/) Some sound effects
 - [Hubblesite](http://hubblesite.org/) Space photographs

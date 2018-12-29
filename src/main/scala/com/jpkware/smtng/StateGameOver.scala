@@ -15,10 +15,10 @@ class StateGameOver(game: Game, options: Map[String,String]) extends State {
 
     game.add.bitmapText(game.width/2,300, GlobalRes.FontId, "Game Over", 128).anchor.set(0.5,0.5)
 
-    PhaserButton.addRetry(game, game.width/2-200,game.height-200)
+    PhaserButton.addExit(game, game.width/2-200,game.height-200)
     keyDown = PhaserKeys.isFireDown(game)
-    PhaserButton.addLevels(game, game.width/2,game.height-200)
-    PhaserButton.addExit(game, game.width/2+200,game.height-200)
+    PhaserButton.addRetry(game, game.width/2,game.height-200)
+    PhaserButton.addLevels(game, game.width/2+200,game.height-200)
   }
 
   override def update(): Unit = {

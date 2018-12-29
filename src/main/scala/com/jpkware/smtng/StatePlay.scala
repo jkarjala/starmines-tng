@@ -208,7 +208,7 @@ class StatePlay(game: Game, options: Map[String,String]) extends State {
       StatePlay.scores.stars += 1
       "* Time Bonus Achieved!"
     } else {
-      "  Time Bonus Missed..."
+      "- Time Bonus Missed..."
     }
 
     val bonusoidMsg: String = if (bonusManager.bonusoidCount == StatePlay.scores.bonusoidsCollected) {
@@ -219,7 +219,7 @@ class StatePlay(game: Game, options: Map[String,String]) extends State {
     else {
       sfxLevelClr.play()
       val ratio = s"${StatePlay.scores.bonusoidsCollected}/${bonusManager.bonusoidCount}"
-      s"  Only $ratio Bonusoids..."
+      s"- Only $ratio Bonusoids..."
     }
     clearLevel()
     Progress.updateAndSave(StatePlay.scores, debug)

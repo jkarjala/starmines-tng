@@ -20,8 +20,10 @@ class StateMenu(game: Game, options: Map[String,String]) extends State {
     val help = if (game.device.desktop || options.contains("touch")) "Control your ship with arrow keys and space, or z,x,n,m, or mouse"
     else "Use the touch buttons to control your ship"
 
-    game.add.bitmapText(game.width/2,game.height/2-220, GlobalRes.FontId, "StarMines", 128).anchor.set(0.5,0.5)
-    game.add.bitmapText(game.width/2,game.height/2-180, GlobalRes.FontId, "THE NEXT GENERATION", 32).anchor.set(0.5,0.5)
+    GlobalRes.drawLogo(game)
+
+    game.add.bitmapText(game.width/2,game.height-300, GlobalRes.FontId,
+      s"Welcome ${Progress.state.name}!", 32).anchor.set(0.5,0.5)
 
     game.add.bitmapText(game.width/2,game.height-200, GlobalRes.FontId,
       "Collect all Bonusoids for maximum score and ship upgrades", 32).anchor.set(0.5,0.5)

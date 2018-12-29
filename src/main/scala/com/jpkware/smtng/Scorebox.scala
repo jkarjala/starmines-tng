@@ -34,8 +34,8 @@ class Scorebox(game: Game, scores: ScoreState) extends Sprite(game, 0,0, Scorebo
   game.physics.enable(this)
   body match { case b: Body => b.immovable = true}
 
-  game.add.bitmapText(game.width/2,game.height/2-80, GlobalRes.FontId, "StarMines", 96).anchor.set(0.5,0.5)
-  game.add.bitmapText(game.width/2,game.height/2-48, GlobalRes.FontId, "THE NEXT GENERATION", 28).anchor.set(0.5,0.5)
+  game.add.bitmapText(game.width/2,game.height/2-80, GlobalRes.FontMoonId, GlobalRes.Title, 96).anchor.set(0.5,0.5)
+  game.add.bitmapText(game.width/2,game.height/2-48, GlobalRes.FontMoonId, GlobalRes.SubTitle, 28).anchor.set(0.5,0.5)
 
   game.add.bitmapText(game.width/2-280,game.height/2+16, GlobalRes.FontId, "SCORE:", 28)
   scoreText = game.add.bitmapText(game.width/2+280,game.height/2, GlobalRes.FontId, "", 48)

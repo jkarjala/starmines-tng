@@ -32,6 +32,8 @@ object StarMinesNG {
         if (os.length>1) os(0) -> os(1) else os(0) -> "true"
       }).toMap
     }
+    status.innerHTML = ""
+
     val mode = if (options.contains("webgl")) Phaser.WEBGL else Phaser.CANVAS
     val game = new Game(1920, 1080, mode, parent)
     game.state.add("boot", new StateBoot(game, options))
