@@ -13,6 +13,7 @@ class StateName(game: Game, options: Map[String,String]) extends State {
 
   override def create(): Unit = {
 
+    game.add.sprite(0,0, GlobalRes.MenuBg).scale.set(2,2)
     PhaserButton.addMinMax(game)
 
     game.add.bitmapText(300,200, GlobalRes.FontId, "Please Input Your Player Name:", 48)

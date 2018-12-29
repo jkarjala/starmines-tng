@@ -54,12 +54,12 @@ class StatePreload(game: Game, options: Map[String,String], status: Element) ext
       // Now that things are loaded, it is OK to pause on losing focus.
       game.stage.disableVisibilityChange = false
       if (Progress.hasCheckpoint)
-        game.state.start("play", args = "restore", clearCache = false, clearWorld = false)
+        game.state.start("play", args = "restore", clearCache = false, clearWorld = true)
       else {
         if (Progress.state.name.get.isEmpty)
-          game.state.start("name", args = null, clearCache = false, clearWorld = false)
+          game.state.start("name", args = null, clearCache = false, clearWorld = true)
         else
-          game.state.start("menu", args = null, clearCache = false, clearWorld = false)
+          game.state.start("menu", args = null, clearCache = false, clearWorld = true)
       }
       ship.destroy(true)
       preloadBar.destroy(true)
@@ -82,6 +82,5 @@ object GlobalRes {
   def drawLogo(game: Game): Unit = {
     game.add.bitmapText(game.width/2,game.height/2-220, FontMoonId, Title, 128).anchor.set(0.5,0.5)
     game.add.bitmapText(game.width/2,game.height/2-180, FontMoonId, SubTitle, 32).anchor.set(0.5,0.5)
-
   }
 }
