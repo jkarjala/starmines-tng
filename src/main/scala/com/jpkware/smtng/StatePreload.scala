@@ -80,7 +80,7 @@ object GlobalRes {
   val SubTitle = "THE NEXT GENERATION"
 
   def drawLogo(game: Game): Unit = {
-    game.add.bitmapText(game.width/2,game.height/2-220, FontMoonId, Title, 128).anchor.set(0.5,0.5)
-    game.add.bitmapText(game.width/2,game.height/2-180, FontMoonId, SubTitle, 32).anchor.set(0.5,0.5)
+    game.add.bitmapText(game.width/2,game.height/2-260, FontMoonId, Title, 128).anchor.set(0.5,0.5)
+    game.add.bitmapText(game.width/2,game.height/2-220, FontMoonId, SubTitle, 32).anchor.set(0.5,0.5)
   }
 }

@@ -25,6 +25,8 @@ class Checkpoints extends js.Object {
   var scores: js.Dictionary[String] = Dictionary()
 }
 
+case class HighScore(field: Int, score: Int, name: String, bonusoids: Int)
+
 object Progress {
   val LSProgressKey = "starmines-progress"
   val LSCheckpointKey = "starmines-checkpoint"
@@ -177,12 +179,12 @@ object Progress {
 
   private val hostUrl = "https://jpkware.com"
   private val script = if (dom.document.location.host.startsWith("smtng.")) "smtng.php" else "smtng-dev.php"
+  private val scriptUrl = s"$hostUrl/$script"
 
   def postData(path: String, data: String, callback: (String) => Unit): Unit = {
-    val xhr = new XMLHttpRequest()
-
     Logger.info(s"XHR POST $data")
-    xhr.open("POST", s"$hostUrl/$script/$path", async = true)
+    val xhr = new XMLHttpRequest()
+    xhr.open("POST", s"$scriptUrl/$path", async = true)
     xhr.setRequestHeader("Content-Type", "application/tsv")
     xhr.onreadystatechange = { (_: Event) => { // Call a function when the state changes.
       if (xhr.status == 200) {
@@ -196,5 +198,29 @@ object Progress {
       }
     }}
     xhr.send(data)
+  }
+
+  def fetchScores(field: Option[Int], limit: Int, callback: (Seq[HighScore]) => Unit): Unit = {
+    val url = if (field.isDefined) s"$scriptUrl?field=$field&limit=$limit" else s"$scriptUrl?limit=$limit"
+    val xhr = new XMLHttpRequest()
+    xhr.open("GET", url, async = true)
+    xhr.onreadystatechange = { (_: Event) => { // Call a function when the state changes.
+      if (xhr.status == 200) {
+        if (xhr.readyState==4) {
+          Logger.info(s"XHR GET $url response '${xhr.response}'")
+          val lines = xhr.response.toString.split("\n")
+          val scores = lines.map(line => {
+            val values = line.split("\t")
+            HighScore(values(0).toInt, values(1).toInt, values(2).replace("\"",""), values(3).toInt)
+          })
+          callback(scores)
+        }
+      }
+      else {
+        Logger.warn(s"XHR ${xhr.readyState} ${xhr.status} ${xhr.response}")
+      }
+    }}
+    xhr.send()
+
   }
 }

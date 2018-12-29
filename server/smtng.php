@@ -131,7 +131,7 @@ else {
         header('Expires: 0');
         while ($row = $result->fetch_array(MYSQLI_NUM))
         {
-            fputcsv($fp, array_values($row));
+            fputcsv($fp, array_values($row), "\t");
         }
        die;
     }
