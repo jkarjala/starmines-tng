@@ -6,11 +6,24 @@ package com.jpkware.smtng
 
 import com.definitelyscala.phaser._
 
+import scala.scalajs.js
+
 object PhaserKeys {
   def isFireDown(game: Game): Boolean = {
     val k = game.input.keyboard
     k.isDown(0x0D) || k.isDown(' ') || k.isDown('M')
   }
+}
+
+
+class ScaleManagerCompatibility extends js.Object {
+  var supportsFullScreen: Boolean = _
+  var orientationFallback: Boolean = _
+  var noMargins: Boolean = _
+  var scrollTo: Point = _
+  var forceMinimumDocumentHeight: Boolean = _
+  var canExpandParent: Boolean = _
+  var clickTrampoline: String = _
 }
 
 object PhaserButton {
@@ -61,7 +74,7 @@ object PhaserButton {
   }
 
   def addMinMax(game: Game): Unit = {
-    if (!game.device.iOS) {
+    if (game.scale.compatibility.asInstanceOf[ScaleManagerCompatibility].supportsFullScreen) {
       game.scale.onFullScreenChange.dispose() // clear all old listeners
       val frame = if (game.scale.isFullScreen) FrameMin else FrameMax
       val button2 = PhaserButton.add(game, 50, 50, " ", scale = 0.4, frame = frame)
