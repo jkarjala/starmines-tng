@@ -4,15 +4,14 @@
  */
 package com.jpkware.smtng
 
-import com.definitelyscala.phaser.{BitmapText, Game, Sprite, State}
-import org.scalajs.dom.raw.Element
+import com.definitelyscala.phaser.{BitmapText, Game, State}
 
 import scala.collection.mutable
 
 class StateMenu(game: Game, options: Map[String,String]) extends State {
 
-  var infoTexts: mutable.Buffer[BitmapText] = mutable.Buffer()
-  var scoreTexts: mutable.Buffer[BitmapText] = mutable.Buffer()
+  var infoTexts: mutable.Buffer[BitmapText] = _
+  var scoreTexts: mutable.Buffer[BitmapText] = _
   var scores: Seq[HighScore] = Seq()
   var scoresShown: Boolean = false
   val ScoreListLen = 10
@@ -28,6 +27,7 @@ class StateMenu(game: Game, options: Map[String,String]) extends State {
     val help = if (game.device.desktop || options.contains("touch")) "Control your ship with arrow keys and space, or z,x,n,m, or mouse"
     else "Use the touch buttons to control your ship"
 
+    infoTexts = mutable.Buffer()
     infoTexts.append(game.add.bitmapText(game.width/2,game.height-400, GlobalRes.FontId, s"Welcome ${Progress.state.name}!", 40))
     infoTexts.append(game.add.bitmapText(game.width/2,game.height-250, GlobalRes.FontId,
       "Collect all Bonusoids for maximum score and ship upgrades", 32))
@@ -35,6 +35,7 @@ class StateMenu(game: Game, options: Map[String,String]) extends State {
     infoTexts.append(game.add.bitmapText(game.width/2,game.height-50, GlobalRes.FontId, "Copyright 2018 Jari.Karjala@iki.fi", 32))
     infoTexts.foreach(_.anchor.set(0.5,0.5))
 
+    scoreTexts = mutable.Buffer()
     (1 to ScoreListLen).foreach(i => scoreTexts.append(game.add.bitmapText(game.width/2-270,game.height-440+i*40, GlobalRes.FontId, "", 32)))
     scoreTexts.append(game.add.bitmapText(game.width/2-290,game.height-460, GlobalRes.FontId, "Top 10 Scores and Players:", 40))
     scoreTexts.foreach(_.anchor.set(0,0.5))

@@ -91,26 +91,33 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       die("Error1 " . ($dev ? $stmt->error : "*"));
     }
     // LOGGING
-    $stmt = $conn->prepare("INSERT INTO log (dt,ip,device,st,pt, field_id,stars,score,lives, time_bonus,bonusoids_collected,bonusoids_total,user_name) VALUES (utc_timestamp(),?,?,?,?,?,?,?,?,?,?,?,?)");
+    $stmt = $conn->prepare("INSERT INTO log (dt,ip,device,st,pt, field_id,stars,score,lives, time_bonus,bonusoids_collected,bonusoids_total,user_name, field_time) VALUES (utc_timestamp(),?,?,?,?,?,?,?,?,?,?,?,?,?)");
     $st=gmdate("Y-m-d H:i:s", $bits[0]/1000);
     $pt=gmdate("Y-m-d H:i:s", $bits[1]/1000);
-    $stmt->bind_param("ssssddddddds", $id,$retid,$st,$pt, $bits[2],$bits[3],$bits[4],$bits[5], $bits[6],$bits[7],$bits[8],$bits[9]);
+    $stmt->bind_param("ssssdddddddsd", $id,$retid,$st,$pt, $bits[2],$bits[3],$bits[4],$bits[5], $bits[6],$bits[7],$bits[8],$bits[9],$bits[10]);
     if (!$stmt->execute()) {
       die("Error2 " . ($dev ? $stmt->error : "*"));
     }
 }
 else {
     $field = get($_GET['field'], 0);
-    $limit = get($_GET['field'], 10);
+    $limit = get($_GET['limit'], 10);
+    $user = get($_GET['user'], '');
     if ($field>0) {
         // SINGLE FIELD TOP SCORES
-        $user = get($_GET['user'], '%');
-
-        $stmt = $conn->prepare("select field_id, score, user_name, bonusoids,device,dt from highscores where field_id=? and user_name like ? order by score desc limit ?");
+        $stmt = $conn->prepare("select field_id, score, user_name, bonusoids,device,dt from highscores where field_id=? order by score desc limit ?");
         if (!$stmt) {
-          die("Error3 " . ($dev ? $conn->error : "*"));
+          die("Error3a " . ($dev ? $conn->error : "*"));
         }
-        $stmt->bind_param("dsd", $field, $user, $limit);
+        $stmt->bind_param("dd", $field, $limit);
+    }
+    else if ($user!='') {
+        // SINGLE USER SCORES PER FIELD
+        $stmt = $conn->prepare("select field_id, score, user_name, bonusoids,device,dt from highscores where user_name=? order by field_id limit ?");
+        if (!$stmt) {
+          die("Error3b " . ($dev ? $conn->error : "*"));
+        }
+        $stmt->bind_param("sd", $user, $limit);
     }
     else {
         // OVERALL TOP SCORES

@@ -22,6 +22,7 @@ CREATE TABLE log (
   user_name varchar(20),
   device char(23),
   field_id smallint,
+  field_time int,
   stars smallint,
   score int,
   lives smallint,
@@ -45,5 +46,7 @@ PARTITION BY RANGE ( YEAR(dt) ) (
     PARTITION p2029 VALUES LESS THAN ( YEAR('2030-01-01 00:00:00') ),
     PARTITION future VALUES LESS THAN (MAXVALUE)
 );
+
+ALTER TABLE log ADD COLUMN field_time int AFTER field_id;
 
 -- INSERT INTO log (ip,id,st,pt,field_id,stars,score,lives,time_bonus,bonusoids_collected,bonusoids_total,user_name) VALUES ('1.2.3.4','id1','2019-01-01 00:00:00',from_unixtime(1546072717812/1000),0,0,0,0,0,0,0,'test');

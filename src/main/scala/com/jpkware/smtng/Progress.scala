@@ -43,6 +43,7 @@ object Progress {
         new Checkpoints
     }
   }
+  var levelStartTime: Long = _
 
   def apply(): Progress = {
     dom.window.localStorage.getItem(LSProgressKey) match {
@@ -145,6 +146,7 @@ object Progress {
       // Assume game started when score is 0
       state.playTime = new js.Date().getTime()
     }
+    if (scores.stars==0 && scores.lives>0) levelStartTime = new js.Date().getTime().toLong
   }
 
   def save(progress: Progress): Unit = {
@@ -172,6 +174,7 @@ object Progress {
       "\t" + scores.bonusoidsCollected +
       "\t" + scores.totalBonusoids +
       "\t" + progress.name +
+      "\t" + (new js.Date().getTime().toLong - levelStartTime) +
       // Once in production, add new items here!
       ""
     postData(progress.id.get, tsv, (str: String) => { progress.id = if (debug && !str.startsWith("!")) "!"+str else str})
