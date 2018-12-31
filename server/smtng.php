@@ -84,11 +84,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     print($retid);
 
     $bits = explode("\t", $data);
-    // HIGHSCORES
-    $stmt = $conn->prepare("INSERT INTO highscores (dt, user_name,field_id,score,bonusoids,device) VALUES (utc_timestamp(), ?, ?, ?, ?, ?) ON DUPLICATE KEY UPDATE score=GREATEST(score, VALUES(score)), bonusoids=GREATEST(bonusoids, VALUES(bonusoids)), device=VALUES(device), dt=VALUES(dt)");
-    $stmt->bind_param("sddds", $bits[9], $bits[2], $bits[4], $bits[8], $retid);
-    if (!$stmt->execute()) {
-      die("Error1 " . ($dev ? $stmt->error : "*"));
+
+    if ($retid[0]!='!') {
+        // HIGHSCORES
+        $stmt = $conn->prepare("INSERT INTO highscores (dt, user_name,field_id,score,bonusoids,device) VALUES (utc_timestamp(), ?, ?, ?, ?, ?) ON DUPLICATE KEY UPDATE score=GREATEST(score, VALUES(score)), bonusoids=GREATEST(bonusoids, VALUES(bonusoids)), device=VALUES(device), dt=VALUES(dt)");
+        $stmt->bind_param("sddds", $bits[9], $bits[2], $bits[4], $bits[8], $retid);
+        if (!$stmt->execute()) {
+          die("Error1 " . ($dev ? $stmt->error : "*"));
+        }
     }
     // LOGGING
     $stmt = $conn->prepare("INSERT INTO log (dt,ip,device,st,pt, field_id,stars,score,lives, time_bonus,bonusoids_collected,bonusoids_total,user_name, field_time) VALUES (utc_timestamp(),?,?,?,?,?,?,?,?,?,?,?,?,?)");
@@ -133,7 +136,7 @@ else {
     $result = $stmt->get_result();
     $fp = fopen('php://output', 'w');
     if ($fp && $result) {
-        header('Content-Type: text/csv');
+        header('Content-Type: text/plain');
         header('Pragma: no-cache');
         header('Expires: 0');
         while ($row = $result->fetch_array(MYSQLI_NUM))

@@ -1,0 +1,34 @@
+# smtng-backup.sh (remember to add mysqlbackup user and password to ~/.my.cnf
+
+#!/bin/sh
+DT=`date "+%y%m%d"`
+mysqldump jpkware_smtng_dev | gzip > "$HOME/smtng-data/jpkware_smtng_dev_${DT}.sql.gz"
+mysqldump jpkware_smtng | gzip > "$HOME/smtng-data/jpkware_smtng_${DT}.sql.gz"
+echo "Backup $DT done"
+
+# cron: 10 0 * * * $HOME/smtng-backup.sh >> $HOME/smtng-backup.log 2>&1
+
+# smtng-data-backup.sh
+
+echo "Backup started $(date)" >> /share/backup/smtng-data-backup.log
+rsync -chavzP -e "ssh -p $PORT" $HOST:/home/jpkware/smtng-data /share/backup/smtng-data/ >> /share/backup/smtng-data-backup.log 2>&1
+
+# cron: 45 7 * * * /share/backup/smtng-data-backup.sh
+
+# smtng-log-rotate
+# https://askubuntu.com/questions/405663/configuring-logrotate-without-root-access-per-user-log-rotation
+
+# $HOME/logrotate/my.conf
+
+/home/jpkware/smtng.log {
+        size 8M
+        copytruncate
+        create 700 jpkware jpkware
+        rotate 5
+        dateext
+        compress
+        olddir /home/jpkware/smtng-data
+        missingok
+}
+
+# cron: 1 0 * * * /usr/sbin/logrotate -s $HOME/logrotate/status $HOME/logrotate/my.conf > $HOME/logrotate/cron.log 2>&1
