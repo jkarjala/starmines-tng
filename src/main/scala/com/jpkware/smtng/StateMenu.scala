@@ -32,7 +32,7 @@ class StateMenu(game: Game, options: Map[String,String]) extends State {
     infoTexts.append(game.add.bitmapText(game.width/2,game.height-250, GlobalRes.FontId,
       "Collect all Bonusoids for maximum score and ship upgrades", 32))
     infoTexts.append(game.add.bitmapText(game.width/2,game.height-200, GlobalRes.FontId, help, 32))
-    infoTexts.append(game.add.bitmapText(game.width/2,game.height-50, GlobalRes.FontId, "Copyright 2018 Jari.Karjala@iki.fi", 32))
+    infoTexts.append(game.add.bitmapText(game.width/2,game.height-50, GlobalRes.FontId, "Copyright 2018-2019 Jari.Karjala@iki.fi", 32))
     infoTexts.foreach(_.anchor.set(0.5,0.5))
 
     scoreTexts = mutable.Buffer()

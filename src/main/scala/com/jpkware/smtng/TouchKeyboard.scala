@@ -40,7 +40,7 @@ class TouchKeyboard(game: Game, x:Double, y:Double, limit: Int, entered: (String
   private val backspace = PhaserButton.add(game, x+lowerKeys(0).length*step,y+step, "Del", group = keyboardButtons, scale = 0.75, alpha = 1.0)
   backspace.events.onInputUp.add(() => delChar(), null, 1)
 
-  private val shift = PhaserButton.add(game, x-step+60,y+step*4, "Shfit", group = keyboardButtons, scale = 0.75, alpha = 1.0)
+  private val shift = PhaserButton.add(game, x-step+60,y+step*4, "Shift", group = keyboardButtons, scale = 0.75, alpha = 1.0)
   shift.events.onInputUp.add(() => toggleShift(), null, 1)
 
   private val okButton = PhaserButton.add(game, x+120+step*lowerKeys(2).length, y+step*3.5, "OK", group = keyboardButtons, scale = 1.5, alpha = 1.0)

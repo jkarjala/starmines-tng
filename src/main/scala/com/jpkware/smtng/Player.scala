@@ -13,17 +13,20 @@ class Player(game: Game, x: Double, y: Double, bonusoidCount: Int)
   extends PreRotatedSprite(game, x,y, GlobalRes.MainAtlasId, Player.ShipPrefix, 64) {
 
   val ShipLevelInfos = Seq(
-    ShipLevelInfo(0, 700, 300, 1000, 1.0),
-    ShipLevelInfo(16, 800, 300, 1000, 1.0),
-    ShipLevelInfo(32, 800, 250, 1000, 1.0),
-    ShipLevelInfo(64, 900, 250, 1000, 1.0),
-    ShipLevelInfo(100, 900, 200, 1000, 1.0),
-    ShipLevelInfo(150, 1000, 200, 1000, 1.0),
-    ShipLevelInfo(200, 1000, 150, 1000, 1.0),
-    ShipLevelInfo(300, 1000, 125, 1000, 1.0),
-    ShipLevelInfo(400, 1000, 100, 1000, 1.0),
+    ShipLevelInfo(0, 700, 300, 800, 1.0),
+    ShipLevelInfo(16, 750, 300, 800, 1.0),
+    ShipLevelInfo(32, 800, 300, 850, 1.0),
+    ShipLevelInfo(64, 800, 250, 900, 1.0),
+    ShipLevelInfo(100, 800, 200, 900, 1.0),
+    ShipLevelInfo(150, 800, 200, 950, 1.0),
+    ShipLevelInfo(200, 800, 175, 950, 1.0),
+    ShipLevelInfo(300, 800, 150, 950, 1.0),
+    ShipLevelInfo(400, 800, 150, 1000, 1.0),
+    ShipLevelInfo(500, 800, 130, 1000, 1.0),
+    ShipLevelInfo(600, 850, 120, 1000, 1.0),
+    ShipLevelInfo(700, 850, 110, 1000, 1.0),
   )
-  val dualMissileBonusoidLimit: Int = 500
+  val dualMissileBonusoidLimit: Int = 800
 
   game.physics.arcade.enable(this)
   physBody.drag.set(10,10)
@@ -65,7 +68,7 @@ class Player(game: Game, x: Double, y: Double, bonusoidCount: Int)
     }
     else {
       // Drop the weapon level only partly when dual missiles enabled
-      val count = bonusoidCount - dualMissileBonusoidLimit + 100
+      val count = bonusoidCount - dualMissileBonusoidLimit + 200
       ShipLevelInfos.length + ShipLevelInfos.count(_.bonusoidLimit <= count) - 1
     }
     if (level>shipLevel) {
