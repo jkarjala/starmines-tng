@@ -5,7 +5,6 @@
 package com.jpkware.smtng
 
 import com.definitelyscala.phaser._
-import org.scalajs.dom.raw.Element
 
 import scala.scalajs.js
 
@@ -65,9 +64,7 @@ class StatePlay(game: Game, options: Map[String,String]) extends State {
     val space = StarMinesNG.addBackground(game, StatePlay.scores.level)
     space.scale.set(2,2)
 
-    val gr = game.add.graphics(0,0)
-    gr.lineStyle(2, 0xFFFFFF, 1)
-    gr.drawRect(0,0,game.width,game.height)
+    PhaserGraphics.addBox(game, new Rectangle(0,0,game.width,game.height), 0xFFFFFF, 2, None)
 
     if (debug) {
       val button = PhaserButton.add(game, game.width/2, game.height-128, "skip", scale = 1.0)

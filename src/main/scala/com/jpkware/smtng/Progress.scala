@@ -184,8 +184,11 @@ object Progress {
   private val script = if (dom.document.location.host.startsWith("smtng.")) "smtng.php" else "smtng-dev.php"
   private val scriptUrl = s"$hostUrl/$script"
 
+  var postPending: Boolean = false
+
   def postData(path: String, data: String, callback: (String) => Unit): Unit = {
     Logger.info(s"XHR POST $data")
+    postPending = true
     val xhr = new XMLHttpRequest()
     xhr.open("POST", s"$scriptUrl/$path", async = true)
     xhr.setRequestHeader("Content-Type", "application/tsv")
@@ -193,10 +196,12 @@ object Progress {
       if (xhr.status == 200) {
         if (xhr.readyState==4) {
           Logger.info(s"XHR POST response '${xhr.response}'")
+          postPending = false
           callback(xhr.response.toString)
         }
       }
       else {
+        postPending = false
         Logger.warn(s"XHR ${xhr.readyState} ${xhr.status} ${xhr.response}")
       }
     }}
@@ -204,7 +209,7 @@ object Progress {
   }
 
   def fetchScores(field: Option[Int], limit: Int, callback: (Seq[HighScore]) => Unit): Unit = {
-    val url = if (field.isDefined) s"$scriptUrl?field=$field&limit=$limit" else s"$scriptUrl?limit=$limit"
+    val url = if (field.isDefined) s"$scriptUrl?field=${field.get}&limit=$limit" else s"$scriptUrl?limit=$limit"
     val xhr = new XMLHttpRequest()
     xhr.open("GET", url, async = true)
     xhr.onreadystatechange = { (_: Event) => { // Call a function when the state changes.
@@ -212,9 +217,10 @@ object Progress {
         if (xhr.readyState==4) {
           Logger.info(s"XHR GET $url response '${xhr.response}'")
           val lines = xhr.response.toString.split("\n")
-          val scores = lines.map(line => {
+          val scores = lines.flatMap(line => {
             val values = line.split("\t")
-            HighScore(values(0).toInt, values(1).toInt, values(2).replace("\"",""), values(3).toInt)
+            if (values.length<3) None
+            else Some(HighScore(values(0).toInt, values(1).toInt, values(2).replace("\"",""), values(3).toInt))
           })
           callback(scores)
         }
@@ -224,6 +230,11 @@ object Progress {
       }
     }}
     xhr.send()
+  }
 
+  def formatScores(scores: Seq[HighScore]): String = {
+    scores.zipWithIndex.map {
+      case (score, index) => f"${index+1}%3d.  ${score.score}%08d  ${score.name}"
+    }.mkString("\n")
   }
 }

@@ -146,3 +146,14 @@ object PhaserButton {
     game.state.start("menu", args = "gameover", clearCache = false, clearWorld = true)
   }
 }
+
+object PhaserGraphics {
+  def addBox(game: Game, bounds: Rectangle, lineColor: Int, lineWidth: Int, fillColor: Option[Int]): Graphics = {
+    val gr = game.add.graphics(bounds.x,bounds.y)
+    gr.lineStyle(lineWidth, lineColor, 1)
+    if (fillColor.isDefined) gr.beginFill(fillColor.get, 0.75)
+    gr.drawRect(0,0,bounds.width,bounds.height)
+    gr.endFill()
+    gr
+  }
+}

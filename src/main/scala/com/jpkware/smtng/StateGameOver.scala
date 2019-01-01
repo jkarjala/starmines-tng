@@ -4,17 +4,17 @@
  */
 package com.jpkware.smtng
 
-import com.definitelyscala.phaser.{Game, State}
-import org.scalajs.dom.raw.Element
+import com.definitelyscala.phaser.{Game, Rectangle, State}
 
 class StateGameOver(game: Game, options: Map[String,String]) extends State {
 
   var keyDown: Boolean = _
+  var scoresDisplayed: Boolean = _
 
   override def create(): Unit = {
 
-    game.add.bitmapText(game.width/2,300, GlobalRes.FontId, "Game Over", 128).anchor.set(0.5,0.5)
-
+    game.add.bitmapText(game.width/2,250, GlobalRes.FontId, "Game Over", 128).anchor.set(0.5,0.5)
+    scoresDisplayed = false
     PhaserButton.addExit(game, game.width/2-200,game.height-200)
     keyDown = PhaserKeys.isFireDown(game)
     PhaserButton.addRetry(game, game.width/2,game.height-200)
@@ -22,6 +22,23 @@ class StateGameOver(game: Game, options: Map[String,String]) extends State {
   }
 
   override def update(): Unit = {
+    if (!Progress.postPending && !scoresDisplayed) {
+      // wait until the scores have been posted to ensure the latest game results are included
+      PhaserGraphics.addBox(game, new Rectangle(game.width-620,game.height/2-180,590,360), 0xFFFFFF, 2, Some(0x202020))
+
+      val fieldScoreText = game.add.bitmapText(game.width-600,game.height/2-160, GlobalRes.FontId, "", 24)
+      val level = StatePlay.scores.level
+      Progress.fetchScores(Some(level), 10, (scores: Seq[HighScore]) => {
+        fieldScoreText.text = s"Field $level High Scores:\n"+Progress.formatScores(scores)
+      })
+
+      PhaserGraphics.addBox(game, new Rectangle(30,game.height/2-180,590,360), 0xFFFFFF, 2, Some(0x202020))
+      val globalScoreText = game.add.bitmapText(50, game.height/2-160, GlobalRes.FontId, "", 24)
+      Progress.fetchScores(None, 10, (scores: Seq[HighScore]) => {
+        globalScoreText.text = s"Game High Scores:\n"+Progress.formatScores(scores)
+      })
+      scoresDisplayed = true
+    }
     if (keyDown) keyDown = !PhaserKeys.isFireDown(game)
     if (!keyDown && PhaserKeys.isFireDown(game)) PhaserButton.gotoRetry(game)
     if (game.input.keyboard.isDown(27)) PhaserButton.gotoLevels(game)

@@ -4,14 +4,13 @@
  */
 package com.jpkware.smtng
 
-import com.definitelyscala.phaser.{BitmapText, Game, State}
-
-import scala.collection.mutable
+import com.definitelyscala.phaser.{BitmapText, Game, Group, State}
 
 class StateMenu(game: Game, options: Map[String,String]) extends State {
 
-  var infoTexts: mutable.Buffer[BitmapText] = _
-  var scoreTexts: mutable.Buffer[BitmapText] = _
+  var infoTexts: Group = _
+  var scoreTexts: Group = _
+  var scoreText: BitmapText = _
   var scores: Seq[HighScore] = Seq()
   var scoresShown: Boolean = false
   val ScoreListLen = 10
@@ -27,19 +26,18 @@ class StateMenu(game: Game, options: Map[String,String]) extends State {
     val help = if (game.device.desktop || options.contains("touch")) "Control your ship with arrow keys and space, or z,x,n,m, or mouse"
     else "Use the touch buttons to control your ship"
 
-    infoTexts = mutable.Buffer()
-    infoTexts.append(game.add.bitmapText(game.width/2,game.height-400, GlobalRes.FontId, s"Welcome ${Progress.state.name}!", 40))
-    infoTexts.append(game.add.bitmapText(game.width/2,game.height-250, GlobalRes.FontId,
+    infoTexts = game.add.group(name="infotexts")
+    infoTexts.add(game.add.bitmapText(game.width/2,game.height-400, GlobalRes.FontId, s"Welcome ${Progress.state.name}!", 40))
+    infoTexts.add(game.add.bitmapText(game.width/2,game.height-250, GlobalRes.FontId,
       "Collect all Bonusoids for maximum score and ship upgrades", 32))
-    infoTexts.append(game.add.bitmapText(game.width/2,game.height-200, GlobalRes.FontId, help, 32))
-    infoTexts.append(game.add.bitmapText(game.width/2,game.height-50, GlobalRes.FontId, "Copyright 2018-2019 Jari.Karjala@iki.fi", 32))
-    infoTexts.foreach(_.anchor.set(0.5,0.5))
+    infoTexts.add(game.add.bitmapText(game.width/2,game.height-200, GlobalRes.FontId, help, 32))
+    infoTexts.add(game.add.bitmapText(game.width/2,game.height-50, GlobalRes.FontId, "Copyright 2018-2019 Jari.Karjala@iki.fi", 32))
+    infoTexts.forEach((text: BitmapText) => { text.anchor.set(0.5,0.5) }, null, false)
 
-    scoreTexts = mutable.Buffer()
-    (1 to ScoreListLen).foreach(i => scoreTexts.append(game.add.bitmapText(game.width/2-270,game.height-440+i*40, GlobalRes.FontId, "", 32)))
-    scoreTexts.append(game.add.bitmapText(game.width/2-290,game.height-460, GlobalRes.FontId, "Top 10 Scores and Players:", 40))
-    scoreTexts.foreach(_.anchor.set(0,0.5))
-
+    scoreTexts = game.add.group(name="scores")
+    scoreText = game.add.bitmapText(game.width/2-270,game.height-400, GlobalRes.FontId, "", 32)
+    scoreTexts.add(scoreText)
+    scoreTexts.add(game.add.bitmapText(game.width/2-290,game.height-460, GlobalRes.FontId, "Top Scores and Players:", 40))
     showTexts()
 
     val (b1x,b2x,b3x) = if (Progress.hasCheckpoint) (-200,0,200) else (-100, 0, 100)
@@ -59,7 +57,7 @@ class StateMenu(game: Game, options: Map[String,String]) extends State {
     timer.loop(10000, () => {
       if (scoresShown) showTexts() else showScores()
     }, null)
-    timer.start(1000)
+    timer.start(0)
   }
 
   override def update(): Unit = {
@@ -67,19 +65,16 @@ class StateMenu(game: Game, options: Map[String,String]) extends State {
   }
 
   def showTexts(): Unit = {
-    infoTexts.foreach(_.visible = true)
-    scoreTexts.foreach(_.visible = false)
+    infoTexts.visible = true
+    scoreTexts.visible = false
     scoresShown = false
   }
 
   def showScores(): Unit = {
-    infoTexts.foreach(_.visible = false)
+    infoTexts.visible = false
     if (scores.nonEmpty && !scoresShown) {
-      scores.zipWithIndex.foreach {
-        case (score, index) =>
-          scoreTexts(index).text = f"${index+1}%3d.  ${score.score}%08d  ${score.name}"
-      }
-      scoreTexts.foreach(_.visible = true)
+      scoreText.text = Progress.formatScores(scores)
+      scoreTexts.visible = true
       fetchHighScores()
       scoresShown = true
     }
