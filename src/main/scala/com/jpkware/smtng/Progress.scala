@@ -238,7 +238,7 @@ object Progress {
     val href = dom.document.location.href
     val base = href.substring(0, href.lastIndexOf('/'))
     serverRequest("GET", s"${base}/build.txt", None, {
-      case Some(version) => callback("v"+version)
+      case Some(version) => callback("v"+version.stripLineEnd)
       case None => callback("Version not found")
     })
   }

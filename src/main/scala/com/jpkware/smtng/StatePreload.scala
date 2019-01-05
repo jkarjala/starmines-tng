@@ -75,8 +75,8 @@ object GlobalRes {
   val Title = "StarMines"
   val SubTitle = "THE NEXT GENERATION"
 
-  def drawLogo(game: Game): Unit = {
-    game.add.bitmapText(game.width/2,game.height/2-260, FontMoonId, Title, 128).anchor.set(0.5,0.5)
-    game.add.bitmapText(game.width/2,game.height/2-220, FontMoonId, SubTitle, 32).anchor.set(0.5,0.5)
+  def drawLogo(game: Game, offset: Int = 260): Unit = {
+    game.add.bitmapText(game.width/2,offset, FontMoonId, Title, 128).anchor.set(0.5,0.5)
+    game.add.bitmapText(game.width/2,offset+40, FontMoonId, SubTitle, 32).anchor.set(0.5,0.5)
   }
 }

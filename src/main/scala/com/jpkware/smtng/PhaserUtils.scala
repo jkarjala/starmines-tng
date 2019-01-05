@@ -122,14 +122,15 @@ object PhaserButton {
     val button = PhaserButton.add(game, x,y, "", textFrame=PhaserButton.FramePlay, scale = scale, group = group)
     group.add(button)
     group.add(PhaserButton.addRetry(game, x-step,y, scale = scale, group = group))
-    group.add(PhaserButton.addExit(game, x-2*step,y, scale = scale, group = group))
+    group.add(PhaserButton.addLevels(game, x-2*step,y, scale = scale, group = group))
+    group.add(PhaserButton.addExit(game, x-3*step,y, scale = scale, group = group))
 
     group.forEach((button: Button) => button.events.onInputUp.add(() => {
       game.paused = false
     }, null, 1), null, false)
 
     if (touchControls.touchButtons.visible) {
-      val buttonLayout = PhaserButton.add(game, x-3*step, y, "", textFrame = PhaserButton.FrameButton, scale = scale, group = group)
+      val buttonLayout = PhaserButton.add(game, x-4*step, y, "", textFrame = PhaserButton.FrameButton, scale = scale, group = group)
       buttonLayout.events.onInputUp.add(() => touchControls.nextLayout(), null, 1)
       group.add(buttonLayout)
     }

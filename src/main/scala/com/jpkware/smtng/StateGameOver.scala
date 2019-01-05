@@ -24,17 +24,17 @@ class StateGameOver(game: Game, options: Map[String,String]) extends State {
   override def update(): Unit = {
     if (!Progress.postPending && !scoresDisplayed) {
       // wait until the scores have been posted to ensure the latest game results are included
-      PhaserGraphics.addBox(game, new Rectangle(game.width-620,game.height/2-180,590,360), 0xFFFFFF, 2, Some(0x202020))
+      PhaserGraphics.addBox(game, new Rectangle(game.width-620,game.height/2-160,590,320), 0xFFFFFF, 2, Some(0x202020))
 
-      val fieldScoreText = game.add.bitmapText(game.width-600,game.height/2-160, GlobalRes.FontId, "", 24)
+      val fieldScoreText = game.add.bitmapText(game.width-600,game.height/2-145, GlobalRes.FontId, "", 24)
       val level = StatePlay.scores.level
-      Progress.fetchScores(Some(level), 10, (scores: Seq[HighScore]) => {
+      Progress.fetchScores(Some(level), 9, (scores: Seq[HighScore]) => {
         fieldScoreText.text = s"Field $level High Scores:\n"+Progress.formatScores(scores)
       })
 
-      PhaserGraphics.addBox(game, new Rectangle(30,game.height/2-180,590,360), 0xFFFFFF, 2, Some(0x202020))
-      val globalScoreText = game.add.bitmapText(50, game.height/2-160, GlobalRes.FontId, "", 24)
-      Progress.fetchScores(None, 10, (scores: Seq[HighScore]) => {
+      PhaserGraphics.addBox(game, new Rectangle(30,game.height/2-160,590,320), 0xFFFFFF, 2, Some(0x202020))
+      val globalScoreText = game.add.bitmapText(50, game.height/2-145, GlobalRes.FontId, "", 24)
+      Progress.fetchScores(None, 9, (scores: Seq[HighScore]) => {
         globalScoreText.text = s"Game High Scores:\n"+Progress.formatScores(scores)
       })
       scoresDisplayed = true

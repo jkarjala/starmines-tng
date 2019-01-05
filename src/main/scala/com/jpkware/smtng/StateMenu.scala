@@ -22,7 +22,7 @@ class StateMenu(game: Game, options: Map[String,String], sharebutton: Option[htm
   override def create(): Unit = {
     game.add.sprite(0,0, GlobalRes.MenuBg).scale.set(2,2)
 
-    GlobalRes.drawLogo(game)
+    GlobalRes.drawLogo(game, 200)
     sharebutton match {
       case Some(b) => b.style.display = "block"
       case None =>  // share button not present on the page
@@ -31,24 +31,26 @@ class StateMenu(game: Game, options: Map[String,String], sharebutton: Option[htm
     val help = if (game.device.desktop || options.contains("touch")) "Control your ship with arrow keys and space, or z,x,n,m, or mouse"
     else "Use the touch buttons to control your ship"
 
+    val infoY = game.height-700
     infoTexts = game.add.group(name="infotexts")
-    infoTexts.add(game.add.bitmapText(game.width/2,game.height-400, GlobalRes.FontId, s"Welcome ${Progress.state.name}!", 40))
-    infoTexts.add(game.add.bitmapText(game.width/2,game.height-250, GlobalRes.FontId,
+    infoTexts.add(game.add.bitmapText(game.width/2,infoY+50, GlobalRes.FontId, s"Welcome ${Progress.state.name}!", 40))
+    infoTexts.add(game.add.bitmapText(game.width/2,infoY+250, GlobalRes.FontId,
       "Collect all Bonusoids for maximum score and ship upgrades", 32))
-    infoTexts.add(game.add.bitmapText(game.width/2,game.height-200, GlobalRes.FontId, help, 32))
-    infoTexts.add(game.add.bitmapText(game.width/2,game.height-50, GlobalRes.FontId, "Copyright 2018-2019 Jari.Karjala@iki.fi", 32))
+    infoTexts.add(game.add.bitmapText(game.width/2,infoY+300, GlobalRes.FontId, help, 32))
     infoTexts.forEach((text: BitmapText) => { text.anchor.set(0.5,0.5) }, null, false)
 
     scoreTexts = game.add.group(name="scores")
-    scoreText = game.add.bitmapText(game.width/2-270,game.height-400, GlobalRes.FontId, "", 32)
+    scoreText = game.add.bitmapText(game.width/2-270,infoY, GlobalRes.FontId, "", 32)
     scoreTexts.add(scoreText)
-    scoreTexts.add(game.add.bitmapText(game.width/2-290,game.height-460, GlobalRes.FontId, "Top Scores and Players:", 40))
+    scoreTexts.add(game.add.bitmapText(game.width/2-290,infoY-60, GlobalRes.FontId, "Top Scores and Players:", 40))
     showTexts()
 
-    Progress.fetchBuild(res => game.add.bitmapText(game.width-2,2, GlobalRes.FontId, res, 20).anchor.set(1,0))
+    val copy: BitmapText = game.add.bitmapText(game.width/2,game.height-32, GlobalRes.FontId, "Copyright 2018-2019 Jari Karjala - www.jpkware.com", 24)
+    copy.anchor.set(0.5,0.5)
+    Progress.fetchBuild(res => copy.setText(res + " - " + copy.text))
 
     val (b1x,b2x,b3x) = if (Progress.hasCheckpoint) (-200,0,200) else (-100, 0, 100)
-    val buttonY = game.height/2-60
+    val buttonY = game.height-180
 
     val button = PhaserButton.add(game, game.width/2+b1x, buttonY, "", scale = 1.0, textFrame=PhaserButton.FramePlay)
     button.events.onInputUp.add(startGame _, null, 1)
