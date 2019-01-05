@@ -23,6 +23,8 @@ class StateMenu(game: Game, options: Map[String,String], sharebutton: Option[htm
     game.add.sprite(0,0, GlobalRes.MenuBg).scale.set(2,2)
 
     GlobalRes.drawLogo(game, 200)
+    GlobalRes.drawCopy(game)
+
     sharebutton match {
       case Some(b) => b.style.display = "block"
       case None =>  // share button not present on the page
@@ -33,21 +35,18 @@ class StateMenu(game: Game, options: Map[String,String], sharebutton: Option[htm
 
     val infoY = game.height-700
     infoTexts = game.add.group(name="infotexts")
-    infoTexts.add(game.add.bitmapText(game.width/2,infoY+50, GlobalRes.FontId, s"Welcome ${Progress.state.name}!", 40))
-    infoTexts.add(game.add.bitmapText(game.width/2,infoY+250, GlobalRes.FontId,
+    infoTexts.add(game.add.bitmapText(game.width/2,infoY+100, GlobalRes.FontId, s"Welcome ${Progress.state.name}!", 40))
+    infoTexts.add(game.add.bitmapText(game.width/2,infoY+300, GlobalRes.FontId,
       "Collect all Bonusoids for maximum score and ship upgrades", 32))
-    infoTexts.add(game.add.bitmapText(game.width/2,infoY+300, GlobalRes.FontId, help, 32))
+    infoTexts.add(game.add.bitmapText(game.width/2,infoY+350, GlobalRes.FontId, help, 32))
     infoTexts.forEach((text: BitmapText) => { text.anchor.set(0.5,0.5) }, null, false)
 
     scoreTexts = game.add.group(name="scores")
-    scoreText = game.add.bitmapText(game.width/2-270,infoY, GlobalRes.FontId, "", 32)
+    scoreText = game.add.bitmapText(game.width/2,infoY, GlobalRes.FontId, "", 32)
     scoreTexts.add(scoreText)
-    scoreTexts.add(game.add.bitmapText(game.width/2-290,infoY-60, GlobalRes.FontId, "Top Scores and Players:", 40))
+    scoreTexts.add(game.add.bitmapText(game.width/2,infoY-60, GlobalRes.FontId, "Game High Scores:", 40))
+    scoreTexts.forEach((text: BitmapText) => { text.anchor.set(0.5,0) }, null, false)
     showTexts()
-
-    val copy: BitmapText = game.add.bitmapText(game.width/2,game.height-32, GlobalRes.FontId, "Copyright 2018-2019 Jari Karjala - www.jpkware.com", 24)
-    copy.anchor.set(0.5,0.5)
-    Progress.fetchBuild(res => copy.setText(res + " - " + copy.text))
 
     val (b1x,b2x,b3x) = if (Progress.hasCheckpoint) (-200,0,200) else (-100, 0, 100)
     val buttonY = game.height-180

@@ -25,6 +25,7 @@ class StateBoot(game: Game, options: Map[String,String]) extends State {
     game.load.image("ship-preload", "res/ship-preload.png")
     game.load.image(GlobalRes.MenuBg, "res/space0.jpg")
     game.load.bitmapFont(GlobalRes.FontMoonId, "res/font.png", "res/font.fnt")
+    game.load.bitmapFont(GlobalRes.FontId, "res/font-x.png", "res/font-x.fnt")
   }
 
   override def create(): Unit = {

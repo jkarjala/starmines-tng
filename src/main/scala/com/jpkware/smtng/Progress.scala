@@ -238,13 +238,22 @@ object Progress {
     })
   }
 
+  private var buildVersion: String = "" // cached version if found
+
   def fetchBuild(callback: (String) => Unit): Unit = {
-    val href = dom.document.location.href
-    val base = href.substring(0, href.lastIndexOf('/'))
-    serverRequest("GET", s"${base}/build.txt", None, {
-      case Some(version) => callback("v"+version.stripLineEnd)
-      case None => callback("Version not found")
-    })
+    if (buildVersion != "") {
+      callback(buildVersion)
+    }
+    else {
+      val href = dom.document.location.href
+      val base = href.substring(0, href.lastIndexOf('/'))
+      serverRequest("GET", s"$base/build.txt", None, {
+        case Some(version) =>
+          buildVersion = "v" + version.stripLineEnd
+          callback(buildVersion)
+        case None => callback("Version not found")
+      })
+    }
   }
 
   def formatScores(scores: Seq[HighScore]): String = {
