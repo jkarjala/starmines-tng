@@ -25,8 +25,8 @@ class StatePlay(game: Game, options: Map[String,String]) extends State {
   private var checkpointRestored: Boolean = _
   private var pauseMenu: Group = _
   private var pauseButtonGroup: Group = _
+  private val debug = StarMinesNG.debug
 
-  private val debug: Boolean = options.contains("debug")
   private def optionsCount: Int = if (options.contains("mines")) options("mines").toInt else -1
 
   override def init(args: js.Any*): Unit = {
@@ -95,7 +95,7 @@ class StatePlay(game: Game, options: Map[String,String]) extends State {
     sfxCollect = game.add.audio(StatePlay.SfxSwip)
 
     StatePlay.scorebox = new Scorebox(game, StatePlay.scores)
-    bonusManager = new BonusManager(game, containersPerLevel(StatePlay.scores.level), setStartPosition)
+    bonusManager = new BonusManager(game, BonusManager.containersOnLevel(StatePlay.scores.level), setStartPosition)
     enemyManager = new EnemyManager(game, setStartPosition)
     val (e, m) = enemyManager.spawnEnemies(player, StatePlay.scores.level, optionsCount)
     enemies = e
@@ -134,8 +134,6 @@ class StatePlay(game: Game, options: Map[String,String]) extends State {
       pauseButtonGroup.visible = true
     }, null, 1, null)
   }
-
-  def containersPerLevel(level: Int): Int = 1 + math.min((level-1)/2, 9)
 
   override def update(): Unit = {
     if (gameOver) return
@@ -219,7 +217,6 @@ class StatePlay(game: Game, options: Map[String,String]) extends State {
       s"- Only $ratio Bonusoids..."
     }
     clearLevel()
-    Progress.updateAndSave(StatePlay.scores, debug)
     val result = fieldMsg + "\n" + timeBonusMsg + "\n" + bonusoidMsg
     game.state.start("nextlevel", args = result, clearCache = false, clearWorld = false)
   }

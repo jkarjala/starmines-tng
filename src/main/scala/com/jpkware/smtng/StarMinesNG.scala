@@ -15,6 +15,7 @@ import scala.util.Random
 object StarMinesNG {
   val rnd = new Random(42) // This random should be used only for level generation, reset at level change
   val maxBackground = 48
+  var debug: Boolean = false
 
   def addBackground(game: Game, level: Int,  x: Double = 0, y: Double = 0): Sprite = {
     val bgLevel = ((level-1) / 4) % StarMinesNG.maxBackground + 1
@@ -25,6 +26,8 @@ object StarMinesNG {
 
     val parent: Element = dom.document.getElementById("game")
     val status: Element = dom.document.getElementById("status")
+    status.innerHTML = ""
+
     val sb = dom.document.getElementById("sharebutton")
     val sharebutton: Option[html.Div]= sb match {
       case div: html.Div =>
@@ -43,7 +46,7 @@ object StarMinesNG {
         if (os.length>1) os(0) -> os(1) else os(0) -> "true"
       }).toMap
     }
-    status.innerHTML = ""
+    debug = options.contains("debug")
 
     val mode = if (options.contains("webgl")) Phaser.WEBGL else Phaser.CANVAS
     val game = new Game(1920, 1080, mode, parent)

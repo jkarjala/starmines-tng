@@ -78,6 +78,19 @@ object Progress {
     dom.window.localStorage.setItem(Progress.LSLevelCheckpointsKey, json2)
   }
 
+  def getCheckpoint(level: Int): ScoreState = {
+    checkpoints.scores.get(level.toString) match {
+      case Some(s) =>
+        Logger.info(s"Local checkpoint found for level $level: $s")
+        JSON.parse(s).asInstanceOf[ScoreState]
+      case _ =>
+        Logger.info(s"NO local checkpoint found for level $level")
+        val s = Scorebox.InitialScore
+        s.level = level
+        s
+    }
+  }
+
   def restoreCheckpoint(level: Option[Int]): ScoreState = {
     val scores = if (level.isEmpty) {
       dom.window.localStorage.getItem(LSCheckpointKey) match {
@@ -91,16 +104,7 @@ object Progress {
     }
     else {
       val lvl = math.max(1, level.get)
-      val scores = checkpoints.scores.get(lvl.toString) match {
-        case Some(s) =>
-          Logger.info(s"Local checkpoint found for level $level: $s")
-          JSON.parse(s).asInstanceOf[ScoreState]
-        case _ =>
-          Logger.info(s"NO local checkpoint found for level $level")
-          val s = Scorebox.InitialScore
-          s.level = lvl
-          s
-      }
+      val scores = getCheckpoint(lvl)
       if (level.get>0) saveCheckpoint(scores) // next retry starts from this point, except on level 1
       scores
     }

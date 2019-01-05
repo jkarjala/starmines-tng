@@ -65,3 +65,11 @@ class BonusManager(game: Game, containerCount: Int, randomSafePosition: (Sprite)
 
   def allDead: Boolean = containers.countLiving()==0 && bonusoids.countLiving()==0
 }
+
+object BonusManager {
+  def containersOnLevel(level: Int): Int = if (level>0) 1 + math.min((level-1)/2, 9) else 0
+  def bonusoidsOnLevel(level: Int): Int = containersOnLevel(level) * 4
+  def maxBonusoidsOnLevel(level: Int): Int = {
+    if (level==0) 0 else bonusoidsOnLevel(level) + maxBonusoidsOnLevel(level-1)
+  }
+}
