@@ -26,8 +26,13 @@ class StateLevels(game: Game, options: Map[String,String]) extends State {
   }
 
   override def update(): Unit = {
-    // XXX add keyboard controls?
-    if (game.input.keyboard.isDown(27)) gotoMenu()
+    // XXX add keyboard controls to move around?
+    if (selectedLevel>0) {
+      if (PhaserKeys.isFireDown(game) || PhaserKeys.isRetryDown(game)) startGame(selectedLevel)
+    }
+    else {
+      if (game.input.keyboard.isDown(27)) gotoMenu()
+    }
   }
 
   def createGrid(startLevel: Int, maxLevel: Int, starMap: Map[String, Int]): Unit = {
@@ -123,17 +128,13 @@ class StateLevels(game: Game, options: Map[String,String]) extends State {
       scale = 0.5, group = group)
     buttonRight.events.onInputUp.add(() => { showInfo(selectedLevel+1) }, null, 1)
 
-    def cleanUp(): Unit = {
-      levelInfoGroup.visible = false
-      gridGroup.visible = true
-    }
     button.events.onInputUp.add(() => {
-      cleanUp()
+      hideInfo()
       startGame(selectedLevel)
     }, null, 1)
 
     buttonBack.events.onInputUp.add(() => {
-      cleanUp()
+      hideInfo()
     }, null, 1)
 
     group.add(levelScoresText)
@@ -141,9 +142,15 @@ class StateLevels(game: Game, options: Map[String,String]) extends State {
     group
   }
 
+  def hideInfo(): Unit = {
+    levelInfoGroup.visible = false
+    gridGroup.visible = true
+    selectedLevel = -1
+  }
+
   var buttonLeft: Button = _
   var buttonRight: Button = _
-  var selectedLevel: Int = _
+  var selectedLevel: Int = -1
 
   def showInfo(level: Int): Unit = {
     selectedLevel = level

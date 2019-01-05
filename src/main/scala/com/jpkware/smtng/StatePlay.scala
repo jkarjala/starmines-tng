@@ -328,6 +328,14 @@ class StatePlay(game: Game, options: Map[String,String]) extends State {
 
     val k = game.input.keyboard
     if (k.isDown(27) || PhaserKeys.isFireDown(game)) game.paused = false
+    if (PhaserKeys.isRetryDown(game)) {
+      game.paused = false
+      PhaserButton.gotoRetry(game)
+    }
+    if (PhaserKeys.isLevelsDown(game)) {
+      game.paused = false
+      PhaserButton.gotoLevels(game)
+    }
   }
 
   def debugUpgrade(): Unit = {

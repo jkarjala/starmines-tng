@@ -13,6 +13,15 @@ object PhaserKeys {
     val k = game.input.keyboard
     k.isDown(0x0D) || k.isDown(' ') || k.isDown('M')
   }
+  def isRetryDown(game: Game): Boolean = {
+    val k = game.input.keyboard
+    k.isDown('R')
+  }
+  def isLevelsDown(game: Game): Boolean = {
+    val k = game.input.keyboard
+    k.isDown('F') || k.isDown('L')
+  }
+
 }
 
 

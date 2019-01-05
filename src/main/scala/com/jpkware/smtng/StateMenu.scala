@@ -70,6 +70,8 @@ class StateMenu(game: Game, options: Map[String,String], sharebutton: Option[htm
 
   override def update(): Unit = {
     if (PhaserKeys.isFireDown(game)) startGame()
+    if (Progress.hasCheckpoint && PhaserKeys.isRetryDown(game)) PhaserButton.gotoRetry(game)
+    if (PhaserKeys.isLevelsDown(game)) PhaserButton.gotoLevels(game)
   }
 
   def showTexts(): Unit = {
