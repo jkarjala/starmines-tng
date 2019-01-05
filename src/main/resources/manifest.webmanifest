@@ -2,7 +2,7 @@
   "name": "StarMines: The Next Generation",
   "short_name": "StarMines",
   "start_url": ".",
-  "display": "standalone",
+  "display": "fullscreen",
   "orientation": "landscape",
   "background_color": "#000",
   "description": "Space shooter inspired by old classics like Asteroids and Omega Race",

@@ -177,7 +177,10 @@ object Progress {
       "\t" + (new js.Date().getTime().toLong - levelStartTime) +
       // Once in production, add new items here!
       ""
-    postData(progress.id.get, tsv, (str: String) => { progress.id = if (debug && !str.startsWith("!")) "!"+str else str})
+    postData(progress.id.get, tsv, {
+      case Some(str) => progress.id = if (debug && !str.startsWith("!")) "!" + str else str
+      case None => // XXX Should save the score for a later day posting...
+    })
   }
 
   private val hostUrl = "https://jpkware.com"
@@ -186,50 +189,58 @@ object Progress {
 
   var postPending: Boolean = false
 
-  def postData(path: String, data: String, callback: (String) => Unit): Unit = {
-    Logger.info(s"XHR POST $data")
-    postPending = true
+  def serverRequest(op: String, url: String, data: Option[Any], callback: Option[String] => Unit): Unit = {
     val xhr = new XMLHttpRequest()
-    xhr.open("POST", s"$scriptUrl/$path", async = true)
+    xhr.open(op, url, async = true)
     xhr.setRequestHeader("Content-Type", "application/tsv")
     xhr.onreadystatechange = { (_: Event) => { // Call a function when the state changes.
       if (xhr.status == 200) {
         if (xhr.readyState==4) {
           Logger.info(s"XHR POST response '${xhr.response}'")
-          postPending = false
-          callback(xhr.response.toString)
+          callback(Some(xhr.response.toString))
         }
       }
       else {
-        postPending = false
         Logger.warn(s"XHR ${xhr.readyState} ${xhr.status} ${xhr.response}")
+        callback(None)
       }
     }}
-    xhr.send(data)
+    if (data.isDefined) xhr.send(data.get.asInstanceOf[js.Any]) else xhr.send()
+  }
+
+  def postData(path: String, data: String, callback: (Option[String]) => Unit): Unit = {
+    Logger.info(s"XHR POST $data")
+    postPending = true
+    serverRequest("POST", s"$scriptUrl/$path", Some(data), (result: Option[String]) => {
+      postPending = false
+      callback(result)
+    })
   }
 
   def fetchScores(field: Option[Int], limit: Int, callback: (Seq[HighScore]) => Unit): Unit = {
     val url = if (field.isDefined) s"$scriptUrl?field=${field.get}&limit=$limit" else s"$scriptUrl?limit=$limit"
-    val xhr = new XMLHttpRequest()
-    xhr.open("GET", url, async = true)
-    xhr.onreadystatechange = { (_: Event) => { // Call a function when the state changes.
-      if (xhr.status == 200) {
-        if (xhr.readyState==4) {
-          Logger.info(s"XHR GET $url response '${xhr.response}'")
-          val lines = xhr.response.toString.split("\n")
-          val scores = lines.flatMap(line => {
+    serverRequest("GET", url, None, (result: Option[String]) => {
+      val scores: Seq[HighScore] = result match {
+        case Some(str) =>
+          val lines = str.split("\n")
+          lines.flatMap(line => {
             val values = line.split("\t")
-            if (values.length<3) None
-            else Some(HighScore(values(0).toInt, values(1).toInt, values(2).replace("\"",""), values(3).toInt))
+            if (values.length < 3) None
+            else Some(HighScore(values(0).toInt, values(1).toInt, values(2).replace("\"", ""), values(3).toInt))
           })
-          callback(scores)
-        }
+        case None => Seq()
       }
-      else {
-        Logger.warn(s"XHR ${xhr.readyState} ${xhr.status} ${xhr.response}")
-      }
-    }}
-    xhr.send()
+      callback(scores)
+    })
+  }
+
+  def fetchBuild(callback: (String) => Unit): Unit = {
+    val href = dom.document.location.href
+    val base = href.substring(0, href.lastIndexOf('/'))
+    serverRequest("GET", s"${base}/build.txt", None, {
+      case Some(version) => callback("v"+version)
+      case None => callback("Version not found")
+    })
   }
 
   def formatScores(scores: Seq[HighScore]): String = {

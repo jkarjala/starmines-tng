@@ -13,10 +13,11 @@ sbt fastOptJS fullOptJS
 pushd target/scala-2.12
 zip -rp $ZIP starmines-the-next-generation-opt.js starmines-the-next-generation-fastopt.*
 pushd classes
-zip -rp $ZIP index* styles* offline-*.js manifest* lib/* res/*
+echo "$DT" > build.txt
+zip -rp $ZIP index* styles* offline-*.js manifest* build.txt lib/* res/*
 popd
 popd
 scp $ZIP ${DEPLOY_HOST}:public_html
-ssh $DEPLOY_HOST "cd public_html && mkdir smtng-dev/$DT && cd smtng-dev/$DT && echo "$DT" > build.txt && unzip -o ../../smtng.zip"
+ssh $DEPLOY_HOST "cd public_html && mkdir smtng-dev/$DT && cd smtng-dev/$DT && unzip -o ../../smtng.zip"
 ssh $DEPLOY_HOST "cd public_html/smtng-dev && rm latest && ln -s $DT latest"
 echo ./promote.sh ${DEPLOY_HOST} $DT

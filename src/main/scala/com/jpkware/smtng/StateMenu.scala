@@ -5,8 +5,9 @@
 package com.jpkware.smtng
 
 import com.definitelyscala.phaser.{BitmapText, Game, Group, State}
+import org.scalajs.dom.html
 
-class StateMenu(game: Game, options: Map[String,String]) extends State {
+class StateMenu(game: Game, options: Map[String,String], sharebutton: Option[html.Div]) extends State {
 
   var infoTexts: Group = _
   var scoreTexts: Group = _
@@ -22,6 +23,10 @@ class StateMenu(game: Game, options: Map[String,String]) extends State {
     game.add.sprite(0,0, GlobalRes.MenuBg).scale.set(2,2)
 
     GlobalRes.drawLogo(game)
+    sharebutton match {
+      case Some(b) => b.style.display = "block"
+      case None =>  // share button not present on the page
+    }
 
     val help = if (game.device.desktop || options.contains("touch")) "Control your ship with arrow keys and space, or z,x,n,m, or mouse"
     else "Use the touch buttons to control your ship"
@@ -39,6 +44,8 @@ class StateMenu(game: Game, options: Map[String,String]) extends State {
     scoreTexts.add(scoreText)
     scoreTexts.add(game.add.bitmapText(game.width/2-290,game.height-460, GlobalRes.FontId, "Top Scores and Players:", 40))
     showTexts()
+
+    Progress.fetchBuild(res => game.add.bitmapText(game.width-2,2, GlobalRes.FontId, res, 20).anchor.set(1,0))
 
     val (b1x,b2x,b3x) = if (Progress.hasCheckpoint) (-200,0,200) else (-100, 0, 100)
     val buttonY = game.height/2-60
@@ -84,6 +91,11 @@ class StateMenu(game: Game, options: Map[String,String]) extends State {
     Progress.fetchScores(None, ScoreListLen, (scores: Seq[HighScore]) => {this.scores = scores})
   }
   def startGame(): Unit = {
+    sharebutton match {
+      case Some(button) => button.style.display = "none"
+      case None =>
+    }
+
     Progress.resetCheckpoint()
     game.state.start("play", args = "start", clearCache = false, clearWorld = true)
   }

@@ -7,6 +7,7 @@ package com.jpkware.smtng
 import com.definitelyscala.phaser.Game
 import com.definitelyscala.phaser._
 import org.scalajs.dom
+import org.scalajs.dom.html
 import org.scalajs.dom.raw.Element
 
 import scala.util.Random
@@ -24,6 +25,16 @@ object StarMinesNG {
 
     val parent: Element = dom.document.getElementById("game")
     val status: Element = dom.document.getElementById("status")
+    val sb = dom.document.getElementById("sharebutton")
+    val sharebutton: Option[html.Div]= sb match {
+      case div: html.Div =>
+        div.style.display = "none"
+        Some(div)
+      case x =>
+        Logger.info(s"No sharebutton div found, $x found")
+        None
+    }
+
     val hash = dom.document.location.hash
     val options: Map[String, String] = if (hash==null || hash.isEmpty) Map() else {
       val s = hash.tail.split(',')
@@ -38,7 +49,7 @@ object StarMinesNG {
     val game = new Game(1920, 1080, mode, parent)
     game.state.add("boot", new StateBoot(game, options))
     game.state.add("preloader", new StatePreload(game, options, status))
-    game.state.add("menu", new StateMenu(game, options))
+    game.state.add("menu", new StateMenu(game, options, sharebutton))
     game.state.add("name", new StateName(game, options))
     game.state.add("play", new StatePlay(game, options))
     game.state.add("nextlevel", new StateNextLevel(game, options))

@@ -29,23 +29,18 @@
     <meta property="og:url" content="https://jpkware.com/smtng/">
 </head>
 <body>
-<div id="container"><span id="status"><p>StarMines loading...</p></span><div id="game"></div></div>
+<div id="container"><span id="status">StarMines loading...</span>
+    <div id="game"></div>
+    <div id="sharebutton">
+        <a class="a2a_dd" href="https://www.addtoany.com/share"><img src="https://static.addtoany.com/buttons/share_save_171_16.png" width="171" height="16" border="0" alt="Share"></a>
+        <script async src="https://static.addtoany.com/menu/page.js"></script>
+    </div>
+</div>
 <script type="text/javascript" src="/workbench.js"></script>
 <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/phaser-ce/2.11.1/phaser.js"></script>
-<script type="text/javascript" src="../starmines-the-next-generation-fastopt.js"></script>
-<span id="version"></span>
 <!-- AddToAny BEGIN -->
-<div id="sharebutton">
-    <a class="a2a_dd" href="https://www.addtoany.com/share"><img src="https://static.addtoany.com/buttons/share_save_171_16.png" width="171" height="16" border="0" alt="Share"></a>
-    <script async src="https://static.addtoany.com/menu/page.js"></script>
-</div>
 <script>var a2a_config = a2a_config || {}; a2a_config.onclick = 1;</script>
 <!-- AddToAny END -->
-<script>
-var client = new XMLHttpRequest();
-client.open('GET', 'build.txt');
-client.onreadystatechange = function() { document.getElementById('version').innerHTML = "Version: "+client.responseText; }
-client.send();
-</script>
+<script type="text/javascript" src="../starmines-the-next-generation-fastopt.js"></script>
 </body>
 </html>
