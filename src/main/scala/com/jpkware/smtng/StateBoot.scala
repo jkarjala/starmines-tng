@@ -14,7 +14,8 @@ class StateBoot(game: Game, options: Map[String,String]) extends State {
   override def init(args: js.Any*): Unit = {
     game.stage.disableVisibilityChange = true
     game.time.advancedTiming = true
-    game.scale.compatibility.asInstanceOf[ScaleManagerCompatibility].forceMinimumDocumentHeight = true
+    game.scale.pageAlignHorizontally = true
+    game.scale.pageAlignVertically = true
     game.scale.windowConstraints = js.Dynamic.literal(right="visual", bottom="visual")
     game.scale.fullScreenScaleMode = ScaleManager.SHOW_ALL
     game.scale.scaleMode = ScaleManager.SHOW_ALL
