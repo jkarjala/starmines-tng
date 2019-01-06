@@ -147,12 +147,15 @@ object PhaserButton {
   }
 
   def gotoLevels(game: Game): Unit = {
+    StarMinesNG.shareButtonVisible(false)
     game.state.start("levels", args = "gameover", clearCache = false, clearWorld = true)
   }
   def gotoRetry(game: Game): Unit = {
+    StarMinesNG.shareButtonVisible(false)
     game.state.start("play", args = "restore", clearCache = false, clearWorld = true)
   }
   def gotoMenu(game: Game): Unit = {
+    StarMinesNG.shareButtonVisible(false)
     game.state.start("menu", args = "gameover", clearCache = false, clearWorld = true)
   }
 }

@@ -22,21 +22,22 @@ object StarMinesNG {
     game.add.sprite(x,y,s"space$bgLevel")
   }
 
-  def main(args: Array[String]): Unit = {
-
-    val parent: Element = dom.document.getElementById("game")
-    val status: Element = dom.document.getElementById("status")
-    status.innerHTML = ""
-
-    val sb = dom.document.getElementById("sharebutton")
-    val sharebutton: Option[html.Div]= sb match {
+  def shareButtonVisible(yes: Boolean): Unit = {
+    dom.document.getElementById("sharebutton") match {
       case div: html.Div =>
-        div.style.display = "none"
+        div.style.display = if (yes) "block" else "none"
         Some(div)
       case x =>
         Logger.info(s"No sharebutton div found, $x found")
         None
     }
+  }
+
+  def main(args: Array[String]): Unit = {
+
+    val parent: Element = dom.document.getElementById("game")
+    val status: Element = dom.document.getElementById("status")
+    status.innerHTML = ""
 
     val hash = dom.document.location.hash
     val options: Map[String, String] = if (hash==null || hash.isEmpty) Map() else {
@@ -52,7 +53,7 @@ object StarMinesNG {
     val game = new Game(1920, 1080, mode, parent)
     game.state.add("boot", new StateBoot(game, options))
     game.state.add("preloader", new StatePreload(game, options, status))
-    game.state.add("menu", new StateMenu(game, options, sharebutton))
+    game.state.add("menu", new StateMenu(game, options))
     game.state.add("name", new StateName(game, options))
     game.state.add("play", new StatePlay(game, options))
     game.state.add("nextlevel", new StateNextLevel(game, options))

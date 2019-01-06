@@ -26,7 +26,9 @@ body {
     margin: auto auto;
     position: relative;
 }
-
+#sharebutton {
+    display: none; /* controlled by code */
+}
 /* unvisited link */
 a:link {
     color: aqua;

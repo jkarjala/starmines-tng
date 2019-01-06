@@ -7,7 +7,7 @@ package com.jpkware.smtng
 import com.definitelyscala.phaser.{BitmapText, Game, Group, State}
 import org.scalajs.dom.html
 
-class StateMenu(game: Game, options: Map[String,String], sharebutton: Option[html.Div]) extends State {
+class StateMenu(game: Game, options: Map[String,String]) extends State {
 
   var infoTexts: Group = _
   var scoreTexts: Group = _
@@ -25,10 +25,7 @@ class StateMenu(game: Game, options: Map[String,String], sharebutton: Option[htm
     GlobalRes.drawLogo(game, 200)
     GlobalRes.drawCopy(game)
 
-    sharebutton match {
-      case Some(b) => b.style.display = "block"
-      case None =>  // share button not present on the page
-    }
+    StarMinesNG.shareButtonVisible(true)
 
     val help = if (game.device.desktop || options.contains("touch")) "Control your ship with arrow keys and space, or z,x,n,m, or mouse"
     else "Use the touch buttons to control your ship"
@@ -93,12 +90,9 @@ class StateMenu(game: Game, options: Map[String,String], sharebutton: Option[htm
   def fetchHighScores(): Unit = {
     Progress.fetchScores(None, ScoreListLen, (scores: Seq[HighScore]) => {this.scores = scores})
   }
-  def startGame(): Unit = {
-    sharebutton match {
-      case Some(button) => button.style.display = "none"
-      case None =>
-    }
 
+  def startGame(): Unit = {
+    StarMinesNG.shareButtonVisible(false)
     Progress.resetCheckpoint()
     game.state.start("play", args = "start", clearCache = false, clearWorld = true)
   }
