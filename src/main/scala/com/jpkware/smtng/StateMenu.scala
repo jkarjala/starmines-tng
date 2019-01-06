@@ -82,7 +82,7 @@ class StateMenu(game: Game, options: Map[String,String], sharebutton: Option[htm
 
   def showScores(): Unit = {
     infoTexts.visible = false
-    if (scores.nonEmpty && !scoresShown) {
+    if (!scoresShown) {
       scoreText.text = Progress.formatScores(scores)
       scoreTexts.visible = true
       fetchHighScores()

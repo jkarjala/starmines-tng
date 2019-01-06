@@ -257,7 +257,8 @@ object Progress {
   }
 
   def formatScores(scores: Seq[HighScore]): String = {
-    scores.zipWithIndex.map {
+    if (scores.isEmpty) "No High Scores Available\n"
+    else scores.zipWithIndex.map {
       case (score, index) => f"${index+1}%3d.  ${score.score}%08d  ${score.name}"
     }.mkString("\n")
   }
