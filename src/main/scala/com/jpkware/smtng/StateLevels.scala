@@ -145,7 +145,6 @@ class StateLevels(game: Game, options: Map[String,String]) extends State {
   def hideInfo(): Unit = {
     levelInfoGroup.visible = false
     gridGroup.visible = true
-    selectedLevel = -1
   }
 
   var buttonLeft: Button = _
