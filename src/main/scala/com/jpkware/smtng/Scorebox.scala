@@ -20,7 +20,7 @@ class ScoreState extends js.Object {
   var shipLevel: Int = 0
 }
 
-class Scorebox(game: Game, scores: ScoreState) extends Sprite(game, 0,0, Scorebox.ScoreboxId) {
+class Scorebox(game: Game, scores: ScoreState) extends Sprite(game, 0,0, GlobalRes.MainAtlasId, Scorebox.ScoreboxId) {
 
   private var scoreText: BitmapText = _
   private var livesImage: Image = _
@@ -45,7 +45,7 @@ class Scorebox(game: Game, scores: ScoreState) extends Sprite(game, 0,0, Scorebo
   bonusText = game.add.bitmapText(game.width/2+280,game.height/2+45, GlobalRes.FontId, "", 48)
   bonusText.anchor.set(1,0)
 
-  livesImage = game.add.image(game.width/2-25,game.height/2+110, Scorebox.ShipsId)
+  livesImage = game.add.image(game.width/2-25,game.height/2+110, GlobalRes.MainAtlasId, Scorebox.ShipsId)
   livesImage.scale.set(0.5,0.5)
   livesImage.anchor.set(0,0.25)
 
@@ -107,7 +107,6 @@ object Scorebox {
   val ShipsId = "ships"
   def InitialScore = new ScoreState
   def preloadResources(game: Game): Unit = {
-    game.load.image(ScoreboxId, "res/scorebox.png")
-    game.load.image(ShipsId, "res/ships.png")
+    // Nothing, all in main atlas
   }
 }

@@ -16,7 +16,7 @@ class StateName(game: Game, options: Map[String,String]) extends State {
     game.add.sprite(0,0, GlobalRes.MenuBg).scale.set(2,2)
     PhaserButton.addMinMax(game)
 
-    game.add.bitmapText(300,200, GlobalRes.FontId, "Please Input Your Player Name:", 48)
+    game.add.bitmapText(300,200, GlobalRes.FontId, "Please Choose a Player Name:", 48)
 
     keyboard = new TouchKeyboard(game, 360,300, 15,
       (name: String) => {
@@ -24,6 +24,9 @@ class StateName(game: Game, options: Map[String,String]) extends State {
         game.state.start("menu", args = null, clearCache = false, clearWorld = false)
       }
     )
+
+    game.add.bitmapText(300,900, GlobalRes.FontId, "Your Player Name will be shown in the high score lists and stored in the server", 32)
+
   }
 
   override def update(): Unit = {

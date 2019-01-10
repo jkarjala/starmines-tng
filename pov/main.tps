@@ -277,6 +277,19 @@
                 <key>scale9FromFile</key>
                 <false/>
             </struct>
+            <key type="filename">tmp/main/explo.png</key>
+            <struct type="IndividualSpriteSettings">
+                <key>pivotPoint</key>
+                <point_f>0.5,0.5</point_f>
+                <key>scale9Enabled</key>
+                <false/>
+                <key>scale9Borders</key>
+                <rect>8,8,16,16</rect>
+                <key>scale9Paddings</key>
+                <rect>8,8,16,16</rect>
+                <key>scale9FromFile</key>
+                <false/>
+            </struct>
             <key type="filename">tmp/main/missile.png</key>
             <struct type="IndividualSpriteSettings">
                 <key>pivotPoint</key>
@@ -287,6 +300,19 @@
                 <rect>8,3,15,6</rect>
                 <key>scale9Paddings</key>
                 <rect>8,3,15,6</rect>
+                <key>scale9FromFile</key>
+                <false/>
+            </struct>
+            <key type="filename">tmp/main/scorebox.png</key>
+            <struct type="IndividualSpriteSettings">
+                <key>pivotPoint</key>
+                <point_f>0.5,0.5</point_f>
+                <key>scale9Enabled</key>
+                <false/>
+                <key>scale9Borders</key>
+                <rect>160,80,320,160</rect>
+                <key>scale9Paddings</key>
+                <rect>160,80,320,160</rect>
                 <key>scale9FromFile</key>
                 <false/>
             </struct>
@@ -354,14 +380,6 @@
             <key type="filename">tmp/main/ship62.png</key>
             <key type="filename">tmp/main/ship63.png</key>
             <key type="filename">tmp/main/ship64.png</key>
-            <key type="filename">tmp/main/warp1.png</key>
-            <key type="filename">tmp/main/warp2.png</key>
-            <key type="filename">tmp/main/warp3.png</key>
-            <key type="filename">tmp/main/warp4.png</key>
-            <key type="filename">tmp/main/warp5.png</key>
-            <key type="filename">tmp/main/warp6.png</key>
-            <key type="filename">tmp/main/warp7.png</key>
-            <key type="filename">tmp/main/warp8.png</key>
             <struct type="IndividualSpriteSettings">
                 <key>pivotPoint</key>
                 <point_f>0.5,0.5</point_f>
@@ -371,6 +389,19 @@
                 <rect>16,16,32,32</rect>
                 <key>scale9Paddings</key>
                 <rect>16,16,32,32</rect>
+                <key>scale9FromFile</key>
+                <false/>
+            </struct>
+            <key type="filename">tmp/main/ships.png</key>
+            <struct type="IndividualSpriteSettings">
+                <key>pivotPoint</key>
+                <point_f>0.5,0.5</point_f>
+                <key>scale9Enabled</key>
+                <false/>
+                <key>scale9Borders</key>
+                <rect>46,16,91,32</rect>
+                <key>scale9Paddings</key>
+                <rect>46,16,91,32</rect>
                 <key>scale9FromFile</key>
                 <false/>
             </struct>
