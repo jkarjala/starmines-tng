@@ -58,7 +58,9 @@ CREATE TABLE devices (
   dt DATETIME,
   device varchar(23),
   user_name varchar(20),
-  PRIMARY KEY (ID)
+  PRIMARY KEY (ID),
+  KEY idx_devices_device (device),
+  KEY idx_devices_user_name (user_name)
 );
 insert into devices(user_name, device) select user_name, device from log group by 1,2;
 
@@ -71,11 +73,17 @@ CREATE TABLE scores (
   bonusoids int,
   PRIMARY KEY (field_id,device_id),
   KEY idx_highscores_score (score),
+  KEY idx_highscores_bonusoids (bonusoids),
   FOREIGN KEY (device_id) REFERENCES devices(ID)
 );
 insert into scores(dt, field_id, device_id, score, bonusoids) select h.dt, h.field_id, d.id, h.score, h.bonusoids from highscores as h,devices as d where d.device=h.device;
 
+-- highscores
 -- SELECT max(field_id),max(score),device_id,devices.user_name,max(bonusoids) FROM `scores`, devices where scores.device_id=devices.id group by device_id order by max(score) desc limit 10
+-- scores by user
+-- SELECT field_id, score, d.user_name, bonusoids,d.device,s.dt FROM scores as s,devices as d where s.device_id=d.id and d.user_name='Foo' order by field_id limit 20;
+-- scores by field
+-- SELECT field_id, score, d.user_name, bonusoids,d.device,s.dt from scores as s,devices as d where s.device_id=d.id and s.field_id=1 order by score desc limit 20;
 
 DROP TABLE IF EXISTS new_log;
 CREATE TABLE new_log (
