@@ -40,7 +40,6 @@ class Player(game: Game, x: Double, y: Double, bonusoidCount: Int)
   weapon2.trackSprite(this, 0, 0, trackRotation = false)
   var shipLevel: Int = 0
   resetWeapon(weapon1, ShipLevelInfos.head)
-  maybeUpgradeShip(bonusoidCount)
 
   val FlameScalaMax: Double = fullWidth/80
   val flame: Sprite = game.add.sprite(x,y,Player.FlameId)
@@ -57,12 +56,17 @@ class Player(game: Game, x: Double, y: Double, bonusoidCount: Int)
   sfxZap.allowMultiple = true
   sfxZap.volume = 0.5
 
+  val sfxUpgrade: Sound = game.add.audio(Player.SfxUpgradeId)
+  sfxUpgrade.allowMultiple = true
+
+  maybeUpgradeShip(bonusoidCount, sound=false)
+
   var immortal: Boolean = true
   revive()
 
   def dualMissiles: Boolean = shipLevel >= ShipLevelInfos.length
 
-  def maybeUpgradeShip(bonusoidCount: Int): Option[Int] = {
+  def maybeUpgradeShip(bonusoidCount: Int, sound: Boolean = true): Option[Int] = {
     val level = if (bonusoidCount<dualMissileBonusoidLimit) {
       ShipLevelInfos.count(_.bonusoidLimit <= bonusoidCount) - 1
     }
@@ -71,7 +75,7 @@ class Player(game: Game, x: Double, y: Double, bonusoidCount: Int)
       val count = bonusoidCount - dualMissileBonusoidLimit + 200
       ShipLevelInfos.length + ShipLevelInfos.count(_.bonusoidLimit <= count) - 1
     }
-    if (level>shipLevel) {
+    val res = if (level>shipLevel) {
       shipLevel = level
       if (!dualMissiles) {
         val levelInfo = ShipLevelInfos(level)
@@ -89,6 +93,8 @@ class Player(game: Game, x: Double, y: Double, bonusoidCount: Int)
       }
     }
     else None
+    if (sound && res.nonEmpty) sfxUpgrade.play()
+    res
   }
 
   def resetWeapon(weapon: Weapon, shipLevel: ShipLevelInfo): Unit = {
@@ -216,11 +222,13 @@ object Player {
   def FlameId = "flame"
   def SfxZapId = "sfx:zap"
   def SfxThrustId = "sfx:thrust"
+  def SfxUpgradeId = "sfx:upgrade"
   def ShipPrefix = "ship"
 
   def preloadResources(game: Game): Unit = {
     game.load.image(FlameId, "res/flame.png")
     game.load.audio(SfxZapId, "res/zap.wav")
     game.load.audio(SfxThrustId, "res/thrust.wav")
+    game.load.audio(SfxUpgradeId, "res/upgrade.wav")
   }
 }

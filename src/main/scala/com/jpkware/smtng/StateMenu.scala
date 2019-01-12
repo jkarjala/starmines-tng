@@ -57,6 +57,9 @@ class StateMenu(game: Game, options: Map[String,String]) extends State {
 
     PhaserButton.addMinMax(game)
 
+    val infoButton = PhaserButton.add(game, game.width - 40, 40, "C", scale = 0.5)
+    infoButton.events.onInputUp.add(() => gotoInfo(), null, 1)
+
     fetchHighScores()
     val timer = game.time.create(true)
     timer.loop(10000, () => {
@@ -82,7 +85,6 @@ class StateMenu(game: Game, options: Map[String,String]) extends State {
     if (!scoresShown) {
       scoreText.text = Progress.formatScores(scores)
       scoreTexts.visible = true
-      fetchHighScores()
       scoresShown = true
     }
   }
@@ -95,5 +97,9 @@ class StateMenu(game: Game, options: Map[String,String]) extends State {
     StarMinesNG.shareButtonVisible(false)
     Progress.resetCheckpoint()
     game.state.start("play", args = "start", clearCache = false, clearWorld = true)
+  }
+
+  def gotoInfo(): Unit = {
+    game.state.start("info", args = "menu", clearCache = false, clearWorld = true)
   }
 }

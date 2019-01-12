@@ -116,7 +116,6 @@ object Progress {
 
   def hasCheckpoint: Boolean = dom.window.localStorage.getItem(LSCheckpointKey) match {
     case _: String =>
-      Logger.info("hasCheckpoint TRUE")
       true
     case _ => false
   }

@@ -9,7 +9,9 @@ import js.Dynamic.{ global => g }
 
 object Logger {
   var messages: Messages = null
+  var showInfo: Boolean = false
   def info(s: String): Unit = {
+    if (!showInfo) return
     if (messages!=null) messages.show(s)
     g.console.info(s)
   }

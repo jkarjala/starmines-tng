@@ -48,6 +48,7 @@ object StarMinesNG {
       }).toMap
     }
     debug = options.contains("debug")
+    Logger.showInfo = options.contains("info")
 
     val mode = if (options.contains("webgl")) Phaser.WEBGL else Phaser.CANVAS
     val game = new Game(1920, 1080, mode, parent)
@@ -55,6 +56,7 @@ object StarMinesNG {
     game.state.add("preloader", new StatePreload(game, options, status))
     game.state.add("menu", new StateMenu(game, options))
     game.state.add("name", new StateName(game, options))
+    game.state.add("info", new StateInfo(game, options))
     game.state.add("play", new StatePlay(game, options))
     game.state.add("nextlevel", new StateNextLevel(game, options))
     game.state.add("gameover", new StateGameOver(game, options))
