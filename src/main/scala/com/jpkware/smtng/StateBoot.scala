@@ -12,6 +12,7 @@ import scala.scalajs.js
 class StateBoot(game: Game, options: Map[String,String]) extends State {
 
   override def init(args: js.Any*): Unit = {
+    game.clearBeforeRender = false
     game.stage.disableVisibilityChange = true
     game.time.advancedTiming = true
     game.scale.pageAlignHorizontally = true
