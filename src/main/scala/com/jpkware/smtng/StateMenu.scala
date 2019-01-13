@@ -13,7 +13,7 @@ class StateMenu(game: Game, options: Map[String,String]) extends State {
   var scoreTexts: Group = _
   var scoreText: BitmapText = _
   var scores: Seq[HighScore] = Seq()
-  var scoresShown: Boolean = false
+  var scoresShown: Boolean = _
   val ScoreListLen = 10
 
   override def preload(): Unit = {
@@ -57,7 +57,7 @@ class StateMenu(game: Game, options: Map[String,String]) extends State {
 
     PhaserButton.addMinMax(game)
 
-    val infoButton = PhaserButton.add(game, game.width - 40, 40, "C", scale = 0.5)
+    val infoButton = PhaserButton.add(game, game.width - 40, 40, "Info", scale = 0.5)
     infoButton.events.onInputUp.add(() => gotoInfo(), null, 1)
 
     fetchHighScores()
