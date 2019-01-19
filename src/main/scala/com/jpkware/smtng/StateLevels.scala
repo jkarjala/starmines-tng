@@ -13,8 +13,8 @@ class StateLevels(game: Game, options: Map[String,String]) extends State {
   private lazy val gridW = game.width/4
   private lazy val gridH = game.height/4
 
-  var initialStartLevel: Int = Progress.state.maxLevel/64*64 + 1
-  var currentStartLevel: Int = Progress.state.maxLevel/64*64 + 1
+  var initialStartLevel: Int = 0
+  var currentStartLevel: Int = _
 
   var levelInfoText: BitmapText = _
   var levelScoresText: BitmapText = _
@@ -22,6 +22,7 @@ class StateLevels(game: Game, options: Map[String,String]) extends State {
   var gridGroup: Group = _
 
   override def create(): Unit = {
+    if (initialStartLevel==0 || initialStartLevel>Progress.state.maxLevel) initialStartLevel = Progress.state.maxLevel/64*64 + 1
     createGrid(initialStartLevel, Progress.state.maxLevel, Progress.state.stars.toMap)
   }
 
@@ -159,8 +160,8 @@ class StateLevels(game: Game, options: Map[String,String]) extends State {
     gridGroup.visible = false
     val cp = Progress.getCheckpoint(level)
 
-    val fieldInfo = if (cp.score==0) s"You have not completed field $level, yet!\n\n"
-    else s"Your Field $level Checkpoint:\n\n" +
+    val fieldInfo = if (cp.score==0) s"You have not yet completed field $level!\n\n"
+    else s"Your statistics at Field $level:\n\n" +
       s" Score so far:\n  ${cp.score}\n" +
       s" Field Bonusoids:\n  ${cp.bonusoidsCollected} / ${BonusManager.bonusoidsOnLevel(level)}\n" +
       s" Total Bonusoids:\n  ${cp.totalBonusoids} / ${BonusManager.maxBonusoidsOnLevel(level)}\n" +
@@ -170,7 +171,7 @@ class StateLevels(game: Game, options: Map[String,String]) extends State {
       s"\nYour Total Game Statistics:\n\n" +
       s" High Score:\n  ${Progress.state.highScore}\n" +
       s" Total Bonusoids:\n  ${Progress.state.maxBonusoids}\n" +
-      s" Playing Since:\n  ${new js.Date(Progress.state.startTime.get).toDateString()}\n"
+      s" Playing Since:\n  ${new js.Date(Progress.state.playTime.get).toDateString()}\n"
 
     levelInfoText.setText(info)
     levelScoresText.setText("Retrieving Field High Scores...")

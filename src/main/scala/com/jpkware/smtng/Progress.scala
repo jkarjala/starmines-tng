@@ -62,6 +62,10 @@ object Progress {
     }
   }
 
+  def getName: String = {
+    if (state.name.get.isEmpty) "Guest" else state.name.get
+  }
+
   def saveName(name: String): Unit = {
     state.name = name
     save(state)
@@ -122,6 +126,18 @@ object Progress {
 
   def resetCheckpoint(): Unit = {
     dom.window.localStorage.removeItem(Progress.LSCheckpointKey)
+  }
+
+  def resetProgress(): Unit = {
+    resetCheckpoint()
+    dom.window.localStorage.removeItem(Progress.LSLevelCheckpointsKey)
+    dom.window.localStorage.removeItem(Progress.LSProgressKey)
+    state.maxLevel = 0
+    state.playTime = new js.Date().getTime()
+    state.maxBonusoids = 0
+    state.highScore = 0
+    state.stars = Dictionary()
+    checkpoints.scores = Dictionary()
   }
 
   def update(scores: ScoreState): Unit = {

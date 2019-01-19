@@ -27,12 +27,12 @@ class StateMenu(game: Game, options: Map[String,String]) extends State {
 
     StarMinesNG.shareButtonVisible(true)
 
-    val help = if (game.device.desktop || options.contains("touch")) "Control your ship with arrow keys and space, or z,x,n,m, or mouse"
+    val help = if (game.device.desktop || options.contains("touch")) "Control your ship with z,x,n,m, or arrow keys and space, or mouse"
     else "Use the touch buttons to control your ship"
 
     val infoY = game.height-700
     infoTexts = game.add.group(name="infotexts")
-    infoTexts.add(game.add.bitmapText(game.width/2,infoY+100, GlobalRes.FontId, s"Welcome ${Progress.state.name}!", 40))
+    infoTexts.add(game.add.bitmapText(game.width/2,infoY+100, GlobalRes.FontId, s"Welcome ${Progress.getName}!", 40))
     infoTexts.add(game.add.bitmapText(game.width/2,infoY+300, GlobalRes.FontId,
       "Collect all Bonusoids for maximum score and ship upgrades", 32))
     infoTexts.add(game.add.bitmapText(game.width/2,infoY+350, GlobalRes.FontId, help, 32))
@@ -95,8 +95,7 @@ class StateMenu(game: Game, options: Map[String,String]) extends State {
 
   def startGame(): Unit = {
     StarMinesNG.shareButtonVisible(false)
-    Progress.resetCheckpoint()
-    game.state.start("play", args = "start", clearCache = false, clearWorld = true)
+    game.state.start("name", args = "start", clearCache = false, clearWorld = true)
   }
 
   def gotoInfo(): Unit = {

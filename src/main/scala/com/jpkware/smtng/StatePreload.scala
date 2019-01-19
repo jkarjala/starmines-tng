@@ -52,10 +52,7 @@ class StatePreload(game: Game, options: Map[String,String], status: Element) ext
     if (ship.x>game.width) {
       // Now that things are loaded, it is OK to pause on losing focus.
       game.stage.disableVisibilityChange = false
-      if (Progress.state.name.get.isEmpty)
-        game.state.start("name", args = null, clearCache = false, clearWorld = true)
-      else
-        game.state.start("menu", args = null, clearCache = false, clearWorld = true)
+      game.state.start("menu", args = null, clearCache = false, clearWorld = true)
       ship.destroy(true)
       preloadBar.destroy(true)
     }
