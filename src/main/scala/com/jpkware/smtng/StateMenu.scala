@@ -27,8 +27,10 @@ class StateMenu(game: Game, options: Map[String,String]) extends State {
 
     StarMinesNG.shareButtonVisible(true)
 
-    val help = if (game.device.desktop || options.contains("touch")) "Control your ship with z,x,n,m, or arrow keys and space, or mouse"
-    else "Use the touch buttons to control your ship"
+    val help = if (game.device.desktop && !options.contains("touch"))
+      "Control your ship with z,x,n,m, or arrow keys and space, or mouse"
+    else
+      "Use the touch buttons to control your ship, Pause menu to adjust the button layout"
 
     val infoY = game.height-700
     infoTexts = game.add.group(name="infotexts")
@@ -57,7 +59,7 @@ class StateMenu(game: Game, options: Map[String,String]) extends State {
 
     PhaserButton.addMinMax(game)
 
-    val infoButton = PhaserButton.add(game, game.width - 40, 40, "Info", scale = 0.5)
+    val infoButton = PhaserButton.add(game, game.width - 64, 64, "Info", scale = 0.6)
     infoButton.events.onInputUp.add(() => gotoInfo(), null, 1)
 
     fetchHighScores()

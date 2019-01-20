@@ -40,7 +40,7 @@ class StateInfo(game: Game, options: Map[String,String]) extends State {
     val text = game.add.bitmapText(game.width/2,230, GlobalRes.FontId, credits.replace("\n",""), 32)
     text.anchor.set(0.5,0)
 
-    val button = PhaserButton.addExit(game, game.width - 40, 40, scale = 0.5)
+    val button = PhaserButton.addExit(game, game.width - 64, 64, scale = 0.6)
     button.events.onInputUp.add(() => gotoMenu(), null, 1)
   }
 

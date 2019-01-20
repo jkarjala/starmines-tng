@@ -259,12 +259,17 @@ class StatePlay(game: Game, options: Map[String,String]) extends State {
     bonusoid.kill()
     StatePlay.scorebox.addToBonusoidsCollected(1)
     StatePlay.scorebox.addToScore(2000)
-    messages.show(s"Bonusoid collected!")
+    if (StatePlay.scores.totalBonusoids%4==0) {
+      messages.show(s"Four Bonusoids powered up the shield for 5 seconds!")
+      player.addShield(5000)
+    }
+    else messages.show(s"Bonusoid collected!")
+
     maybeUpgradeWithMessage()
   }
 
   def playerVsEnemy(player: Player, enemy: Sprite): Unit = {
-    if (player.immortal) {
+    if (player.shielded) {
       messages.show("SHIP PROTECTED BY SHIELD!")
       Explosion(game, Explosion.SmallExploCount, enemy)
       enemy.kill()

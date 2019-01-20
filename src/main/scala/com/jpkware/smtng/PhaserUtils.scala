@@ -86,7 +86,7 @@ object PhaserButton {
     if (game.scale.compatibility.asInstanceOf[ScaleManagerCompatibility].supportsFullScreen) {
       game.scale.onFullScreenChange.dispose() // clear all old listeners
       val frame = if (game.scale.isFullScreen) FrameMin else FrameMax
-      val button2 = PhaserButton.add(game, 50, 50, " ", scale = 0.4, frame = frame)
+      val button2 = PhaserButton.add(game, 55, 55, " ", scale = 0.4, frame = frame)
       game.scale.onFullScreenChange.add(() => if (game.scale.isFullScreen) {
         button2.setFrames(FrameMin, FrameMin+1, FrameMin+2)
       } else {

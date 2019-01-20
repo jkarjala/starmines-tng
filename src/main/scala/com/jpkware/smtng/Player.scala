@@ -43,6 +43,7 @@ class Player(game: Game, x: Double, y: Double, bonusoidCount: Int)
   physBody.collideWorldBounds = true
   physBody.bounce.set(1,1)
 
+  // weapons are needed in StatePlay for collision checking
   val weapon1: Weapon = game.add.weapon(10, GlobalRes.MainAtlasId, Player.MissileId)
   weapon1.trackSprite(this, 0, 0, trackRotation = false)
   val weapon2: Weapon = game.add.weapon(10, GlobalRes.MainAtlasId, Player.MissileId)
@@ -50,7 +51,6 @@ class Player(game: Game, x: Double, y: Double, bonusoidCount: Int)
   resetWeapon(weapon1, ShipLevelInfos.head)
 
   private var shipLevelIndex: Int = 0
-  var immortal: Boolean = true
 
   private val FlameScalaMax: Double = fullWidth/80
   private val flame: Sprite = game.add.sprite(x,y,Player.FlameId)
@@ -58,6 +58,11 @@ class Player(game: Game, x: Double, y: Double, bonusoidCount: Int)
   flame.visible = false
   private var flameScale = 0.25
   game.physics.arcade.enable(flame)
+
+  private var shieldTime: Long = 0
+  private val shield: Sprite = game.add.sprite(0,0,GlobalRes.ButtonId, PhaserButton.FrameButton)
+  shield.anchor = new Point(0.5,0.5)
+  this.addChild(shield)
 
   private val sfxThrust: Sound = game.add.audio(Player.SfxThrustId)
   sfxThrust.allowMultiple = false
@@ -86,7 +91,6 @@ class Player(game: Game, x: Double, y: Double, bonusoidCount: Int)
 
   def maybeUpgradeShip(bonusoidCount: Int, sound: Boolean = true): Option[String] = {
     val level = ShipLevelInfos.count(_.bonusoidLimit <= bonusoidCount) - 1
-
     val res = if (level>shipLevelIndex && level<ShipLevelInfos.length) {
       shipLevelIndex = level
       val levelInfo = ShipLevelInfos(level)
@@ -187,6 +191,7 @@ class Player(game: Game, x: Double, y: Double, bonusoidCount: Int)
     stop()
     visible = false
   }
+
   def fire(): Unit = {
     if (!this.visible) return
     weapon1.fireAngle = indexAngle
@@ -207,6 +212,16 @@ class Player(game: Game, x: Double, y: Double, bonusoidCount: Int)
     bullet.body match { case body: Body => body.bounce.set(1,1) }
   }
 
+  def shielded: Boolean = shieldTime > 0
+
+  def addShield(time: Int): Unit = {
+    alpha = 0.75
+    flame.alpha = 0.75
+    shield.alpha = 0.4
+    shield.visible = true
+    shieldTime += time
+  }
+
   override def kill(): Sprite = {
     stop()
     flame.kill()
@@ -214,18 +229,21 @@ class Player(game: Game, x: Double, y: Double, bonusoidCount: Int)
   }
 
   override def revive(health: Double = 1): Sprite = {
-    alpha = 0.5
-    flame.alpha = 0.5
-    immortal = true
-    val timer = game.time.create(true)
-    timer.add(1000, () => {
-      immortal = false
-      alpha = 1.0
-      flame.alpha = 1.0
-    }, null)
-    timer.start(0)
-
+    addShield(1000)
     super.revive(health)
+  }
+
+  override def update(): Unit = {
+    super.update()
+    if (shieldTime>0) {
+      shieldTime -= game.time.physicsElapsedMS.toLong
+      if (shieldTime<1000) shield.alpha = 0.4 * (shieldTime/1000.0)
+      if (shieldTime<=0) {
+        alpha = 1.0
+        flame.alpha = 1.0
+        shield.visible = false
+      }
+    }
   }
 }
 
