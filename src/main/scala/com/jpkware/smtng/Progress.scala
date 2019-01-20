@@ -215,7 +215,7 @@ object Progress {
     xhr.onreadystatechange = { (_: Event) => { // Call a function when the state changes.
       if (xhr.status == 200) {
         if (xhr.readyState==4) {
-          Logger.info(s"XHR POST response '${xhr.response}'")
+          Logger.info(s"XHR $op response '${xhr.response}'")
           callback(Some(xhr.response.toString))
         }
       }
