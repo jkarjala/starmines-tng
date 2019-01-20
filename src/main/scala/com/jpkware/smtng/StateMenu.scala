@@ -69,8 +69,9 @@ class StateMenu(game: Game, options: Map[String,String]) extends State {
   }
 
   override def update(): Unit = {
-    if (PhaserKeys.isFireDown(game)) startGame()
-    if (Progress.hasCheckpoint && PhaserKeys.isRetryDown(game)) PhaserButton.gotoRetry(game)
+    if (Progress.hasCheckpoint && (PhaserKeys.isRetryDown(game) || PhaserKeys.isFireDown(game))) PhaserButton.gotoRetry(game)
+    else if (PhaserKeys.isFireDown(game)) startGame()
+
     if (PhaserKeys.isLevelsDown(game)) PhaserButton.gotoLevels(game)
   }
 

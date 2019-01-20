@@ -7,30 +7,39 @@ package com.jpkware.smtng
 import com.definitelyscala.phaser.Physics.Arcade.Body
 import com.definitelyscala.phaser._
 
-case class ShipLevelInfo(bonusoidLimit: Int, bulletLifespan: Int, fireRate: Int, bulletSpeed: Int, shield: Double)
+case class ShipLevelInfo(bonusoidLimit: Int, bulletLifespan: Int, fireRate: Int, bulletSpeed: Int,
+                         dual: Boolean, shipSpeed: Int, shipAccel: Int, msg: String)
 
 class Player(game: Game, x: Double, y: Double, bonusoidCount: Int)
   extends PreRotatedSprite(game, x,y, GlobalRes.MainAtlasId, Player.ShipPrefix, 64) {
 
-  val ShipLevelInfos = Seq(
-    ShipLevelInfo(0, 700, 300, 800, 1.0),
-    ShipLevelInfo(16, 750, 300, 800, 1.0),
-    ShipLevelInfo(32, 800, 300, 850, 1.0),
-    ShipLevelInfo(64, 800, 250, 900, 1.0),
-    ShipLevelInfo(100, 800, 200, 900, 1.0),
-    ShipLevelInfo(150, 800, 200, 950, 1.0),
-    ShipLevelInfo(200, 800, 175, 950, 1.0),
-    ShipLevelInfo(300, 800, 150, 950, 1.0),
-    ShipLevelInfo(400, 800, 150, 1000, 1.0),
-    ShipLevelInfo(500, 800, 130, 1000, 1.0),
-    ShipLevelInfo(600, 850, 120, 1000, 1.0),
-    ShipLevelInfo(700, 850, 110, 1000, 1.0),
+  private val ShipLevelInfos = Seq(
+    ShipLevelInfo(0, 700, 300, 800, false, 450, 400, "Base level"),
+
+    ShipLevelInfo(16, 750, 300, 800, false, 600, 400, "Missile range and ship speed upgraded"),
+    ShipLevelInfo(32, 800, 300, 850, false, 700, 400, "Missile range and ship speed upgraded"),
+    ShipLevelInfo(64, 800, 250, 900, false, 700, 500, "Missile fire rate and ship thrusters upgraded"),
+    ShipLevelInfo(100, 800, 200, 900, false, 700, 500, "Missile fire rate upgraded"),
+    ShipLevelInfo(150, 800, 200, 950, false, 750, 500, "Missile range and ship speed upgraded"),
+
+    ShipLevelInfo(200, 800, 175, 950, false, 750, 500, "Missile fire rate upgraded"),
+    ShipLevelInfo(300, 800, 150, 950, false, 750, 500, "Missile fire rate upgraded"),
+    ShipLevelInfo(400, 800, 150, 1000, false, 750, 500, "Missile speed upgraded"),
+    ShipLevelInfo(500, 800, 130, 1000, false, 750, 500, "Missile fire rate upgraded"),
+    ShipLevelInfo(600, 850, 120, 1000, false, 750, 500, "Missile range and fire rate upgraded"),
+    ShipLevelInfo(700, 850, 110, 1000, false, 750, 500, "Missile fire rate upgraded"),
+
+    ShipLevelInfo(800, 800, 175, 950, true, 750, 500, "Dual missiles installed"),
+    ShipLevelInfo(900, 800, 150, 950, true, 750, 500, "Dual missiles fire rate upgraded"),
+    ShipLevelInfo(1000, 800, 150, 1000, true, 750, 500, "Dual missiles speed upgraded"),
+    ShipLevelInfo(1100, 800, 130, 1000, true, 750, 500, "Dual missiles fire rate upgraded"),
+
+    ShipLevelInfo(1200, 850, 120, 1000, true, 750, 500, "Dual missiles range and fire rate upgraded"),
+    ShipLevelInfo(1300, 850, 110, 1000, true, 750, 500, "Dual missiles range and fire rate upgraded")
   )
-  val dualMissileBonusoidLimit: Int = 800
 
   game.physics.arcade.enable(this)
   physBody.drag.set(10,10)
-  physBody.maxVelocity.set(750,750)
   physBody.collideWorldBounds = true
   physBody.bounce.set(1,1)
 
@@ -38,58 +47,61 @@ class Player(game: Game, x: Double, y: Double, bonusoidCount: Int)
   weapon1.trackSprite(this, 0, 0, trackRotation = false)
   val weapon2: Weapon = game.add.weapon(10, GlobalRes.MainAtlasId, Player.MissileId)
   weapon2.trackSprite(this, 0, 0, trackRotation = false)
-  var shipLevel: Int = 0
   resetWeapon(weapon1, ShipLevelInfos.head)
 
-  val FlameScalaMax: Double = fullWidth/80
-  val flame: Sprite = game.add.sprite(x,y,Player.FlameId)
+  private var shipLevelIndex: Int = 0
+  var immortal: Boolean = true
+
+  private val FlameScalaMax: Double = fullWidth/80
+  private val flame: Sprite = game.add.sprite(x,y,Player.FlameId)
   flame.anchor = new Point(1.0, 0.5)
   flame.visible = false
-  var flameScale = 0.25
+  private var flameScale = 0.25
   game.physics.arcade.enable(flame)
 
-  val sfxThrust: Sound = game.add.audio(Player.SfxThrustId)
+  private val sfxThrust: Sound = game.add.audio(Player.SfxThrustId)
   sfxThrust.allowMultiple = false
   sfxThrust.volume = 0.4
 
-  val sfxZap: Sound = game.add.audio(Player.SfxZapId)
+  private val sfxZap: Sound = game.add.audio(Player.SfxZapId)
   sfxZap.allowMultiple = true
   sfxZap.volume = 0.5
 
-  val sfxUpgrade: Sound = game.add.audio(Player.SfxUpgradeId)
+  private val sfxUpgrade: Sound = game.add.audio(Player.SfxUpgradeId)
   sfxUpgrade.allowMultiple = true
 
   maybeUpgradeShip(bonusoidCount, sound=false)
+  physBody.maxVelocity.set(ShipLevelInfos.head.shipSpeed, ShipLevelInfos.head.shipSpeed)
 
-  var immortal: Boolean = true
   revive()
 
-  def dualMissiles: Boolean = shipLevel >= ShipLevelInfos.length
+  def shipLevel: Int = shipLevelIndex+1
 
-  def maybeUpgradeShip(bonusoidCount: Int, sound: Boolean = true): Option[Int] = {
-    val level = if (bonusoidCount<dualMissileBonusoidLimit) {
-      ShipLevelInfos.count(_.bonusoidLimit <= bonusoidCount) - 1
-    }
-    else {
-      // Drop the weapon level only partly when dual missiles enabled
-      val count = bonusoidCount - dualMissileBonusoidLimit + 200
-      ShipLevelInfos.length + ShipLevelInfos.count(_.bonusoidLimit <= count) - 1
-    }
-    val res = if (level>shipLevel) {
-      shipLevel = level
-      if (!dualMissiles) {
-        val levelInfo = ShipLevelInfos(level)
+  def shipLevelMsg(): String = {
+    val next = if (shipLevelIndex<ShipLevelInfos.length-1) {
+      s", next upgrade at ${ShipLevelInfos(shipLevelIndex+1).bonusoidLimit} B'soids"
+    } else ""
+    s"level $shipLevel$next"
+  }
+
+  def maybeUpgradeShip(bonusoidCount: Int, sound: Boolean = true): Option[String] = {
+    val level = ShipLevelInfos.count(_.bonusoidLimit <= bonusoidCount) - 1
+
+    val res = if (level>shipLevelIndex && level<ShipLevelInfos.length) {
+      shipLevelIndex = level
+      val levelInfo = ShipLevelInfos(level)
+      physBody.maxVelocity.set(levelInfo.shipSpeed, levelInfo.shipSpeed)
+
+      if (!levelInfo.dual) {
         Logger.info(s"$bonusoidCount => Single missiles $level $levelInfo")
         resetWeapon(weapon1, levelInfo)
-        Some(level)
+        Some(levelInfo.msg)
       }
       else {
-        val newLevel = math.min(level - ShipLevelInfos.length, ShipLevelInfos.length-1)
-        val levelInfo = ShipLevelInfos(newLevel)
-        Logger.info(s"$bonusoidCount => Dual missiles $level $newLevel $levelInfo")
+        Logger.info(s"$bonusoidCount => Dual missiles $level $levelInfo")
         resetWeapon(weapon1, levelInfo)
         resetWeapon(weapon2, levelInfo)
-        if (newLevel<ShipLevelInfos.length) Some(level) else None
+        Some(levelInfo.msg)
       }
     }
     else None
@@ -147,7 +159,7 @@ class Player(game: Game, x: Double, y: Double, bonusoidCount: Int)
   def thrust(): Unit = {
     if (!this.visible) return
 
-    game.physics.arcade.accelerationFromRotation(indexRotation, 500, physBody.acceleration)
+    game.physics.arcade.accelerationFromRotation(indexRotation, ShipLevelInfos(shipLevelIndex).shipAccel, physBody.acceleration)
     flame.revive(1)
     flame.rotation = indexRotation
     flame.position = headPoint(-fullWidth/6)
@@ -180,7 +192,7 @@ class Player(game: Game, x: Double, y: Double, bonusoidCount: Int)
     weapon1.fireAngle = indexAngle
     weapon2.fireAngle = indexAngle
 
-    if (dualMissiles) {
+    if (ShipLevelInfos(shipLevelIndex).dual) {
       val bullet1 = weapon1.fire(rotatedPoint(fullWidth/4, indexRotation + math.Pi/2))
       val bullet2 = weapon2.fire(rotatedPoint(fullWidth/4, indexRotation - math.Pi/2))
       if (bullet1!=null || bullet2!=null) sfxZap.play()

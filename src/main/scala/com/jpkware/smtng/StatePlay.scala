@@ -101,7 +101,7 @@ class StatePlay(game: Game, options: Map[String,String]) extends State {
     enemies = e
     enemyMissiles = m
 
-    StatePlay.scores.shipLevel = player.shipLevel+1
+    StatePlay.scores.shipLevel = player.shipLevel
     StatePlay.scores.timeBonus = bonusManager.bonusoidCount * 5000
 
     messages = new Messages(game)
@@ -109,7 +109,7 @@ class StatePlay(game: Game, options: Map[String,String]) extends State {
     if (checkpointRestored) {
       messages.show(s"Restarted Field ${StatePlay.scores.level} from Checkpoint!")
     }
-    messages.show(s"Ship level ${player.shipLevel+1}")
+    messages.show(s"Ship ${player.shipLevelMsg()}")
   }
 
   private def createPauseMenu = {
@@ -260,16 +260,12 @@ class StatePlay(game: Game, options: Map[String,String]) extends State {
     StatePlay.scorebox.addToBonusoidsCollected(1)
     StatePlay.scorebox.addToScore(2000)
     messages.show(s"Bonusoid collected!")
-    player.maybeUpgradeShip(StatePlay.scores.totalBonusoids) match {
-      case Some(level) =>
-        messages.show(s"SHIP SYSTEMS UPGRADED TO LEVEL ${level+1}")
-        StatePlay.scores.shipLevel = level+1
-      case None => // Nothing to do
-    }
+    maybeUpgradeWithMessage()
   }
 
   def playerVsEnemy(player: Player, enemy: Sprite): Unit = {
     if (player.immortal) {
+      messages.show("SHIP PROTECTED BY SHIELD!")
       Explosion(game, Explosion.SmallExploCount, enemy)
       enemy.kill()
     }
@@ -338,12 +334,18 @@ class StatePlay(game: Game, options: Map[String,String]) extends State {
     }
   }
 
-  def debugUpgrade(): Unit = {
-    StatePlay.scorebox.addToBonusoidsCollected(1)
+  def maybeUpgradeWithMessage(): Unit = {
     player.maybeUpgradeShip(StatePlay.scores.totalBonusoids) match {
-      case Some(level) => messages.show(s"Ship upgraded to level $level with ${StatePlay.scores.totalBonusoids} B'soids!")
+      case Some(msg) =>
+        messages.show(s"Upgraded to ${player.shipLevelMsg()}")
+        messages.show(s"$msg!")
       case None => // Nothing to do
     }
+  }
+
+  def debugUpgrade(): Unit = {
+    StatePlay.scorebox.addToBonusoidsCollected(1)
+    maybeUpgradeWithMessage()
   }
 }
 
