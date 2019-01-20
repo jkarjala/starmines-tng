@@ -266,7 +266,9 @@ object Progress {
         case Some(version) =>
           buildVersion = "v" + version.stripLineEnd
           callback(buildVersion)
-        case None => callback("Version not found")
+        case None =>
+          buildVersion = "Version not found"
+          callback(buildVersion)
       })
     }
   }

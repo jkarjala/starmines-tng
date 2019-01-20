@@ -110,6 +110,10 @@ class StatePlay(game: Game, options: Map[String,String]) extends State {
       messages.show(s"Restarted Field ${StatePlay.scores.level} from Checkpoint!")
     }
     messages.show(s"Ship ${player.shipLevelMsg()}")
+
+    game.sound.stopAll()
+
+    GlobalRes.GameMusic.loopFull(GlobalRes.MusicVolume)
   }
 
   private def createPauseMenu = {
@@ -295,6 +299,8 @@ class StatePlay(game: Game, options: Map[String,String]) extends State {
   def handleGameOver(): Unit = {
     gameOver = true
     clearLevel()
+    game.sound.stopAll()
+    GlobalRes.MenuMusic.loopFull()
     Progress.updateAndSave(StatePlay.scores, debug)
     game.state.start("gameover", args = "gameover", clearCache = false, clearWorld = false)
   }

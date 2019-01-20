@@ -68,6 +68,11 @@ class StateMenu(game: Game, options: Map[String,String]) extends State {
       if (scoresShown) showTexts() else showScores()
     }, null)
     timer.start(0)
+
+    game.sound.volume = 0.5
+    game.sound.muteOnPause = true
+    if (GlobalRes.GameMusic.isPlaying) GlobalRes.GameMusic.stop()
+    if (!GlobalRes.MenuMusic.isPlaying) GlobalRes.MenuMusic.loopFull(GlobalRes.MusicVolume)
   }
 
   override def update(): Unit = {

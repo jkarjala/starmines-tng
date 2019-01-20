@@ -24,6 +24,7 @@ class StateInfo(game: Game, options: Map[String,String]) extends State {
       |- Some Icons by Freepik from www.flaticon.com
       |- Some Sound FX from freesound.org
       |- Some Sound FX from www.freesfx.co.uk
+      |- Music by Eric Matyas www.soundimage.org
       |- Audacity Free audio editor
       """.stripMargin
 

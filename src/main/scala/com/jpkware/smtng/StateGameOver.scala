@@ -41,7 +41,7 @@ class StateGameOver(game: Game, options: Map[String,String]) extends State {
     }
     if (keyDown) keyDown = !PhaserKeys.isFireDown(game)
     if (!keyDown && PhaserKeys.isFireDown(game)) PhaserButton.gotoRetry(game)
-    if (game.input.keyboard.isDown(27)) PhaserButton.gotoLevels(game)
+    if (game.input.keyboard.isDown(27)) PhaserButton.gotoMenu(game)
     if (PhaserKeys.isRetryDown(game)) PhaserButton.gotoRetry(game)
     if (PhaserKeys.isLevelsDown(game)) PhaserButton.gotoLevels(game)
   }

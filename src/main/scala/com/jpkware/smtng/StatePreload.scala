@@ -4,9 +4,8 @@
  */
 package com.jpkware.smtng
 
-import com.definitelyscala.phaser.{BitmapText, Game, Sprite, State}
+import com.definitelyscala.phaser._
 import org.scalajs.dom.raw.Element
-import org.scalajs.dom
 
 class StatePreload(game: Game, options: Map[String,String], status: Element) extends State {
 
@@ -42,7 +41,15 @@ class StatePreload(game: Game, options: Map[String,String], status: Element) ext
     Producer.preloadResources(game)
     StatePlay.preloadResources(game)
     StateNextLevel.preloadResources(game)
+    game.load.audio(GlobalRes.MenuMusicId, "res/Cosmic-Switchboard_Looping.mp3")
+    game.load.audio(GlobalRes.GameMusicId, "res/Terraforming-Begins_Looping.mp3")
     (1 to StarMinesNG.maxBackground).foreach(i => game.load.image(s"space$i", s"res/space$i.jpg"))
+  }
+
+  override def create(): Unit = {
+    super.create()
+    GlobalRes.MenuMusic = game.add.audio(GlobalRes.MenuMusicId)
+    GlobalRes.GameMusic = game.add.audio(GlobalRes.GameMusicId)
   }
 
   override def update(): Unit = {
@@ -67,7 +74,11 @@ object GlobalRes {
   val FontMoonId = "font"
   val ButtonId = "button"
   val MenuBg = "space0"
-
+  val GameMusicId = "gamemusic"
+  val MenuMusicId = "menumusic"
+  var GameMusic: Sound = _
+  var MenuMusic: Sound = _
+  val MusicVolume = 0.5
   val Title = "StarMines"
   val SubTitle = "THE NEXT GENERATION"
 
