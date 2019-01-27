@@ -6,11 +6,15 @@ CREATE TABLE highscores (
   device varchar(23),
   score int,
   bonusoids int,
+  host char(4),
   PRIMARY KEY (field_id,user_name),
   KEY idx_highscores_name (user_name),
   KEY idx_highscores_field (field_id),
   KEY idx_highscores_score (score)
 );
+
+ALTER TABLE highscores ADD COLUMN host char(4) AFTER bonusoids;
+update highscores set host = 'jpk';
 
 DROP TABLE IF EXISTS log;
 CREATE TABLE log (
@@ -29,6 +33,7 @@ CREATE TABLE log (
   time_bonus smallint,
   bonusoids_collected smallint,
   bonusoids_total int,
+  host char(4),
   PRIMARY KEY (ID,dt)
 )
 PARTITION BY RANGE ( YEAR(dt) ) (
@@ -48,6 +53,8 @@ PARTITION BY RANGE ( YEAR(dt) ) (
 );
 
 ALTER TABLE log ADD COLUMN field_time int AFTER field_id;
+ALTER TABLE log ADD COLUMN host char(4) AFTER bonusoids_total;
+UPDATE log SET host = 'jpk'
 
 -- INSERT INTO log (ip,id,st,pt,field_id,stars,score,lives,time_bonus,bonusoids_collected,bonusoids_total,user_name) VALUES ('1.2.3.4','id1','2019-01-01 00:00:00',from_unixtime(1546072717812/1000),0,0,0,0,0,0,0,'test');
 

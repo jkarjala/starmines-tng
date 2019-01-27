@@ -2,11 +2,12 @@
 
 if (endsWith($_SERVER['SCRIPT_NAME'], '-dev.php')) {
     $dev=true;
-    error_reporting(0);
+    error_reporting(E_ALL);
     $conf = parse_ini_file('../smtng-dev.conf');
 }
 else {
     $dev=false;
+    error_reporting(0);
     $conf = parse_ini_file('../smtng-prd.conf');
 }
 
@@ -29,11 +30,18 @@ function get(&$var, $default=null) {
     return isset($var) ? $var : $default;
 }
 
-// Allow from any origin
+function findUrl($origin, $urls) {
+    foreach ($urls as $key => $value) {
+        if (endsWith($origin,$value)) return $key;
+    }
+    return null;
+}
+
+// Allow CORS from configured referers
 if (isset($_SERVER['HTTP_ORIGIN'])) {
     $s = $_SERVER['HTTP_ORIGIN'];
-    if (endsWith($s, ".jpkware.com")
-    || startsWith($s, 'http://127.0.0.1:') ) {
+    $host_key = findUrl($s, $conf['urls']);
+    if ($host_key!=null) {
         header("Access-Control-Allow-Origin: $s");
         header('Access-Control-Allow-Credentials: false');
         header('Access-Control-Max-Age: 86400');    // cache for 1 day
@@ -50,7 +58,7 @@ if (isset($_SERVER['HTTP_ORIGIN'])) {
 if ($_SERVER['REQUEST_METHOD'] == 'OPTIONS') {
 
     if (isset($_SERVER['HTTP_ACCESS_CONTROL_REQUEST_METHOD']))
-        header("Access-Control-Allow-Methods: POST");
+        header("Access-Control-Allow-Methods: POST,GET");
 
     if (isset($_SERVER['HTTP_ACCESS_CONTROL_REQUEST_HEADERS']))
         header("Access-Control-Allow-Headers: {$_SERVER['HTTP_ACCESS_CONTROL_REQUEST_HEADERS']}");
@@ -85,19 +93,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     $bits = explode("\t", $data);
 
-    if ($retid[0]!='!') {
-        // HIGHSCORES
-        $stmt = $conn->prepare("INSERT INTO highscores (dt, user_name,field_id,score,bonusoids,device) VALUES (utc_timestamp(), ?, ?, ?, ?, ?) ON DUPLICATE KEY UPDATE score=GREATEST(score, VALUES(score)), bonusoids=GREATEST(bonusoids, VALUES(bonusoids)), device=VALUES(device), dt=VALUES(dt)");
-        $stmt->bind_param("sddds", $bits[9], $bits[2], $bits[4], $bits[8], $retid);
+    if ($retid[0]!='!' && isset($host_key)) {
+        // HIGHSCORES accept only scores without debug and approved host
+        $stmt = $conn->prepare("INSERT INTO highscores (dt, user_name,field_id,score,bonusoids,device,host) VALUES (utc_timestamp(), ?, ?, ?, ?, ?, ?) ON DUPLICATE KEY UPDATE score=GREATEST(score, VALUES(score)), bonusoids=GREATEST(bonusoids, VALUES(bonusoids)), device=VALUES(device), dt=VALUES(dt)");
+        $stmt->bind_param("sdddss", $bits[9], $bits[2], $bits[4], $bits[8], $retid, $host_key);
         if (!$stmt->execute()) {
           die("Error1 " . ($dev ? $stmt->error : "*"));
         }
     }
     // LOGGING
-    $stmt = $conn->prepare("INSERT INTO log (dt,ip,device,st,pt, field_id,stars,score,lives, time_bonus,bonusoids_collected,bonusoids_total,user_name, field_time) VALUES (utc_timestamp(),?,?,?,?,?,?,?,?,?,?,?,?,?)");
+    $stmt = $conn->prepare("INSERT INTO log (dt,ip,device,st,pt, field_id,stars,score,lives, time_bonus,bonusoids_collected,bonusoids_total,user_name, field_time, host) VALUES (utc_timestamp(),?,?,?,?,?,?,?,?,?,?,?,?,?,?)");
     $st=gmdate("Y-m-d H:i:s", $bits[0]/1000);
     $pt=gmdate("Y-m-d H:i:s", $bits[1]/1000);
-    $stmt->bind_param("ssssdddddddsd", $id,$retid,$st,$pt, $bits[2],$bits[3],$bits[4],$bits[5], $bits[6],$bits[7],$bits[8],$bits[9],$bits[10]);
+    $stmt->bind_param("ssssdddddddsds", $id,$retid,$st,$pt, $bits[2],$bits[3],$bits[4],$bits[5], $bits[6],$bits[7],$bits[8],$bits[9],$bits[10],$host_key);
     if (!$stmt->execute()) {
       die("Error2 " . ($dev ? $stmt->error : "*"));
     }
@@ -105,7 +113,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 else {
     $field = get($_GET['field'], 0);
     $limit = get($_GET['limit'], 10);
+    if ($limit>100) $limit=100;
     $user = get($_GET['user'], '');
+    $days = get($_GET['days'], '');
     if ($field>0) {
         // SINGLE FIELD TOP SCORES
         $stmt = $conn->prepare("select field_id, score, user_name, bonusoids,device,dt from highscores where field_id=? order by score desc limit ?");
@@ -121,6 +131,14 @@ else {
           die("Error3b " . ($dev ? $conn->error : "*"));
         }
         $stmt->bind_param("sd", $user, $limit);
+    }
+    else if ($days!='') {
+        // TOP SCORES in N days
+        $stmt = $conn->prepare("SELECT max(field_id),max(score),user_name,max(bonusoids),min(dt),max(dt),count(dt) FROM `highscores` WHERE dt BETWEEN DATE_SUB(UTC_TIMESTAMP(), INTERVAL ? DAY) and UTC_TIMESTAMP() GROUP BY user_name order by max(score) desc limit ?");
+        if (!$stmt) {
+          die("Error4 " . ($dev ? $conn->error : "*"));
+        }
+        $stmt->bind_param("dd", $days, $limit);
     }
     else {
         // OVERALL TOP SCORES
