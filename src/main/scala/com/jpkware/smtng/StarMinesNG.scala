@@ -25,11 +25,9 @@ object StarMinesNG {
   def shareButtonVisible(yes: Boolean): Unit = {
     dom.document.getElementById("sharebutton") match {
       case div: html.Div =>
-        div.style.display = if (yes) "block" else "none"
-        Some(div)
+        div.style.display = if (yes && dom.document.location.hostname.contains("jpkware.com")) "block" else "none"
       case x =>
         Logger.info(s"No sharebutton div found, $x found")
-        None
     }
   }
 

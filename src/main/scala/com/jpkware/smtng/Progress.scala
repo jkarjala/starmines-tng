@@ -203,7 +203,7 @@ object Progress {
   }
 
   private val hostUrl = "https://jpkware.com"
-  private val script = if (dom.document.location.host.startsWith("smtng.")) "smtng.php" else "smtng-dev.php"
+  private val script = if (dom.document.location.pathname.contains("-dev")) "smtng-dev.php" else "smtng.php"
   private val scriptUrl = s"$hostUrl/$script"
 
   var postPending: Boolean = false
