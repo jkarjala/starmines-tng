@@ -5,6 +5,7 @@
 package com.jpkware.smtng
 
 import com.definitelyscala.phaser._
+import org.scalajs.dom
 
 import scala.scalajs.js
 
@@ -52,6 +53,9 @@ object PhaserButton {
   val FrameRetry = 18
   val FramePause = 19
   val FrameButton = 20
+  val FrameVol0 = 21
+  val FrameVol1 = 22
+  val FrameVol2 = 23
 
   private var pauseMenu: Group = _
 
@@ -69,16 +73,60 @@ object PhaserButton {
       t
     }
     else {
-      val t = game.add.sprite(x,y,GlobalRes.ButtonId, textFrame)
-      t.scale.set(scale,scale)
-      t.anchor.set(0.5, 0.5)
-      t.alpha = alpha
-      t
+      buttonSprite(game, x,y, alpha, scale, textFrame)
     }
     if (group!=null) {
       group.add(button)
       group.add(obj)
     }
+    button
+  }
+
+  def buttonSprite(game: Game, x: Double, y: Double, alpha: Double = 0.75,
+                   scale: Double = 1.5, textFrame: Int = -1): Sprite = {
+    val t = game.add.sprite(x,y,GlobalRes.ButtonId, textFrame)
+    t.scale.set(scale,scale)
+    t.anchor.set(0.5, 0.5)
+    t.alpha = alpha
+    t
+  }
+
+  val LSVolume = "starmines-volume"
+  private var currentVolume = dom.window.localStorage.getItem(LSVolume) match {
+    case item: String =>
+      item.toInt
+    case _ =>
+      2
+  }
+
+  def addVolume(game: Game, x: Double, y: Double, group: Option[Group] = None, scale: Double = 0.6): Button = {
+    val alpha = 0.75
+    val volumeStep = 0.3
+    val volumeSprites = Array(
+      buttonSprite(game, x,y, alpha, scale, PhaserButton.FrameVol0),
+      buttonSprite(game, x,y, alpha, scale, PhaserButton.FrameVol1),
+      buttonSprite(game, x,y, alpha, scale, PhaserButton.FrameVol2)
+    )
+    volumeSprites.foreach(s => {
+      s.alpha = 0
+      group.map(_.add(s))
+    })
+    volumeSprites(currentVolume).alpha = alpha
+    game.sound.volume = volumeStep*currentVolume
+    val button = PhaserButton.add(game, x,y, " ", group = group.orNull, scale = scale)
+
+    def volumeHandler(): Unit = {
+      volumeSprites(currentVolume).alpha = 0
+      currentVolume -= 1
+      if (currentVolume<0) currentVolume = volumeSprites.length-1
+      volumeSprites(currentVolume).alpha = alpha
+      dom.window.localStorage.setItem(LSVolume, currentVolume.toString)
+      game.sound.volume = volumeStep*currentVolume
+    }
+
+    val key = game.input.keyboard.addKey('V')
+    key.onDown.add(volumeHandler _, null, 1)
+    button.events.onInputUp.add(volumeHandler _, null, 1)
     button
   }
 
@@ -135,11 +183,13 @@ object PhaserButton {
     group.add(PhaserButton.addExit(game, x-3*step,y, scale = scale, group = group))
 
     group.forEach((button: Button) => button.events.onInputUp.add(() => {
-      game.paused = false
+      game.paused = false // Only these change states, the rest are controls during pause
     }, null, 1), null, false)
 
+    group.add(PhaserButton.addVolume(game, x,y+step, scale = scale, group = Some(group)))
+
     if (touchControls.touchButtons.visible) {
-      val buttonLayout = PhaserButton.add(game, x-4*step, y, "", textFrame = PhaserButton.FrameButton, scale = scale, group = group)
+      val buttonLayout = PhaserButton.add(game, x, y+2*step, "", textFrame = PhaserButton.FrameButton, scale = scale, group = group)
       buttonLayout.events.onInputUp.add(() => touchControls.nextLayout(), null, 1)
       group.add(buttonLayout)
     }

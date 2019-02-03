@@ -59,7 +59,9 @@ class StateMenu(game: Game, options: Map[String,String]) extends State {
 
     PhaserButton.addMinMax(game)
 
-    val infoButton = PhaserButton.add(game, game.width - 64, 64, "Info", scale = 0.6)
+    PhaserButton.addVolume(game, game.width-64, 64)
+
+    val infoButton = PhaserButton.add(game, game.width - 64, game.height - 64, "Info", scale = 0.6)
     infoButton.events.onInputUp.add(() => gotoInfo(), null, 1)
 
     fetchHighScores()
@@ -69,7 +71,6 @@ class StateMenu(game: Game, options: Map[String,String]) extends State {
     }, null)
     timer.start(0)
 
-    game.sound.volume = 0.5
     game.sound.muteOnPause = true
     if (GlobalRes.GameMusic.isPlaying) GlobalRes.GameMusic.stop()
     if (!GlobalRes.MenuMusic.isPlaying) GlobalRes.MenuMusic.loopFull(GlobalRes.MusicVolume)
