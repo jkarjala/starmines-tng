@@ -10,6 +10,7 @@ import org.scalajs.dom.{Event, XMLHttpRequest}
 import scala.scalajs.js
 import scala.scalajs.js.{Dictionary, JSON}
 import scala.collection.mutable
+import scala.util.Random
 
 class Progress extends js.Object {
   var maxLevel: Int = 1
@@ -46,7 +47,7 @@ object Progress {
   var levelStartTime: Long = _
 
   def apply(): Progress = {
-    dom.window.localStorage.getItem(LSProgressKey) match {
+    val p = dom.window.localStorage.getItem(LSProgressKey) match {
       case item: String =>
         Logger.info(s"Loaded progress:$item")
         val p = JSON.parse(item).asInstanceOf[Progress]
@@ -60,10 +61,12 @@ object Progress {
         Logger.info(s"No local progress found")
         new Progress()
     }
+    if (p.name.get.isEmpty) p.name = s"Guest-${Random.nextInt(10000)}"
+    p
   }
 
   def getName: String = {
-    if (state.name.get.isEmpty) "Guest" else state.name.get
+    state.name.get
   }
 
   def saveName(name: String): Unit = {
