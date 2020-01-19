@@ -1,9 +1,9 @@
-# StarMines: The Next Generation (SM:TNG)
+# StarMines: The Next Generation
 
 StarMines is a space shooter inspired by old classics like Asteroids and Omega Race.
 
 The SM:TNG is the [StarMines for Java](http://jpkware.com/smj/StarMines.html) rebooted 
-using the HTML5 technology and modern tools.
+using the HTML5 technology and modern tools like Scala.js.
 
 You can play the game at [smtng.jpkware.com](https://smtng.jpkware.com/).
 
@@ -16,7 +16,12 @@ You can play the game at [smtng.jpkware.com](https://smtng.jpkware.com/).
 the browser page is refreshed
 - IntelliJ Idea recommended as the IDE
 
-The server folder contains a PHP script for high scores. Debugging
+The 'pov' folder contains the Persistence of Vision 3D models used to
+render most of the sprites. The pre-rendered sprites were packed 
+to sprite sheets with TexturePacker Pro. The 'raw' folder contains
+various original resources used to create the game assets.
+
+The 'server' folder contains a PHP script for high scores. Debugging
 it locally requires a local web server with PHP and MySQL to be set up.
 
 The client always posts high scores to jpkware.com, however, the server
