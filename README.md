@@ -7,8 +7,6 @@ using the HTML5 technology and modern tools.
 
 You can play the game at [smtng.jpkware.com](https://smtng.jpkware.com/).
 
-See the info screen in the game for credits and tools used. 
-
 ## Development
 
 - install SBT 1.x
@@ -22,7 +20,7 @@ The server folder contains a PHP script for high scores. Debugging
 it locally requires a local web server with PHP and MySQL to be set up.
 
 The client always posts high scores to jpkware.com, however, the server
-accepts the requests only from these configured web page URLs .jpkware.com, 
+accepts the requests only from these configured web page URLs: .jpkware.com, 
 127.0.0.1:12345 and 127.0.0.1:8080.
 
 The deploy.sh script can be used to deploy the application to a
@@ -35,5 +33,8 @@ version to production.
 StarMines: The Next Generation copyright [Jari Karjala](https://www.jarikarjala.com/) 
 1999-2020. 
 
-This project is licensed under [GNU General Public License v3](LICENSE).
+StarMines: The Next Generation is licensed under [GNU General Public License v3](LICENSE).
 
+Many tools and resources were used to create the game, 
+see [the info screen](src/main/scala/com/jpkware/smtng/StateInfo.scala) 
+in the game for all the credits. 
