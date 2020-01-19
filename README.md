@@ -11,22 +11,29 @@ See the info screen in the game for credits and tools used.
 
 ## Development
 
-- install sbt 1.x
-- run "sbt ~fastOptJs"
-- open http://localhost:12345/classes/index-dev.html in your browser
-- whenever you edit the scala sources, they are compiled automatically and browser is refreshed
-- IntelliJ Idea recommended  as the IDE
+- install SBT 1.x
+- run "sbt ~fastOptJS"
+- open http://127.0.0.1:12345/classes/index-dev.html in your browser
+- whenever you edit the Scala sources, build runs automatically and 
+the browser page is refreshed
+- IntelliJ Idea recommended as the IDE
 
-The server folder contains a PHP script for highscores. These
-require a local web server with PHP and MySQL to be set up.
+The server folder contains a PHP script for high scores. Debugging
+it locally requires a local web server with PHP and MySQL to be set up.
 
-The client always posts high scores to jpkware.com, howeever, the server
-accepts the requests only from configured host URLs.
+The client always posts high scores to jpkware.com, however, the server
+accepts the requests only from these configured web page URLs .jpkware.com, 
+127.0.0.1:12345 and 127.0.0.1:8080.
 
-The deploy.sh script can be used to deploy to a remote linux host,
-assuming SSH keys have been set up.
+The deploy.sh script can be used to deploy the application to a
+remote Apache based host (using ~/public_html), assuming SSH keys 
+have been set up. The promote.sh is used to promote a deployed 
+version to production.
 
 ## License
 
 StarMines: The Next Generation copyright [Jari Karjala](https://www.jarikarjala.com/) 
-1999-2020. Licensed under [GNU General Public License v3](LICENSE).
+1999-2020. 
+
+This project is licensed under [GNU General Public License v3](LICENSE).
+
