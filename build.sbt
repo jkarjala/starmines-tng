@@ -1,5 +1,5 @@
 /*
- * This file is part of StarMines: The Next Generation - Copyright 2018-2019 Jari Karjala - www.jpkware.com
+ * This file is part of StarMines: The Next Generation - Copyright 2018-2020 Jari Karjala - www.jpkware.com
  * SPDX-License-Identifier: GPLv3-only
  */
 name := "starmines-tng"

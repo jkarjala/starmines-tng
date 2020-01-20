@@ -1,5 +1,5 @@
 /*
- * This file is part of StarMines: The Next Generation - Copyright 2018-2019 Jari Karjala - www.jpkware.com
+ * This file is part of StarMines: The Next Generation - Copyright 2018-2020 Jari Karjala - www.jpkware.com
  * SPDX-License-Identifier: GPLv3-only
  */
 package com.jpkware.smtng
@@ -88,7 +88,7 @@ object GlobalRes {
   }
 
   def drawCopy(game: Game): Unit = {
-    val copy: BitmapText = game.add.bitmapText(game.width / 2, game.height - 32, GlobalRes.FontId, "Copyright 2018-2019 Jari Karjala - www.jpkware.com", 24)
+    val copy: BitmapText = game.add.bitmapText(game.width / 2, game.height - 32, GlobalRes.FontId, "Copyright 2018-2020 Jari Karjala - www.jpkware.com", 24)
     copy.anchor.set(0.5, 0.5)
     Progress.fetchBuild(res => copy.setText(res + " - " + copy.text))
   }

@@ -1,4 +1,4 @@
-// POV Ray StarMines models - Copyright 1999-2019 Jari Karjala - https://www.jpkware.com/
+// POV Ray StarMines models - Copyright 1999-2020 Jari Karjala - https://www.jpkware.com/
 
 #include "colors.inc"  // The include files contain
 #include "shapes.inc"  // pre-defined scene elements
