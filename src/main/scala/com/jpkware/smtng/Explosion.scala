@@ -104,7 +104,7 @@ object Explosion {
   def initGroups(game: Game, counts: Seq[Int]): Unit = {
     counts.foreach(count => {
       val group = game.add.group()
-      (1 to maxExplosions).foreach(i => group.add(new Explosion(game, count)))
+      (1 to maxExplosions).foreach(_ => group.add(new Explosion(game, count)))
       groupMap(count) = group
     })
   }

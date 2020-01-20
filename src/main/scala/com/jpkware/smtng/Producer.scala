@@ -9,7 +9,7 @@ import com.definitelyscala.phaser._
 
 class Producer(game: Game, rule: Rule, group: Group) extends Enemy(game, rule, group) {
   private val pieces: Group = game.add.group()
-  private val shape: String = rule.args(0)
+  private val shape: String = rule.args.head
   private val frames: Int = rule.args(1).toInt
   private val fps: Int = rule.args(2).toInt
   private val count: Int = rule.args(3).toInt
@@ -20,12 +20,12 @@ class Producer(game: Game, rule: Rule, group: Group) extends Enemy(game, rule, g
   private val sfxProduce: Sound = game.add.audio(Producer.SfzProduceId)
   sfxProduce.allowMultiple = true
 
-  (1 to count * 4).foreach(i => {
+  (1 to count * 4).foreach(_ => {
     val b = new ProducerPiece(game, pieceRule, pieces)
     b.kill()
   })
 
-  val timer = game.time.create(true)
+  val timer: Timer = game.time.create(true)
   timer.loop(delay, spawnPieces _, null)
   timer.start(100)
 
@@ -52,7 +52,7 @@ class Producer(game: Game, rule: Rule, group: Group) extends Enemy(game, rule, g
     var spawned = false
     // pieces.forEach((c: Sprite) => { Logger.info(s"Producer timer: ${c.frameName} ${c.alive} ${c.exists}  ${c.centerX} ${c.centerX}")}, null, false)
 
-    (1 to count).foreach(i => {
+    (1 to count).foreach(_ => {
       val b = pieces.getFirstDead()
       b match {
         case b: ProducerPiece =>

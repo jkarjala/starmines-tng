@@ -10,7 +10,7 @@ import org.scalajs.dom
 import scala.collection.mutable
 import scala.scalajs.js
 
-class TouchKeyboard(game: Game, x:Double, y:Double, limit: Int, default: String, entered: (String) => Unit) {
+class TouchKeyboard(game: Game, x:Double, y:Double, limit: Int, default: String, entered: String => Unit) {
   val keyboardButtons: Group = game.add.group()
   val lowerButtons: Group = game.add.group()
   val upperButtons: Group = game.add.group()
@@ -22,20 +22,20 @@ class TouchKeyboard(game: Game, x:Double, y:Double, limit: Int, default: String,
   var shifted = true
   var charAdded = false
 
-  val sfxTick = game.add.audio(StateNextLevel.SfxTick)
+  val sfxTick: Sound = game.add.audio(StateNextLevel.SfxTick)
 
   lowerButtons.visible = false
-  addKeys(x,y+step,lowerKeys(0), lowerButtons)
+  addKeys(x,y+step,lowerKeys.head, lowerButtons)
   addKeys(x+20,y+step*2,lowerKeys(1), lowerButtons)
   addKeys(x+40,y+step*3,lowerKeys(2), lowerButtons)
   addKeys(x+60,y+step*4,lowerKeys(3), lowerButtons)
 
-  addKeys(x,y+step,upperKeys(0), upperButtons)
+  addKeys(x,y+step,upperKeys.head, upperButtons)
   addKeys(x+20,y+step*2,upperKeys(1), upperButtons)
   addKeys(x+40,y+step*3,upperKeys(2), upperButtons)
   addKeys(x+60,y+step*4,upperKeys(3), upperButtons)
 
-  private val backspace = PhaserButton.add(game, x+lowerKeys(0).length*step,y+step, "Del", group = keyboardButtons, scale = 0.75, alpha = 1.0)
+  private val backspace = PhaserButton.add(game, x+lowerKeys.head.length*step,y+step, "Del", group = keyboardButtons, scale = 0.75, alpha = 1.0)
   backspace.events.onInputUp.add(() => delChar(), null, 1)
 
   private val shift = PhaserButton.add(game, x-step+60,y+step*4, "Shift", group = keyboardButtons, scale = 0.75, alpha = 1.0)
@@ -49,10 +49,10 @@ class TouchKeyboard(game: Game, x:Double, y:Double, limit: Int, default: String,
   output.anchor.set(0.0,0.5)
 
   def addKeys(x: Double, y: Double, keys:String, group: Group): Unit = {
-    keys.zipWithIndex.foreach { case (ch, i) => {
+    keys.zipWithIndex.foreach { case (ch, i) =>
       val button = PhaserButton.add(game, x+i*step,y, ch.toString, group = group, scale = 0.75)
       button.events.onInputUp.add(() => addChar(ch), null, 1)
-    }}
+    }
   }
 
   def clearDefault: Boolean = !charAdded && text.mkString("")==default
@@ -73,7 +73,7 @@ class TouchKeyboard(game: Game, x:Double, y:Double, limit: Int, default: String,
     if (text.nonEmpty) {
       if (clearDefault) text.clear() else {
         text.remove(text.length - 1)
-        if (text.length == 0 || text.last=='.') setShift(true) else setShift(false)
+        if (text.isEmpty || text.last=='.') setShift(true) else setShift(false)
       }
     }
     sfxTick.play()

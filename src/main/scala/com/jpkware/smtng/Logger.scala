@@ -8,7 +8,7 @@ import scala.scalajs.js
 import js.Dynamic.{ global => g }
 
 object Logger {
-  var messages: Messages = null
+  var messages: Messages = _
   var showInfo: Boolean = false
   def info(s: String): Unit = {
     if (!showInfo) return

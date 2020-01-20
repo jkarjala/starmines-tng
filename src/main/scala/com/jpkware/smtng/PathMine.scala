@@ -9,7 +9,7 @@ import com.definitelyscala.phaser._
 class PathMine(game: Game, rule: Rule, group: Group) extends Enemy(game, rule, group) {
 
   // Path syntax: z=ccw, x=cw, a=accel, d=decel, i=idle, L=loop-start, [1-9]c=repeat c per tick, [1-9]C repeat c now
-  val path = preparePath(rule.args(0))
+  val path: String = preparePath(rule.args.head)
   var pathIndex = 0
   var loopIndex = 0
   var speed = 0.0
@@ -44,7 +44,7 @@ class PathMine(game: Game, rule: Rule, group: Group) extends Enemy(game, rule, g
     var repeat = 1
     tick += 1
 
-    (1 to tickCount).foreach(i => {
+    (1 to tickCount).foreach(_ => {
       while (repeat>0) {
         repeat -= 1
         val (deltaHeading: Double, deltaSpeed: Double) = path(pathIndex) match {

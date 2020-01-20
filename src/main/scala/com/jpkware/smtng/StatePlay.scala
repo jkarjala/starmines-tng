@@ -47,7 +47,7 @@ class StatePlay(game: Game, options: Map[String,String]) extends State {
           case num if num(0).isDigit =>
             StatePlay.scores = if (num.toInt>1) Progress.restoreCheckpoint(Some(num.toInt-1)) else Scorebox.InitialScore
             checkpointRestored = StatePlay.scores.score!=0
-          case cmd =>
+          case _ =>
             Logger.warn("Unknown init cmd!")
         }
       case _ =>

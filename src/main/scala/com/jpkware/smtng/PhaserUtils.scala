@@ -57,8 +57,6 @@ object PhaserButton {
   val FrameVol1 = 22
   val FrameVol2 = 23
 
-  private var pauseMenu: Group = _
-
   def add(game: Game, x: Double, y: Double, text: String, alpha: Double = 0.75,
           group: Group = null, scale: Double = 1.5, frame: Int = FrameBasic, textFrame: Int = -1): Button = {
     val button = game.add.button(x,y, GlobalRes.ButtonId, null, null, frame, frame+1, frame+2, frame+1)
@@ -173,7 +171,7 @@ object PhaserButton {
   def createPauseMenu(game: Game, touchControls: TouchControls): Group = {
     val step = 100
     val y = 64
-    var x = game.width - 64
+    val x = game.width - 64
     val scale = 0.6
     val group = game.add.group(name = "pausemenu")
     val button = PhaserButton.add(game, x,y, "", textFrame=PhaserButton.FramePlay, scale = scale, group = group)

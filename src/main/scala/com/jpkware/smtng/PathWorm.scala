@@ -7,7 +7,7 @@ package com.jpkware.smtng
 import com.definitelyscala.phaser._
 
 class PathWorm(game: Game, rule: Rule, group: Group) extends PathMine(game, rule, group) {
-  val count = rule.args(1).toInt
+  val count: Int = rule.args(1).toInt
 
   override def reset(x: Double, y: Double, health: Double = 1): Sprite = {
     this.x = x

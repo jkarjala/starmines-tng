@@ -215,7 +215,7 @@ object Progress {
     val xhr = new XMLHttpRequest()
     xhr.open(op, url, async = true)
     xhr.setRequestHeader("Content-Type", "application/tsv")
-    xhr.onreadystatechange = { (_: Event) => { // Call a function when the state changes.
+    xhr.onreadystatechange = { _: Event => { // Call a function when the state changes.
       if (xhr.status == 200) {
         if (xhr.readyState==4) {
           Logger.info(s"XHR $op response '${xhr.response}'")
@@ -230,7 +230,7 @@ object Progress {
     if (data.isDefined) xhr.send(data.get.asInstanceOf[js.Any]) else xhr.send()
   }
 
-  def postData(path: String, data: String, callback: (Option[String]) => Unit): Unit = {
+  def postData(path: String, data: String, callback: Option[String] => Unit): Unit = {
     Logger.info(s"XHR POST $data")
     postPending = true
     serverRequest("POST", s"$scriptUrl/$path", Some(data), (result: Option[String]) => {
@@ -239,7 +239,7 @@ object Progress {
     })
   }
 
-  def fetchScores(field: Option[Int], limit: Int, callback: (Seq[HighScore]) => Unit): Unit = {
+  def fetchScores(field: Option[Int], limit: Int, callback: Seq[HighScore] => Unit): Unit = {
     val url = if (field.isDefined) s"$scriptUrl?field=${field.get}&limit=$limit" else s"$scriptUrl?limit=$limit"
     serverRequest("GET", url, None, (result: Option[String]) => {
       val scores: Seq[HighScore] = result match {
@@ -258,7 +258,7 @@ object Progress {
 
   private var buildVersion: String = "" // cached version if found
 
-  def fetchBuild(callback: (String) => Unit): Unit = {
+  def fetchBuild(callback: String => Unit): Unit = {
     if (buildVersion != "") {
       callback(buildVersion)
     }

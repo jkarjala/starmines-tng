@@ -178,7 +178,7 @@ class TouchControls(game: Game) {
 
   def addMouseControls(bg: Sprite, player: Sprite): Unit = {
     bg.inputEnabled = true
-    bg.events.onInputDown.add((spr: Sprite, ptr: Pointer) => {
+    bg.events.onInputDown.add((_: Sprite, ptr: Pointer) => {
       val deltaX = player.x - ptr.x
       val deltaY = player.y - ptr.y
       val delta =  if (math.abs(deltaX) > math.abs(deltaY)) deltaX else deltaY
@@ -190,7 +190,7 @@ class TouchControls(game: Game) {
         if (math.abs(delta) > 10) thrustRotation = math.atan2(deltaY,deltaX)
       }
     }, null, 0)
-    bg.events.onInputUp.add((spr: Sprite, ptr: Pointer) => {
+    bg.events.onInputUp.add((_: Sprite, ptr: Pointer) => {
       if (ptr.leftButton.isUp) {
         fireRotation = NoRotation
         fire = false
@@ -218,7 +218,7 @@ class TouchControls(game: Game) {
     c.inputEnabled = true
     c.input.enableDrag(lockCenter = false, bringToTop = false, pixelPerfect = false,
       boundsRect = new Rectangle(pos.x-256, pos.y-256, 512,512))
-    c.events.onDragUpdate.add((c: Sprite, pointer: Pointer, x: Double, y: Double, snap: Point, fromStart: Boolean) => {
+    c.events.onDragUpdate.add((c: Sprite, _: Pointer, x: Double, y: Double, _: Point, _: Boolean) => {
       c.alpha = 1.0
       val deltaX = pos.x - x
       val deltaY = pos.y - y
@@ -228,7 +228,7 @@ class TouchControls(game: Game) {
       rotateRight = false
       // if (delta > 0) rotateLeft = true else if (delta < 0) rotateRight = true
     }, null, 1)
-    c.events.onDragStop.add((c: Sprite, pointer: Pointer) => {
+    c.events.onDragStop.add((c: Sprite, _: Pointer) => {
       c.alpha = 0.25
       c.x = pos.x
       c.y = pos.y

@@ -9,14 +9,14 @@ import com.definitelyscala.phaser._
 
 class Splitter(game: Game, rule: Rule, group: Group) extends Enemy(game, rule, group) {
   val pieces: Group = game.add.group()
-  val shape: String = rule.args(0)
+  val shape: String = rule.args.head
   val frames: Int = rule.args(1).toInt
   val fps: Int = rule.args(2).toInt
   val count: Int = rule.args(3).toInt
   val score: Int = rule.score/count
   val pieceRule: Rule = Rule(null, shape, frames, fps, score, spd = rule.spd)
 
-  (1 to count).foreach(i => {
+  (1 to count).foreach(_ => {
     val b = new SplitterPiece(game, pieceRule, group)
     b.kill()
     pieces.add(b)
@@ -24,7 +24,7 @@ class Splitter(game: Game, rule: Rule, group: Group) extends Enemy(game, rule, g
 
   override def bulletHit(bullet: Sprite): Int = {
     super.bulletHit(bullet)
-    (1 to count).foreach(i => {
+    (1 to count).foreach(_ => {
       val b = pieces.getFirstDead()
       b match {
         case b: SplitterPiece =>

@@ -55,7 +55,7 @@ class StateLevels(game: Game, options: Map[String,String]) extends State {
         for (bx <- 0 to 3) {
           if (level <= maxLevel) {
             val b = PhaserButton.add(game, marginX + deltaX * bx, marginY, level.toString, scale = 0.7, group=gridGroup)
-            b.events.onInputUp.add( (o: Any, p: Pointer, isOver: Boolean, lvl: Int) => showInfo(lvl), null, 1, args=level)
+            b.events.onInputUp.add( (_: Any, _: Pointer, _: Boolean, lvl: Int) => showInfo(lvl), null, 1, args=level)
             val starCount = starMap.getOrElse(level.toString, 0)
             val stars = "*" * starCount
             val t = game.add.bitmapText(marginX + deltaX * bx, marginY + 32, GlobalRes.FontId, stars, 32)

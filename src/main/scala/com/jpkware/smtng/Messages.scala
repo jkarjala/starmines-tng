@@ -9,8 +9,8 @@ import com.definitelyscala.phaser.{BitmapText, Game, Timer}
 import scala.collection.mutable
 
 class Messages(game: Game) {
-  var limit: Int = 5
-  var fontSize = 40
+  val limit: Int = 5
+  val fontSize = 40
   private val texts = mutable.ArrayBuffer[BitmapText]()
   private val timer: Timer = game.time.create(false)
 
@@ -29,13 +29,13 @@ class Messages(game: Game) {
   }
 
   def tick(): Unit = {
-    val toDelete: mutable.Seq[BitmapText] = texts.flatMap {text =>
+    val toDelete: Seq[BitmapText] = texts.flatMap {text =>
         text.alpha -= 0.02
         if (text.alpha<0) {
           text.destroy()
           Some(text)
         }
-        None
+        else None
     }
     toDelete.foreach(text => texts -= text)
   }

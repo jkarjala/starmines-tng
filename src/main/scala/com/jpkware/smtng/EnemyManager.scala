@@ -11,7 +11,7 @@ case class SpawnParams(game: Game, rule: Rule, group: Group, enemyMissiles: Grou
 
 case class Rule
 (
-  spawn: (SpawnParams) => Enemy, // spawn function
+  spawn: SpawnParams => Enemy, // spawn function
   shape: String, // sprite shape name prefix
   frames: Int,   // sprite animation frame count
   fps: Int,      // animation fpx
@@ -26,7 +26,7 @@ case class Rule
   args: Seq[String] = Seq() // Additional arguments
 )
 
-class EnemyManager(game: Game, randomSafePosition: (Sprite) => Unit) {
+class EnemyManager(game: Game, randomSafePosition: Sprite => Unit) {
   val MAX = 100000
   val rules = Seq(
     Rule(Enemy.spawn, "mine",  18, 9,  125, minL=1, maxL=MAX, modL=1, minC=4, maxC=10, div=1, spd=40),
@@ -92,7 +92,7 @@ class EnemyManager(game: Game, randomSafePosition: (Sprite) => Unit) {
   }
 
   def spawnEnemies(player: Player, group: Group, enemyMissiles: Group, count: Int, rule: Rule): Unit = {
-    (1 to count).foreach(i => {
+    (1 to count).foreach(_ => {
       val enemy = rule.spawn(SpawnParams(game, rule, group, enemyMissiles, player))
       randomSafePosition(enemy)
     })

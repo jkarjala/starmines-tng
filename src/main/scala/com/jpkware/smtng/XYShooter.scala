@@ -7,7 +7,7 @@ package com.jpkware.smtng
 import com.definitelyscala.phaser._
 
 class XYShooter(game: Game, rule: Rule, group: Group, enemyMissiles: Group, player: Player) extends Enemy(game, rule, group) {
-  private val xMul: Int = rule.args(0).toInt
+  private val xMul: Int = rule.args.head.toInt
   private val yMul: Int = rule.args(1).toInt
   private val missileSpeed: Int = rule.args(2).toInt
 
@@ -19,7 +19,7 @@ class XYShooter(game: Game, rule: Rule, group: Group, enemyMissiles: Group, play
 
   val missileRule: Rule = Rule(null, Player.MissileId, 1, 1, 0, spd = missileSpeed)
   val missiles: Group = game.add.group()
-  (1 to 1).foreach(i => {
+  (1 to 1).foreach(_ => {
     val b = new EnemyMissile(game, missileRule, missiles, velo, player)
     b.tint = 0x00FF00
     b.kill()
@@ -83,10 +83,10 @@ class EnemyMissile (game: Game, rule: Rule, missiles: Group, velo: Point, player
 
   override def enemyHit(theOther: Enemy): Boolean = {
     theOther match {
-      case xy: XYShooter =>
+      case _: XYShooter =>
         if (lifespan < Lifespan-200)
           kill() // hitting XYShooter simply kills the bullet if the lifespan has decreased
-      case em: EnemyMissile =>
+      case _: EnemyMissile =>
         // Do not kill other enemy missiles
       case other: Enemy =>
         other.bulletHit(this)
