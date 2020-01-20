@@ -7,7 +7,7 @@ using the HTML5 technology and modern tools like Scala.js.
 
 You can play the game at [smtng.jpkware.com](https://smtng.jpkware.com/).
 
-![screenshot](src/main/resources/res/demo.jpg)
+![demo](raw/smtng-play3.gif)
 
 ## Development
 
